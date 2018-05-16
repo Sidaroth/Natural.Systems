@@ -1,10 +1,12 @@
 import * as PIXI from 'pixi.js';
+import config from '../config';
+import Module from './Module';
 
 import getRandomInt from 'utils/getRandomInt';
 import constrain from 'utils/constrain';
-import config from './config';
+import getUUID from 'utils/getUUID';
 
-export default class RandomWalker {
+export default class RandomWalker extends Module {
     stage = null;
     position = null;
     radius = 2;
@@ -17,7 +19,7 @@ export default class RandomWalker {
     };
 
     constructor(stage, x, y) {
-        // super();
+        super();
         this.stage = stage;
         this.position = new PIXI.Point(x, y);
     }
@@ -52,6 +54,10 @@ export default class RandomWalker {
 
         this.position.x = constrain(this.position.x, 0, config.WORLD.width);
         this.position.y = constrain(this.position.y, 0, config.WORLD.height);
+    }
+
+    clear() {
+        this.gfx.clear();
     }
 
     render() {
