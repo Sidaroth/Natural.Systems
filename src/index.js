@@ -19,22 +19,26 @@ const app = new PIXI.Application({
 const content = document.getElementById('content');
 content.appendChild(app.view);
 app.renderer.backgroundColor = 0xdddddd;
-// app.renderer.view.style.position = 'absolute';
-// app.renderer.view.style.display = 'block';
-// app.renderer.autoResize = true;
-// app.renderer.resize(window.innerWidth, window.innerHeight);
+app.renderer.view.style.position = 'absolute';
+app.renderer.view.style.display = 'block';
+app.renderer.view.style.margin = 'auto';
+app.renderer.view.style.padding = 0;
+app.renderer.view.style.top = 0;
+app.renderer.view.style.bottom = 0;
+app.renderer.view.style.left = 0;
+app.renderer.view.style.right = 0;
 
 const system = new System(app.stage, app.renderer);
+
+function mainLoop(delta) {
+    system.update(delta);
+    system.render();
+}
 
 function start() {
     system.setup();
 
     app.ticker.add(delta => mainLoop(delta));
-}
-
-function mainLoop(delta) {
-    system.update(delta);
-    system.render();
 }
 
 start();
