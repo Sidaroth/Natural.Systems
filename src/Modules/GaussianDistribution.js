@@ -18,6 +18,7 @@ export default class GaussianDistribution extends Module {
     }
 
     setup() {
+        this.columns = [];
         this.columnWidth = config.WORLD.width / this.numberOfColumns;
         for (let i = 0; i < this.numberOfColumns; i += 1) {
             this.columns.push({

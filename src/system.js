@@ -34,7 +34,7 @@ export default class System {
         };
         const guiController = this.gui.add(this.guiData, 'active', { Walker: this.walker.id, gaussianDistrib: this.gaussianDistrib.id });
 
-        guiController.onChange(id => {
+        guiController.onChange((id) => {
             this.switchModule(id);
         });
     }
