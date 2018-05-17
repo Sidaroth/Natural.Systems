@@ -15,7 +15,7 @@
     "homepage": "https://sidaroth.no",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/sdiaroth/Natural.Systems.git"
+        "url": "git+https://github.com/sidaroth/Natural.Systems.git"
     },
     "devDependencies": {
         "@babel/core": "^7.0.0-beta.46",
