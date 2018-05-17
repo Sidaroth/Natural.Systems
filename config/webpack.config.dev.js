@@ -10,8 +10,6 @@ const PATHS = {
     dist: path.join(__dirname, '../dist'),
 };
 
-console.log(PATHS);
-
 module.exports = {
     context: __dirname,
     mode: 'development',

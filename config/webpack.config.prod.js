@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const pkg = require('../package.json');
 
@@ -17,8 +18,18 @@ module.exports = {
     },
     output: {
         path: PATHS.dist,
-        filename: 'bundle.js',
-        publicPath: './dist/',
+        filename: '[name].js',
+        publicPath: './',
+    },
+    resolve: {
+        alias: {
+            styles: path.resolve(__dirname, '../styles'),
+            assets: path.resolve(__dirname, '../assets'),
+            components: path.resolve(__dirname, '../src/components'),
+            config: path.resolve(__dirname, '../src'),
+            utils: path.resolve(__dirname, '../src/utils'),
+        },
+        extensions: ['.js', '.jsx'],
     },
     module: {
         rules: [
@@ -29,7 +40,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 use: ['babel-loader'],
-                include: path.join(__dirname, 'src'),
+                exclude: /node_modules/,
             },
             {
                 test: /\.scss$/,
@@ -69,7 +80,7 @@ module.exports = {
             template: '../node_modules/html-webpack-template/index.ejs',
             title: 'Natural.Systems',
             meta: [{ name: 'robots', content: 'noindex,nofollow' }],
-            appMountIds: ['app'],
+            appMountIds: ['content'],
             inject: false,
             minify: {
                 collapseWhitespace: true,
@@ -97,14 +108,5 @@ module.exports = {
         fs: 'empty',
         net: 'empty',
         tls: 'empty',
-    },
-    resolve: {
-        alias: {
-            assets: path.resolve(__dirname, 'assets'),
-            components: path.resolve(__dirname, 'src/components'),
-            config: path.resolve(__dirname, 'src'),
-            utils: path.resolve(__dirname, 'src/utils'),
-        },
-        extensions: ['.js', '.jsx'],
     },
 };
