@@ -2,6 +2,8 @@ import * as dat from 'dat.gui';
 import RandomWalker from './Modules/RandomWalker';
 import GaussianDistribution from './Modules/GaussianDistribution';
 import config from './config';
+import BasicNoise from './Modules/BasicNoise';
+import * as PIXI from 'pixi.js';
 
 export default class System {
     stage = null;
@@ -32,7 +34,12 @@ export default class System {
         this.guiData = {
             active: '',
         };
-        const guiController = this.gui.add(this.guiData, 'active', { Walker: this.walker.id, gaussianDistrib: this.gaussianDistrib.id });
+
+        const guiController = this.gui.add(this.guiData, 'active', {
+            walker: this.walker.id,
+            gaussianDistrib: this.gaussianDistrib.id,
+            basicNoise: this.basicNoise.id,
+        });
 
         guiController.onChange((id) => {
             this.switchModule(id);
@@ -44,6 +51,7 @@ export default class System {
         if (mod) {
             if (this.startText) this.stage.removeChild(this.startText);
             if (this.activeModule) this.activeModule.clear();
+            if (this.activeModule) this.activeModule.destroy();
 
             mod.setup();
             this.activeModule = mod;
@@ -53,9 +61,11 @@ export default class System {
     createModules() {
         this.walker = new RandomWalker(this.stage, 200, 200);
         this.gaussianDistrib = new GaussianDistribution(this.stage);
+        this.basicNoise = new BasicNoise(this.stage, this.renderer);
 
         this.modules.push(this.walker);
         this.modules.push(this.gaussianDistrib);
+        this.modules.push(this.basicNoise);
     }
 
     update(delta) {
@@ -69,5 +79,15 @@ export default class System {
             this.activeModule.render();
         }
         this.renderer.render(this.stage);
+    }
+
+    destroy() {
+        this.modules.forEach((mod) => {
+            mod.destroy();
+        });
+
+        this.gui.destroy();
+        this.stage.destroy();
+        this.renderer.destroy();
     }
 }
