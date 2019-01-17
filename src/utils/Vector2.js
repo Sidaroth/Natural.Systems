@@ -105,6 +105,10 @@ export default class Vector {
     }
 
     cross(vector) {
-        return this.x * vector.y + this.y * vector.x; // eslint-disable-line
+        const x = this.y * vector.z - this.z * vector.y;
+        const y = this.z * vector.x - this.x * vector.z;
+        const z = this.x * vector.y - this.y * vector.x;
+
+        return new Vector(x, y, z);
     }
 }
