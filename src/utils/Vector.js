@@ -17,7 +17,7 @@ export default class Vector {
     }
 
     getLength() {
-        return Math.sqrt(this.x * this.x + this.y * this.y); // eslint-disable-line
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z); // eslint-disable-line
     }
 
     // Useful when comparing length of two vectors together, saves a sqrt call.
@@ -37,15 +37,16 @@ export default class Vector {
 
     getUnit() {
         const length = this.getLength();
-        return new Vector(this.x / length, this.y / length);
+        return new Vector(this.x / length, this.y / length, this.z / length);
     }
 
     // Keep in mind this function uses '+' to convert back from string as .toFixed() returns a string.
     getFixedUnit(places) {
         const unit = this.getUnit();
-        return new Vector(+unit.x.toFixed(places), +unit.y.toFixed(places));
+        return new Vector(+unit.x.toFixed(places), +unit.y.toFixed(places), +unit.z.toFixed(places));
     }
 
+    /** Currently only supports 2D rotation. TODO... */
     rotateBy(radians, pivot) {
         const res = rotatePoint(new PIXI.Point(this.x, this.y), radians, pivot);
         this.x = res.x;
@@ -55,13 +56,14 @@ export default class Vector {
     }
 
     equals(vector) {
-        return this.x === vector.x && this.y === vector.y;
+        return this.x === vector.x && this.y === vector.y && this.z === vector.z;
     }
 
     // Copy the values of another vector into this.
     copy(vector) {
         this.x = vector.x;
         this.y = vector.y;
+        this.z = vector.z;
 
         return this;
     }
@@ -101,7 +103,7 @@ export default class Vector {
 
     // products
     dot(vector) {
-        return this.x * vector.x + this.y * vector.y; // eslint-disable-line
+        return this.x * vector.x + this.y * vector.y + this.z * vector.z; // eslint-disable-line
     }
 
     cross(vector) {
