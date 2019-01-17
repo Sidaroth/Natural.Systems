@@ -2,6 +2,8 @@ import getUUID from 'utils/getUUID';
 
 export default class Module {
     id = '';
+    name ='';
+
     constructor() {
         this.id = getUUID();
     }

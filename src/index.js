@@ -35,8 +35,22 @@ function mainLoop(delta) {
     system.render();
 }
 
+function getURLParams() {
+    const params = {};
+    const query = decodeURIComponent(window.location.href.slice(window.location.href.indexOf('?') + 1));
+    query.split('&').forEach((param, k) => {
+        const parts = param.split('=', 2);
+        const key = parts[0];
+        const value = parts[1];
+        params[key] = value;
+    });
+
+    return params;
+}
+
 function start() {
-    system.setup();
+    const params = getURLParams();
+    system.setup(params);
 
     app.ticker.add(delta => mainLoop(delta));
 }

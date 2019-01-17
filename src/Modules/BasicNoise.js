@@ -33,6 +33,7 @@ export default class BasicNoise extends Module {
         super();
         this.stage = stage;
         this.noiseGen = new Noise(Math.random());
+        this.name = 'basicNoise';
     }
 
     setup(gui) {

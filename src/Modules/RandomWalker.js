@@ -22,6 +22,7 @@ export default class RandomWalker extends Module {
         super();
         this.stage = stage;
         this.position = new PIXI.Point(x, y);
+        this.name = 'randomWalker';
     }
 
     setup() {

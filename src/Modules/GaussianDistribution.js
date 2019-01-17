@@ -15,6 +15,7 @@ export default class GaussianDistribution extends Module {
     constructor(stage) {
         super();
         this.stage = stage;
+        this.name = 'gaussianDistribution';
     }
 
     setup() {

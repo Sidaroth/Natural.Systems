@@ -17,7 +17,7 @@ export default class System {
         this.renderer = renderer;
     }
 
-    setup() {
+    setup(params) {
         this.createModules();
         this.setupGui();
 
@@ -26,6 +26,11 @@ export default class System {
         this.startText.x = config.WORLD.width / 2;
         this.startText.y = config.WORLD.height / 2;
         this.stage.addChild(this.startText);
+
+        if (params.module) {
+            const startingModule = this.modules.find(m => m.name === params.module);
+            if (startingModule) this.switchModule(startingModule.id);
+        }
     }
 
     setupGui() {
@@ -41,9 +46,7 @@ export default class System {
             basicNoise: this.basicNoise.id,
         });
 
-        guiController.onChange((id) => {
-            this.switchModule(id);
-        });
+        guiController.onChange(id => this.switchModule(id));
     }
 
     switchModule(id) {
@@ -81,9 +84,7 @@ export default class System {
     }
 
     destroy() {
-        this.modules.forEach((mod) => {
-            mod.destroy();
-        });
+        this.modules.forEach(mod => mod.destroy());
 
         this.gui.destroy();
         this.stage.destroy();
