@@ -66,7 +66,6 @@ module.exports = {
         'class-methods-use-this': 'warn',
         'no-undef': 'warn',
         'no-unreachable': 'warn',
-        'no-unused-vars': 'warn',
         'no-underscore-dangle': 'off',
         'linebreak-style': ['error', 'windows'],
         'no-mixed-operators': [

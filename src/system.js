@@ -24,8 +24,15 @@ export default class System {
         this.startText = new PIXI.Text('Use the selector to select a module');
         this.startText.anchor.set(0.5, 0.5);
         this.startText.x = config.WORLD.width / 2;
-        this.startText.y = config.WORLD.height / 2;
+        this.startText.y = config.WORLD.height / 2 - this.startText.height * 2;
         this.stage.addChild(this.startText);
+
+        this.warningText = new PIXI.Text('Some of the modules use new/experimental browser features.\nThey may not work in your browser version.');
+
+        this.warningText.anchor.set(0.5, 0.5);
+        this.warningText.x = config.WORLD.width / 2;
+        this.warningText.y = config.WORLD.height / 2;
+        this.stage.addChild(this.warningText);
 
         if (params.module) {
             const startingModule = this.modules.find(m => m.name === params.module);
@@ -53,6 +60,7 @@ export default class System {
         const mod = this.modules.find(m => m.id === id);
         if (mod) {
             if (this.startText) this.stage.removeChild(this.startText);
+            if (this.warningText) this.stage.removeChild(this.warningText);
             if (this.activeModule) this.activeModule.clear();
             if (this.activeModule) this.activeModule.destroy();
 
@@ -86,6 +94,8 @@ export default class System {
     destroy() {
         this.modules.forEach(mod => mod.destroy());
 
+        this.startText.destroy();
+        this.warningText.destroy();
         this.gui.destroy();
         this.stage.destroy();
         this.renderer.destroy();
