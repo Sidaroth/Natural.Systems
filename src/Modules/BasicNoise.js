@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import config from '../config';
 import Module from './Module';
 import { Noise } from 'noisejs';
+import Vector from '../utils/Vector';
 
 function normalizeInRange(value, oldMin = -1, oldMax = 1, newMin = 0, newMax = 255) {
     return Math.round(((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin) + newMin);
@@ -34,6 +35,12 @@ export default class BasicNoise extends Module {
         this.stage = stage;
         this.noiseGen = new Noise(Math.random());
         this.name = 'basicNoise';
+
+        const vector = new Vector(1, 2, 3);
+        const vector2 = new Vector(2, 3, 4);
+        // const vector3 = Vector.add(vector, vector2);
+
+        // console.log(vector3);
     }
 
     setup(gui) {

@@ -77,6 +77,56 @@ export default class Vector {
     }
 
     // operators
+    // Support addition of vector+vector, vector+array, and vector+scalars.
+    add(x, y, z) {
+        if (x instanceof Vector) {
+            this.x += x.x || 0;
+            this.y += x.y || 0;
+            this.z += x.z || 0;
+
+            return this;
+        }
+
+        // Unsure how useful this one is.
+        if (x instanceof Array) {
+            this.x += x[0] || 0;
+            this.y += x[1] || 0;
+            this.z += x[2] || 0;
+            return this;
+        }
+
+        this.x += x || 0;
+        this.y += y || 0;
+        this.z += z || 0;
+
+        return this;
+    }
+
+    // Support substraction of vector-vector, vector-array, and vector-scalars.
+    sub(x, y, z) {
+        if (x instanceof Vector) {
+            this.x -= x.x || 0;
+            this.y -= x.y || 0;
+            this.z -= x.z || 0;
+
+            return this;
+        }
+
+        // Unsure how useful this one is.
+        if (x instanceof Array) {
+            this.x -= x[0] || 0;
+            this.y -= x[1] || 0;
+            this.z -= x[2] || 0;
+            return this;
+        }
+
+        this.x -= x || 0;
+        this.y -= y || 0;
+        this.z -= z || 0;
+
+        return this;
+    }
+
     div(scalar) {
         if (!(typeof scalar === 'number' && Math.isFinite(scalar)) || scalar === 0) {
             return this;
@@ -113,4 +163,17 @@ export default class Vector {
 
         return new Vector(x, y, z);
     }
+
+    // TODO: Add static methods.
+    // static add(vec1, vec2) {
+    //     const vector = new Vector();
+    //     vector.copy(vec1);
+    //     return vector.add(vec2);
+    // }
+
+    // static sub(vec1, vec2) {
+    //     const vector = new Vector();
+    //     vector.copy(vec1);
+    //     return vector.sub(vec2);
+    // }
 }
