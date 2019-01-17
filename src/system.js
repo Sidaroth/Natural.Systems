@@ -53,7 +53,7 @@ export default class System {
             if (this.activeModule) this.activeModule.clear();
             if (this.activeModule) this.activeModule.destroy();
 
-            mod.setup();
+            mod.setup(this.gui); // include GUI for now to simplify customization per module.
             this.activeModule = mod;
         }
     }
@@ -61,7 +61,7 @@ export default class System {
     createModules() {
         this.walker = new RandomWalker(this.stage, 200, 200);
         this.gaussianDistrib = new GaussianDistribution(this.stage);
-        this.basicNoise = new BasicNoise(this.stage, this.renderer);
+        this.basicNoise = new BasicNoise(this.stage);
 
         this.modules.push(this.walker);
         this.modules.push(this.gaussianDistrib);
@@ -78,7 +78,6 @@ export default class System {
         if (this.activeModule) {
             this.activeModule.render();
         }
-        this.renderer.render(this.stage);
     }
 
     destroy() {
