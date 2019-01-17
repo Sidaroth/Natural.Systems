@@ -22,7 +22,17 @@ export default class Vector {
 
     // Useful when comparing length of two vectors together, saves a sqrt call.
     squaredLength() {
-        return this.x * this.x + this.y * this.y; // eslint-disable-line
+        return this.x * this.x + this.y * this.y + this.z * this.z; // eslint-disable-line
+    }
+
+    // Limit the magnitude to the specified 'max' value.
+    limit(max) {
+        const squaredMag = this.squaredLength();
+        if (squaredMag > max * max) {
+            this.div(Math.sqrt(squaredMag)).mult(max);
+        }
+
+        return this;
     }
 
     getUnit() {
@@ -40,6 +50,8 @@ export default class Vector {
         const res = rotatePoint(new PIXI.Point(this.x, this.y), radians, pivot);
         this.x = res.x;
         this.y = res.y;
+
+        return this;
     }
 
     equals(vector) {
@@ -50,6 +62,8 @@ export default class Vector {
     copy(vector) {
         this.x = vector.x;
         this.y = vector.y;
+
+        return this;
     }
 
     // Return a clone of this vector.
@@ -58,6 +72,31 @@ export default class Vector {
         vector.copy(this);
 
         return vector;
+    }
+
+    // operators
+    div(scalar) {
+        if (!(typeof scalar === 'number' && Math.isFinite(scalar)) || scalar === 0) {
+            return this;
+        }
+
+        this.x /= scalar;
+        this.y /= scalar;
+        this.z /= scalar;
+
+        return this;
+    }
+
+    mult(scalar) {
+        if (!(typeof scalar === 'number' && Math.isFinite(scalar))) {
+            return this;
+        }
+
+        this.x *= scalar;
+        this.y *= scalar;
+        this.z *= scalar;
+
+        return this;
     }
 
     // products
