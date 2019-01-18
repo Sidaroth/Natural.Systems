@@ -2,9 +2,8 @@ import * as PIXI from 'pixi.js';
 import config from '../config';
 import Module from './Module';
 
-import getRandomInt from 'utils/getRandomInt';
-import constrain from 'utils/constrain';
-import getUUID from 'utils/getUUID';
+import getRandomInt from 'math/getRandomInt';
+import constrain from 'math/constrain';
 
 export default class RandomWalker extends Module {
     stage = null;

@@ -3,7 +3,6 @@ import rotatePoint from './rotatePoint';
 
 /**
  * Homegrown basic vector class.
- * TODO: Expand to 3d.
  */
 export default class Vector {
     x = null;
@@ -16,8 +15,14 @@ export default class Vector {
         this.z = z;
     }
 
+    // get length/magnitude.
     getLength() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z); // eslint-disable-line
+    }
+
+    // set the magnitude/length of the vector.
+    setLength(length) {
+        return this.getUnit().multiply(length);
     }
 
     // Useful when comparing length of two vectors together, saves a sqrt call.
@@ -29,10 +34,15 @@ export default class Vector {
     limit(max) {
         const squaredMag = this.squaredLength();
         if (squaredMag > max * max) {
-            this.div(Math.sqrt(squaredMag)).mult(max);
+            this.div(Math.sqrt(squaredMag)).multiply(max);
         }
 
         return this;
+    }
+
+    // Calculates the Euclidean distance between two points (vectors)
+    dist(vector) {
+        return vector.copy().sub(this).getLength();
     }
 
     getUnit() {
@@ -139,7 +149,7 @@ export default class Vector {
         return this;
     }
 
-    mult(scalar) {
+    multiply(scalar) {
         if (!(typeof scalar === 'number' && Math.isFinite(scalar))) {
             return this;
         }
@@ -164,7 +174,7 @@ export default class Vector {
         return new Vector(x, y, z);
     }
 
-    // TODO: Add static methods.
+    // TODO Add static methods.
     // static add(vec1, vec2) {
     //     const vector = new Vector();
     //     vector.copy(vec1);

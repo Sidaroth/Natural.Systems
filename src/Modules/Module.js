@@ -1,4 +1,4 @@
-import getUUID from 'utils/getUUID';
+import getUUID from 'math/getUUID';
 
 export default class Module {
     id = '';

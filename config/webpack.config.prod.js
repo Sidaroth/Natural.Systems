@@ -27,7 +27,7 @@ module.exports = {
             assets: path.resolve(__dirname, '../assets'),
             components: path.resolve(__dirname, '../src/components'),
             config: path.resolve(__dirname, '../src'),
-            utils: path.resolve(__dirname, '../src/utils'),
+            math: path.resolve(__dirname, '../src/math'),
         },
         extensions: ['.js', '.jsx'],
     },

@@ -2,12 +2,12 @@ import * as PIXI from 'pixi.js';
 import config from '../config';
 import Module from './Module';
 
-import gaussian from '../utils/gaussian';
-import constrain from '../utils/constrain';
+import gaussian from 'math/gaussian';
+import constrain from 'math/constrain';
 
 export default class GaussianDistribution extends Module {
     stage = null;
-    numberOfColumns = 20;
+    numberOfColumns = 60;
     columnWidth = 0;
     columns = [];
     growth = 2;
@@ -29,8 +29,7 @@ export default class GaussianDistribution extends Module {
             });
         }
 
-        // TODO: base this on number of columns.
-        this.gen = gaussian(10, 2);
+        this.gen = gaussian(this.numberOfColumns / 2, this.numberOfColumns / 10);
 
         this.gfx = new PIXI.Graphics();
         this.stage.addChild(this.gfx);
