@@ -19,14 +19,6 @@ export default class BasicNoise extends Module {
     sprite = null;
     width = 4;
     height = 4;
-    zoom = 20;
-
-    speedMax = 250;
-    speedMin = 1;
-    zoomMax = 150;
-    zoomMin = 1;
-    speed = 20;
-
     gui = null;
     type = 'perlin';
 
@@ -37,7 +29,26 @@ export default class BasicNoise extends Module {
         this.name = 'basicNoise';
     }
 
+    reset() {
+        this.zoom = 50;
+        this.speedMax = 250;
+        this.speedMin = 0;
+        this.zoomMax = 150;
+        this.zoomMin = 1;
+        this.speed = 10;
+
+        this.redThreshold = 0;
+        this.greenThreshold = 0;
+        this.blueThreshold = 0;
+
+        this.red = 16;
+        this.green = 0;
+        this.blue = 0;
+        this.alpha = 255;
+    }
+
     setup(gui) {
+        this.reset();
         this.setupGUI(gui);
         this.height = config.WORLD.height;
         this.width = config.WORLD.width;
@@ -52,9 +63,17 @@ export default class BasicNoise extends Module {
     setupGUI(gui) {
         this.gui = gui;
         this.folder = this.gui.addFolder('Noise settings');
-        this.folder.add(this, 'type', ['perlin', 'simplex']);
-        this.folder.add(this, 'speed', this.speedMin, this.speedMax);
-        this.folder.add(this, 'zoom', this.zoomMin, this.zoomMax);
+        this.folder.add(this, 'type', ['perlin', 'simplex']).listen();
+        this.folder.add(this, 'speed', this.speedMin, this.speedMax).listen();
+        this.folder.add(this, 'zoom', this.zoomMin, this.zoomMax).listen();
+        this.folder.add(this, 'redThreshold', -50, 50).listen();
+        this.folder.add(this, 'greenThreshold', -50, 50).listen();
+        this.folder.add(this, 'blueThreshold', -50, 50).listen();
+        this.folder.add(this, 'red', 0, 64).listen();
+        this.folder.add(this, 'green', 0, 64).listen();
+        this.folder.add(this, 'blue', 0, 64).listen();
+        this.folder.add(this, 'alpha', 0, 255).listen();
+        this.folder.add(this, 'reset');
     }
 
     generateNoise() {
@@ -63,27 +82,26 @@ export default class BasicNoise extends Module {
                 const bufferIndex = (y * this.width + x) * 4; // we move 4 by 4 over in X because the array is set up as [R, G, B, A, R, G, B, A...]
 
                 let val;
-                // simplex3
                 if (this.type === 'simplex') {
-                    val = normalizeInRange(this.noiseGen.simplex3(x / this.zoom, y / this.zoom, this.runtime));
-                    this.imageBuffer.data[bufferIndex] = val; // R
+                    val = this.noiseGen.simplex3(x / this.zoom, y / this.zoom, this.runtime) * 256;
                 } else if (this.type === 'perlin') {
-                    // perlin3 with coloring.
                     val = this.noiseGen.perlin3(x / this.zoom, y / this.zoom, this.runtime) * 256;
-                    this.imageBuffer.data[bufferIndex] = val + Math.max(0, (25 - val) * 8); // R
                 }
 
-                // other channels.
-                this.imageBuffer.data[bufferIndex + 1] = val; // G
-                this.imageBuffer.data[bufferIndex + 2] = val; // B
-                this.imageBuffer.data[bufferIndex + 3] = 255; // A
+                this.imageBuffer.data[bufferIndex] = val + Math.max(0, (this.redThreshold - val) * this.red); // R
+                this.imageBuffer.data[bufferIndex + 1] = val + Math.max(0, (this.greenThreshold - val) * this.green); // G
+                this.imageBuffer.data[bufferIndex + 2] = val + Math.max(0, (this.blueThreshold - val) * this.blue); // B
+                this.imageBuffer.data[bufferIndex + 3] = this.alpha; // A
             }
         }
     }
 
     update(delta) {
-        this.runtime += delta * (this.speed / 1000);
-        this.generateNoise();
+        // only recalculate if a speed is set.
+        if (this.speed > 0) {
+            this.runtime += delta * (this.speed / 1000);
+            this.generateNoise();
+        }
     }
 
     clear() {

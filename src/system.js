@@ -36,7 +36,9 @@ export default class System {
 
         if (params.module) {
             const startingModule = this.modules.find(m => m.name === params.module);
-            if (startingModule) this.switchModule(startingModule.id);
+            if (startingModule) {
+                this.switchModule(startingModule.id);
+            }
         }
     }
 
