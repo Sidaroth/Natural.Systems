@@ -65,7 +65,6 @@ export default class System {
         if (mod) {
             if (this.startText) this.stage.removeChild(this.startText);
             if (this.warningText) this.stage.removeChild(this.warningText);
-            if (this.activeModule) this.activeModule.clear();
             if (this.activeModule) this.activeModule.destroy();
 
             mod.setup(this.gui); // include GUI for now to simplify customization per module.

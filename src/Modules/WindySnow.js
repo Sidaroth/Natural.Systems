@@ -17,21 +17,8 @@ export default class WindySnow extends Module {
         super();
         this.stage = stage;
         this.name = 'windySnow';
-
-        this.bgfx = new PIXI.Graphics();
-        this.stage.addChild(this.bgfx);
-
         this.noiseGen = new Noise(Math.random());
         this.gravity = new Vector(0, 0.0981);
-        this.time = 0;
-
-        for (let i = 0; i < this.count; i += 1) {
-            const snowFlake = new PhysicsObject();
-            snowFlake.limitVelocityTo(5);
-            snowFlake.location.set(getRandomInt(0, config.WORLD.width), getRandomInt(0, config.WORLD.height));
-
-            this.snowFlakes.push(snowFlake);
-        }
     }
 
     checkEdges() {
@@ -54,8 +41,24 @@ export default class WindySnow extends Module {
         });
     }
 
-    setup() {
-        this.snowFlakes.forEach(snowFlake => this.stage.addChild(snowFlake));
+    addSnowflake() {
+        const snowFlake = new PhysicsObject();
+        snowFlake.limitVelocityTo(5);
+        snowFlake.location.set(getRandomInt(0, config.WORLD.width), getRandomInt(0, config.WORLD.height));
+
+        this.stage.addChild(snowFlake);
+        this.snowFlakes.push(snowFlake);
+    }
+
+    // TODO fix module options for wind speed, gravity and number of snowflake modifiers.
+    setup(gui) {
+        this.time = 0;
+        this.bgfx = new PIXI.Graphics();
+        this.stage.addChild(this.bgfx);
+
+        for (let i = 0; i < this.count; i += 1) {
+            this.addSnowflake();
+        }
     }
 
     update(delta) {
@@ -98,15 +101,15 @@ export default class WindySnow extends Module {
         this.bgfx.drawRect(0, config.WORLD.height - config.WORLD.height * 0.15, config.WORLD.width, config.WORLD.height * 0.33);
         this.bgfx.endFill();
 
-
         this.snowFlakes.forEach(snowFlake => snowFlake.render());
     }
 
     destroy() {
         this.snowFlakes.forEach((snowFlake) => {
             this.stage.removeChild(snowFlake);
-            this.snowFlake.destroy();
+            snowFlake.destroy();
         });
+        this.snowFlakes = [];
 
         if (this.bgfx) {
             this.stage.removeChild(this.bgfx);
