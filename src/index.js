@@ -28,6 +28,14 @@ app.renderer.view.style.bottom = 0;
 app.renderer.view.style.left = 0;
 app.renderer.view.style.right = 0;
 
+// Source code link.
+const div = document.createElement('div');
+const sourceTag = document.createElement('a');
+sourceTag.setAttribute('href', 'https://github.com/Sidaroth/Natural.Systems');
+sourceTag.innerHTML = 'Source code';
+div.appendChild(sourceTag);
+content.appendChild(div);
+
 const system = new System(app.stage, app.renderer);
 
 function mainLoop(delta) {
