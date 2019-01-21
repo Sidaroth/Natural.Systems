@@ -56,17 +56,17 @@ export default class RandomWalker extends Module {
         this.position.y = constrain(this.position.y, 0, config.WORLD.height);
     }
 
-    clear() {
-        this.gfx.clear();
-    }
-
     render() {
+        // this.gfx.clear();
         this.gfx.beginFill(0x000000);
         this.gfx.drawCircle(this.position.x, this.position.y, this.radius);
         this.gfx.endFill();
     }
 
     destroy() {
-        this.stage.removeChild(this.gfx);
+        if (this.gfx) {
+            this.stage.removeChild(this.gfx);
+            this.gfx.destroy();
+        }
     }
 }

@@ -15,6 +15,12 @@ export default class Vector {
         this.z = z;
     }
 
+    zero() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    }
+
     // get length/magnitude.
     getLength() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z); // eslint-disable-line
@@ -40,9 +46,16 @@ export default class Vector {
         return this;
     }
 
+    inverse() {
+        return this.multiply(-1);
+    }
+
     // Calculates the Euclidean distance between two points (vectors)
     dist(vector) {
-        return vector.copy().sub(this).getLength();
+        return vector
+            .copy()
+            .sub(this)
+            .getLength();
     }
 
     getUnit() {
@@ -71,24 +84,40 @@ export default class Vector {
 
     // Copy the values of another vector into this.
     copy(vector) {
-        this.x = vector.x;
-        this.y = vector.y;
-        this.z = vector.z;
+        this.x = vector.x || 0;
+        this.y = vector.y || 0;
+        this.z = vector.z || 0;
+
+        return this;
+    }
+
+    set(x, y = undefined, z = undefined) {
+        if (x instanceof Vector) {
+            return this.copy(x);
+        }
+
+        if (x instanceof Array) {
+            this.x += x[0] || 0;
+            this.y += x[1] || 0;
+            this.z += x[2] || 0;
+            return this;
+        }
+
+        this.x += x || 0;
+        this.y += y || 0;
+        this.z += z || 0;
 
         return this;
     }
 
     // Return a clone of this vector.
     clone() {
-        const vector = new Vector();
-        vector.copy(this);
-
-        return vector;
+        return new Vector().copy(this);
     }
 
     // operators
     // Support addition of vector+vector, vector+array, and vector+scalars.
-    add(x, y, z) {
+    add(x, y = undefined, z = undefined) {
         if (x instanceof Vector) {
             this.x += x.x || 0;
             this.y += x.y || 0;
@@ -113,7 +142,7 @@ export default class Vector {
     }
 
     // Support substraction of vector-vector, vector-array, and vector-scalars.
-    sub(x, y, z) {
+    sub(x, y = undefined, z = undefined) {
         if (x instanceof Vector) {
             this.x -= x.x || 0;
             this.y -= x.y || 0;
@@ -138,7 +167,7 @@ export default class Vector {
     }
 
     div(scalar) {
-        if (!(typeof scalar === 'number' && Math.isFinite(scalar)) || scalar === 0) {
+        if (!(typeof scalar === 'number' && Number.isFinite(scalar)) || scalar === 0) {
             return this;
         }
 
@@ -150,7 +179,7 @@ export default class Vector {
     }
 
     multiply(scalar) {
-        if (!(typeof scalar === 'number' && Math.isFinite(scalar))) {
+        if (!(typeof scalar === 'number' && Number.isFinite(scalar))) {
             return this;
         }
 

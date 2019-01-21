@@ -1,9 +1,10 @@
 import * as dat from 'dat.gui';
+import * as PIXI from 'pixi.js';
 import RandomWalker from './Modules/RandomWalker';
 import GaussianDistribution from './Modules/GaussianDistribution';
-import config from './config';
 import BasicNoise from './Modules/BasicNoise';
-import * as PIXI from 'pixi.js';
+import WindySnow from './Modules/WindySnow';
+import config from './config';
 
 export default class System {
     stage = null;
@@ -53,6 +54,7 @@ export default class System {
             walker: this.walker.id,
             gaussianDistrib: this.gaussianDistrib.id,
             basicNoise: this.basicNoise.id,
+            windySnow: this.windySnow.id,
         });
 
         guiController.onChange(id => this.switchModule(id));
@@ -75,10 +77,12 @@ export default class System {
         this.walker = new RandomWalker(this.stage, 200, 200);
         this.gaussianDistrib = new GaussianDistribution(this.stage);
         this.basicNoise = new BasicNoise(this.stage);
+        this.windySnow = new WindySnow(this.stage);
 
         this.modules.push(this.walker);
         this.modules.push(this.gaussianDistrib);
         this.modules.push(this.basicNoise);
+        this.modules.push(this.windySnow);
     }
 
     update(delta) {

@@ -2,10 +2,12 @@ import getUUID from 'math/getUUID';
 
 export default class Module {
     id = '';
-    name ='';
+    name = '';
+    stage = null;
 
     constructor() {
         this.id = getUUID();
+        this.name = `ModuleId: ${this.id}`;
     }
 
     setup() {
@@ -13,10 +15,6 @@ export default class Module {
     }
 
     update() {
-        console.error('must be implemented in child class');
-    }
-
-    clear() {
         console.error('must be implemented in child class');
     }
 

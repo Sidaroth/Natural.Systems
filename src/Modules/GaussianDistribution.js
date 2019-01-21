@@ -44,12 +44,8 @@ export default class GaussianDistribution extends Module {
         this.columns.height = constrain(this.columns[index].height, 0, config.WORLD.height);
     }
 
-    clear() {
-        this.gfx.clear();
-    }
-
     render() {
-        this.clear();
+        this.gfx.clear();
         this.gfx.beginFill(0xaaaaaa);
         this.gfx.lineStyle(1, 0x000000, 1);
 
@@ -59,5 +55,10 @@ export default class GaussianDistribution extends Module {
         this.gfx.endFill();
     }
 
-    destroy() {}
+    destroy() {
+        if (this.gfx) {
+            this.stage.removeChild(this.gfx);
+            this.gfx.destroy();
+        }
+    }
 }
