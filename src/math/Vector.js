@@ -40,7 +40,7 @@ export default class Vector {
     limit(max) {
         const squaredMag = this.squaredLength();
         if (squaredMag > max * max) {
-            this.div(Math.sqrt(squaredMag)).multiply(max);
+            this.divide(Math.sqrt(squaredMag)).multiply(max);
         }
 
         return this;
@@ -166,7 +166,7 @@ export default class Vector {
         return this;
     }
 
-    div(scalar) {
+    divide(scalar) {
         if (!(typeof scalar === 'number' && Number.isFinite(scalar)) || scalar === 0) {
             return this;
         }
@@ -203,16 +203,20 @@ export default class Vector {
         return new Vector(x, y, z);
     }
 
-    // TODO Add static methods.
-    // static add(vec1, vec2) {
-    //     const vector = new Vector();
-    //     vector.copy(vec1);
-    //     return vector.add(vec2);
-    // }
+    // Static operators
+    static divide(vec, scalar) {
+        return vec.clone().divide(scalar);
+    }
 
-    // static sub(vec1, vec2) {
-    //     const vector = new Vector();
-    //     vector.copy(vec1);
-    //     return vector.sub(vec2);
-    // }
+    static multiply(vec, scalar) {
+        return vec.clone().multiply(scalar);
+    }
+
+    static add(vec1, vec2) {
+        return vec1.clone().add(vec2);
+    }
+
+    static sub(vec1, vec2) {
+        return vec1.clone().sub(vec2);
+    }
 }
