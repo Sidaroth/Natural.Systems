@@ -13,6 +13,20 @@ export default class Rect {
         this.h = h;
     }
 
+    getVertices() {
+        const pos = this.getPosition();
+        const size = this.getSize();
+
+        const vertices = [
+            pos,
+            new Vector(pos.x + size.x, pos.y),
+            new Vector(pos.x + size.x, pos.y + size.y),
+            new Vector(pos, pos.y + size.y),
+        ];
+
+        return vertices;
+    }
+
     getSize() {
         return new Vector(this.w, this.h);
     }

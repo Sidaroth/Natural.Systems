@@ -4,10 +4,8 @@ export default class Polygon {
     vertices = [];
     sprite;
     position;
-    name;
 
-    constructor(vertices, name = '') {
-        this.name = name;
+    constructor(vertices) {
         [this.position] = vertices;
         this.vertices = vertices;
     }
@@ -29,9 +27,9 @@ export default class Polygon {
         return edges;
     }
 
-    rotateBy(angle) {
+    rotateBy(angle, pivot = this.vertices[0]) {
         this.vertices.forEach((vertex) => {
-            vertex.rotateBy(angle, this.vertices[0]);
+            vertex.rotateBy(angle, pivot);
         });
     }
 
@@ -54,5 +52,27 @@ export default class Polygon {
         });
 
         gfx.endFill();
+    }
+
+    // See https://en.wikipedia.org/wiki/Centroid#Centroid_of_a_polygon
+    getCentroid() {
+        let centerX = 0;
+        let centerY = 0;
+        let area = 0;
+
+        this.vertices.forEach((vertex, i) => {
+            const nextVertex = this.vertices[(i + 1) % this.vertices.length];
+
+            const a = vertex.x * nextVertex.y - nextVertex.x * vertex.y;
+            centerX += (vertex.x + nextVertex.x) * a;
+            centerY += (vertex.y + nextVertex.y) * a;
+            area += a;
+        });
+
+        area *= 3;
+        centerX /= area;
+        centerY /= area;
+
+        return new Vector(centerX, centerY);
     }
 }

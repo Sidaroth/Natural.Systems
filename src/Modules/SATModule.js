@@ -2,18 +2,16 @@ import * as PIXI from 'pixi.js';
 import Module from './Module';
 import config from '../config';
 import Region from '../components/Region';
-import Rect from '../shapes/rect';
 import Polygon from '../shapes/polygon';
-import Circle from '../shapes/circle';
 import store from '../store';
 import Vector from '../math/Vector';
+import getRandomInt from '../math/getRandomInt';
 import SAT from '../math/sat';
-import SATJS from 'sat';
 
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
 // https://www.wikiwand.com/en/Hyperplane_separation_theorem
 export default class SATModule extends Module {
-    rects = [];
+    obstacles = [];
     gfx = new PIXI.Graphics();
 
     innerRegionOffset = 40;
@@ -24,6 +22,7 @@ export default class SATModule extends Module {
     boxWidth = 25;
     boxHeight = 25;
     box;
+    forceVec = new Vector();
 
     constructor(stage) {
         super();
@@ -36,51 +35,117 @@ export default class SATModule extends Module {
         this.stage.addChild(this.innerRegion.gfx);
     }
 
+    createObstacles() {
+        const leftEdge = new Polygon([
+            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y),
+            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y + this.innerRegionHeight),
+            new Vector(this.innerRegion.bounds.x - 10, this.innerRegion.bounds.y + this.innerRegionHeight),
+            new Vector(this.innerRegion.bounds.x - 10, this.innerRegion.bounds.y),
+        ]);
+        const topEdge = new Polygon([
+            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y),
+            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y - 10),
+            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y - 10),
+            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y),
+        ]);
+        const rightEdge = new Polygon([
+            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y),
+            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth + 10, this.innerRegion.bounds.y),
+            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth + 10, this.innerRegion.bounds.y + this.innerRegionHeight),
+            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y + this.innerRegionHeight),
+        ]);
+        const bottomEdge = new Polygon([
+            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y + this.innerRegionHeight),
+            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y + this.innerRegionHeight),
+            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y + this.innerRegionHeight + 10),
+            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y + this.innerRegionHeight + 10),
+        ]);
+
+        this.obstacles.push(leftEdge);
+        this.obstacles.push(topEdge);
+        this.obstacles.push(rightEdge);
+        this.obstacles.push(bottomEdge);
+
+        let pos = new Vector(75, 75);
+        const obs1 = new Polygon([pos, new Vector(75, 125), new Vector(125, 75)]);
+        this.obstacles.push(obs1);
+
+        pos = new Vector(150, 150);
+        const obs2 = new Polygon([pos, new Vector(225, 150), new Vector(225, 225), new Vector(150, 225)]);
+        this.obstacles.push(obs2);
+
+        pos = new Vector(400, 300);
+        const obs3 = new Polygon([pos, new Vector(500, 300), new Vector(500, 400), new Vector(400, 400)]);
+        this.obstacles.push(obs3);
+
+        pos = new Vector(600, 400);
+        const obs4 = new Polygon([pos, new Vector(650, 450), new Vector(615, 375)]);
+        this.obstacles.push(obs4);
+
+        pos = new Vector(150, 400);
+        const obs5 = new Polygon([pos, new Vector(150, 450), new Vector(250, 500), new Vector(350, 450), new Vector(350, 400), new Vector(250, 350)]);
+        this.obstacles.push(obs5);
+
+        pos = new Vector(600, 75);
+        const obs6 = new Polygon([pos, new Vector(700, 150), new Vector(500, 150)]);
+        this.obstacles.push(obs6);
+    }
+
     setup() {
         this.drawBoundary();
-        SAT.setDebugStage(this.stage);
+        this.createObstacles();
+        this.stage.addChild(this.gfx);
 
-        const v1 = new Vector(125, 125);
-        const v2 = new Vector(325, 125);
-        const v4 = new Vector(125, 325);
-        this.triangle = new Polygon([v1, v2, v4], 'trianglePoly');
-
-        const boxPosX = this.innerRegion.bounds.x + 200;
-        const boxPosY = this.innerRegion.bounds.y + 10;
-
+        const boxPosX = this.innerRegion.bounds.x + this.innerRegionWidth / 2;
+        const boxPosY = this.innerRegion.bounds.y + 200;
         const boxVertices = [
             new Vector(boxPosX, boxPosY),
             new Vector(boxPosX + this.boxWidth, boxPosY),
             new Vector(boxPosX + this.boxWidth, boxPosY + this.boxHeight),
             new Vector(boxPosX, boxPosY + this.boxHeight),
         ];
-        this.box = new Polygon(boxVertices, 'mouseBox');
-        this.stage.addChild(this.gfx);
+        this.box = new Polygon(boxVertices);
+
+        this.forceVec = new Vector(1, 1);
     }
 
-    update() {
-        const mousePos = store.renderer.plugins.interaction.mouse.global;
-        this.box.setPosition(mousePos.x, mousePos.y);
+    drawVector(pos, vector) {
+        this.gfx.beginFill();
+        this.gfx.lineStyle(3, 0xff0000);
+        this.gfx.moveTo(pos.x, pos.y);
+        this.gfx.lineTo(pos.x + vector.x, pos.y + vector.y);
+        this.gfx.endFill();
+    }
 
-        const SATResponse = SAT.checkPolygonPolygon(this.box, this.triangle);
+    update(delta) {
+        this.box.setPosition(this.box.position.x + (this.forceVec.x * delta), this.box.position.y + (this.forceVec.y * delta));
+        this.box.rotateBy(0.05, this.box.getCentroid());
 
-        // Rendering here for debug drawing for now...
+        this.obstacles.forEach((obj) => {
+            const SATResponse = SAT.checkPolygonPolygon(this.box, obj);
+
+            if (!SATResponse.isSeparating) {
+                // TODO: Do something more exciting on collisions...
+                const xSign = getRandomInt(0, 1) ? 1 : -1;
+                const ySign = getRandomInt(0, 1) ? 1 : -1;
+                this.forceVec = new Vector(3 * xSign, 3 * ySign);
+                this.box.setPosition(this.box.position.x + SATResponse.overlapVector.x, this.box.position.y + SATResponse.overlapVector.y);
+            }
+        });
+    }
+
+    render() {
         this.gfx.clear();
-        this.triangle.render(this.gfx);
         this.box.render(this.gfx);
+        this.obstacles.forEach((obstacle) => {
+            obstacle.render(this.gfx);
+        });
 
-        if (!SATResponse.isSeparating) {
-            // console.log(SATResponse.overlapVector, satjsResponse.overlapV);
-            this.gfx.beginFill();
-            this.gfx.lineStyle(3, 0xff0000);
-            this.gfx.moveTo(this.box.position.x, this.box.position.y);
-            this.gfx.lineTo(this.box.position.x + SATResponse.overlapVector.x, this.box.position.y + SATResponse.overlapVector.y);
-            this.gfx.endFill();
-            this.box.setPosition(this.box.position.x + SATResponse.overlapVector.x, this.box.y + SATResponse.overlapVector.y);
-        }
+        const centroid = this.box.getCentroid();
+        this.gfx.beginFill(0x000000);
+        this.gfx.drawCircle(centroid.x, centroid.y, 1);
+        this.gfx.endFill();
     }
-
-    render() {}
 
     destroy() {
         this.stage.removeChild(this.innerRegion.gfx);
