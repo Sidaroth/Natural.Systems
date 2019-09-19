@@ -4,6 +4,7 @@ import RandomWalker from './Modules/RandomWalker';
 import GaussianDistribution from './Modules/GaussianDistribution';
 import BasicNoise from './Modules/BasicNoise';
 import WindySnow from './Modules/WindySnow';
+import SAT from './Modules/SATModule';
 import config from './config';
 
 export default class System {
@@ -55,6 +56,7 @@ export default class System {
             gaussianDistrib: this.gaussianDistrib.id,
             basicNoise: this.basicNoise.id,
             windySnow: this.windySnow.id,
+            SAT: this.sat.id,
         });
 
         guiController.onChange(id => this.switchModule(id));
@@ -77,11 +79,13 @@ export default class System {
         this.gaussianDistrib = new GaussianDistribution(this.stage);
         this.basicNoise = new BasicNoise(this.stage);
         this.windySnow = new WindySnow(this.stage);
+        this.sat = new SAT(this.stage);
 
         this.modules.push(this.walker);
         this.modules.push(this.gaussianDistrib);
         this.modules.push(this.basicNoise);
         this.modules.push(this.windySnow);
+        this.modules.push(this.sat);
     }
 
     update(delta) {

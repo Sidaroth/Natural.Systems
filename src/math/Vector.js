@@ -5,9 +5,9 @@ import rotatePoint from './rotatePoint';
  * Homegrown basic vector class.
  */
 export default class Vector {
-    x = null;
-    y = null;
-    z = null;
+    x;
+    y;
+    z;
 
     constructor(x = 0, y = 0, z = 0) {
         this.x = x;
@@ -60,7 +60,12 @@ export default class Vector {
 
     getUnit() {
         const length = this.getLength();
-        return new Vector(this.x / length, this.y / length, this.z / length);
+        let ret = this;
+        if (length > 0) {
+            ret = new Vector(this.x / length, this.y / length, this.z / length);
+        }
+
+        return ret;
     }
 
     // Keep in mind this function uses '+' to convert back from string as .toFixed() returns a string.
@@ -76,6 +81,16 @@ export default class Vector {
         this.y = res.y;
 
         return this;
+    }
+
+    // Project this vector onto another vector.
+    project(other) {
+        const d = this.dot(other) / other.squaredLength();
+        return Vector.multiply(other, d);
+    }
+
+    perpendicular() {
+        return new Vector(-this.y, this.x); // Effectively rotates the vector 90 degrees counter-clockwise.
     }
 
     equals(vector) {
@@ -218,5 +233,17 @@ export default class Vector {
 
     static sub(vec1, vec2) {
         return vec1.clone().sub(vec2);
+    }
+
+    static dot(vec1, vec2) {
+        return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+    }
+
+    static cross(vec1, vec2) {
+        const x = vec1.y * vec2.z - vec1.z * vec2.y;
+        const y = vec1.z * vec2.x - vec1.x * vec2.z;
+        const z = vec1.x * vec2.y - vec1.y * vec2.x;
+
+        return new Vector(x, y, z);
     }
 }

@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import System from './system';
 import config from './config';
+import store from './store';
 
 let type = 'WebGL';
 if (!PIXI.utils.isWebGLSupported) {
@@ -27,6 +28,9 @@ app.renderer.view.style.top = 0;
 app.renderer.view.style.bottom = 0;
 app.renderer.view.style.left = 0;
 app.renderer.view.style.right = 0;
+
+store.app = app;
+store.renderer = app.renderer;
 
 // Source code link.
 const div = document.createElement('div');
