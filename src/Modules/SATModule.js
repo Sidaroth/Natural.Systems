@@ -11,14 +11,14 @@ import SAT from '../math/sat';
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
 // https://www.wikiwand.com/en/Hyperplane_separation_theorem
 export default class SATModule extends Module {
-    edges = [];
-    obstacles = [];
-    gfx = new PIXI.Graphics();
+    edges;
+    obstacles;
+    gfx;
 
     innerRegionOffset = 40;
     innerRegionWidth = config.WORLD.width - 2 * this.innerRegionOffset;
     innerRegionHeight = config.WORLD.height - 2 * this.innerRegionOffset;
-    innerRegion = new Region(this.innerRegionOffset, this.innerRegionOffset, this.innerRegionWidth, this.innerRegionHeight);
+    innerRegion;
 
     boxWidth = 25;
     boxHeight = 25;
@@ -117,6 +117,11 @@ export default class SATModule extends Module {
     }
 
     setup(gui) {
+        this.edges = [];
+        this.obstacles = [];
+        this.gfx = new PIXI.Graphics();
+        this.innerRegion = new Region(this.innerRegionOffset, this.innerRegionOffset, this.innerRegionWidth, this.innerRegionHeight)
+
         this.setupGUI(gui);
         this.drawBoundary();
         this.createObstacles();
@@ -187,8 +192,13 @@ export default class SATModule extends Module {
     }
 
     destroy() {
+        if (this.gui) {
+            this.gui.removeFolder(this.folder);
+        }
+
         this.stage.removeChild(this.innerRegion.gfx);
         this.stage.removeChild(this.gfx);
         this.gfx.destroy();
+        this.innerRegion.destroy();
     }
 }
