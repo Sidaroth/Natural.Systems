@@ -11,6 +11,7 @@ import SAT from '../math/sat';
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
 // https://www.wikiwand.com/en/Hyperplane_separation_theorem
 export default class SATModule extends Module {
+    edges = [];
     obstacles = [];
     gfx = new PIXI.Graphics();
 
@@ -22,7 +23,7 @@ export default class SATModule extends Module {
     boxWidth = 25;
     boxHeight = 25;
     box;
-    forceVec = new Vector();
+    directionVector;
 
     constructor(stage) {
         super();
@@ -61,10 +62,10 @@ export default class SATModule extends Module {
             new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y + this.innerRegionHeight + 10),
         ]);
 
-        this.obstacles.push(leftEdge);
-        this.obstacles.push(topEdge);
-        this.obstacles.push(rightEdge);
-        this.obstacles.push(bottomEdge);
+        this.edges.push(leftEdge);
+        this.edges.push(topEdge);
+        this.edges.push(rightEdge);
+        this.edges.push(bottomEdge);
 
         let pos = new Vector(75, 75);
         const obs1 = new Polygon([pos, new Vector(75, 125), new Vector(125, 75)]);
@@ -83,15 +84,40 @@ export default class SATModule extends Module {
         this.obstacles.push(obs4);
 
         pos = new Vector(150, 400);
-        const obs5 = new Polygon([pos, new Vector(150, 450), new Vector(250, 500), new Vector(350, 450), new Vector(350, 400), new Vector(250, 350)]);
+        const obs5 = new Polygon([
+            pos,
+            new Vector(150, 450),
+            new Vector(250, 500),
+            new Vector(350, 450),
+            new Vector(350, 400),
+            new Vector(250, 350),
+        ]);
         this.obstacles.push(obs5);
 
-        pos = new Vector(600, 75);
-        const obs6 = new Polygon([pos, new Vector(700, 150), new Vector(500, 150)]);
+        pos = new Vector(600, 100);
+        const obs6 = new Polygon([pos, new Vector(700, 175), new Vector(500, 175)]);
         this.obstacles.push(obs6);
     }
 
-    setup() {
+    stop() {
+        this.boxSpeed = 0;
+        this.boxRotation = 0;
+        this.obstacleRotation = 0;
+    }
+
+    setupGUI(gui) {
+        this.stop();
+        this.gui = gui;
+        this.folder = this.gui.addFolder('SAT Settings');
+        this.folder.add(this, 'boxSpeed', 0, 10).listen();
+        this.folder.add(this, 'boxRotation', -20, 20).listen();
+        this.folder.add(this, 'obstacleRotation', -20, 20).listen();
+        this.folder.add(this, 'stop');
+        this.folder.open();
+    }
+
+    setup(gui) {
+        this.setupGUI(gui);
         this.drawBoundary();
         this.createObstacles();
         this.stage.addChild(this.gfx);
@@ -105,8 +131,7 @@ export default class SATModule extends Module {
             new Vector(boxPosX, boxPosY + this.boxHeight),
         ];
         this.box = new Polygon(boxVertices);
-
-        this.forceVec = new Vector(1, 1);
+        this.directionVector = new Vector(1, 1);
     }
 
     drawVector(pos, vector) {
@@ -117,20 +142,30 @@ export default class SATModule extends Module {
         this.gfx.endFill();
     }
 
+    checkCollision(obj) {
+        const SATResponse = SAT.checkPolygonPolygon(this.box, obj);
+        if (!SATResponse.isSeparating) {
+            // Flip direction of movement to bounce off the object along path of movement (mostly).
+            this.directionVector = Math.abs(SATResponse.overlapAxis.x) > Math.abs(SATResponse.overlapAxis.y)
+                ? new Vector(this.directionVector.x * -1, this.directionVector.y)
+                : new Vector(this.directionVector.x, this.directionVector.y * -1);
+
+            this.box.setPosition(this.box.position.x + SATResponse.overlapVector.x, this.box.position.y + SATResponse.overlapVector.y);
+        }
+    }
+
     update(delta) {
-        this.box.setPosition(this.box.position.x + (this.forceVec.x * delta), this.box.position.y + (this.forceVec.y * delta));
-        this.box.rotateBy(0.05, this.box.getCentroid());
+        const velocityVec = Vector.multiply(this.directionVector, delta * this.boxSpeed);
+        this.box.setPosition(this.box.position.x + velocityVec.x, this.box.position.y + velocityVec.y);
+        this.box.rotateBy((this.boxRotation / 100) * delta, this.box.getCentroid());
 
         this.obstacles.forEach((obj) => {
-            const SATResponse = SAT.checkPolygonPolygon(this.box, obj);
+            obj.rotateBy((this.obstacleRotation / 100) * delta, obj.getCentroid());
+            this.checkCollision(obj);
+        });
 
-            if (!SATResponse.isSeparating) {
-                // TODO: Do something more exciting on collisions...
-                const xSign = getRandomInt(0, 1) ? 1 : -1;
-                const ySign = getRandomInt(0, 1) ? 1 : -1;
-                this.forceVec = new Vector(3 * xSign, 3 * ySign);
-                this.box.setPosition(this.box.position.x + SATResponse.overlapVector.x, this.box.position.y + SATResponse.overlapVector.y);
-            }
+        this.edges.forEach((edge) => {
+            this.checkCollision(edge);
         });
     }
 
@@ -139,6 +174,10 @@ export default class SATModule extends Module {
         this.box.render(this.gfx);
         this.obstacles.forEach((obstacle) => {
             obstacle.render(this.gfx);
+        });
+
+        this.edges.forEach((edge) => {
+            edge.render(this.gfx);
         });
 
         const centroid = this.box.getCentroid();
