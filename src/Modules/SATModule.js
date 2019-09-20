@@ -3,10 +3,9 @@ import Module from './Module';
 import config from '../config';
 import Region from '../components/Region';
 import Polygon from '../shapes/polygon';
-import store from '../store';
 import Vector from '../math/Vector';
-import getRandomInt from '../math/getRandomInt';
 import SAT from '../math/sat';
+
 
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
 // https://www.wikiwand.com/en/Hyperplane_separation_theorem

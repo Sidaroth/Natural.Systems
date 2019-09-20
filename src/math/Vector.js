@@ -218,7 +218,7 @@ export default class Vector {
         return new Vector(x, y, z);
     }
 
-    // Static operators
+    // Static functions
     static divide(vec, scalar) {
         return vec.clone().divide(scalar);
     }
@@ -245,5 +245,9 @@ export default class Vector {
         const z = vec1.x * vec2.y - vec1.y * vec2.x;
 
         return new Vector(x, y, z);
+    }
+
+    static clone(vec) {
+        return new Vector().copy(vec);
     }
 }

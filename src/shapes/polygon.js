@@ -54,7 +54,7 @@ export default class Polygon {
         gfx.endFill();
     }
 
-    // See https://en.wikipedia.org/wiki/Centroid#Centroid_of_a_polygon
+    // See https://www.wikiwand.com/en/Centroid#/Of_a_polygon
     getCentroid() {
         let centerX = 0;
         let centerY = 0;
