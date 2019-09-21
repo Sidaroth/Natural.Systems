@@ -2,10 +2,12 @@ import * as dat from 'dat.gui';
 import * as PIXI from 'pixi.js';
 import RandomWalker from './Modules/RandomWalker';
 import GaussianDistribution from './Modules/GaussianDistribution';
-import BasicNoise from './Modules/BasicNoise';
+import NoiseVisualizer from './Modules/NoiseVizualizer';
 import WindySnow from './Modules/WindySnow';
 import SAT from './Modules/SATModule';
 import config from './config';
+import Boids from './Modules/BoidsModule';
+import store from './store';
 
 export default class System {
     stage = null;
@@ -51,14 +53,15 @@ export default class System {
             active: '',
         };
 
-        const guiController = this.gui.add(this.guiData, 'active', {
-            walker: this.walker.id,
-            gaussianDistrib: this.gaussianDistrib.id,
-            basicNoise: this.basicNoise.id,
-            windySnow: this.windySnow.id,
-            SAT: this.sat.id,
-        });
+        store.gui = this.gui;
 
+        // Generate an object for dat.gui that contains name -> id references for each module.
+        const modules = this.modules.reduce((obj, mod) => {
+            obj[mod.name] = mod.id;
+            return obj;
+        }, {});
+
+        const guiController = this.gui.add(this.guiData, 'active', modules);
         guiController.onChange(id => this.switchModule(id));
     }
 
@@ -69,7 +72,7 @@ export default class System {
             if (this.warningText) this.stage.removeChild(this.warningText);
             if (this.activeModule) this.activeModule.destroy();
 
-            mod.setup(this.gui); // include GUI for now to simplify customization per module.
+            mod.setup();
             this.activeModule = mod;
         }
     }
@@ -77,15 +80,17 @@ export default class System {
     createModules() {
         this.walker = new RandomWalker(this.stage, 200, 200);
         this.gaussianDistrib = new GaussianDistribution(this.stage);
-        this.basicNoise = new BasicNoise(this.stage);
+        this.basicNoise = new NoiseVisualizer(this.stage);
         this.windySnow = new WindySnow(this.stage);
         this.sat = new SAT(this.stage);
+        this.boids = new Boids(this.stage);
 
         this.modules.push(this.walker);
         this.modules.push(this.gaussianDistrib);
         this.modules.push(this.basicNoise);
         this.modules.push(this.windySnow);
         this.modules.push(this.sat);
+        this.modules.push(this.boids);
     }
 
     update(delta) {

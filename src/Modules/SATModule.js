@@ -5,6 +5,7 @@ import Region from '../components/Region';
 import Polygon from '../shapes/polygon';
 import Vector from '../math/Vector';
 import SAT from '../math/sat';
+import store from '../store';
 
 
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
@@ -66,35 +67,35 @@ export default class SATModule extends Module {
         this.edges.push(rightEdge);
         this.edges.push(bottomEdge);
 
-        let pos = new Vector(75, 75);
-        const obs1 = new Polygon([pos, new Vector(75, 125), new Vector(125, 75)]);
+        let pos = new Vector(150, 150);
+        const obs1 = new Polygon([pos, new Vector(150, 200), new Vector(200, 150)]);
         this.obstacles.push(obs1);
 
-        pos = new Vector(150, 150);
-        const obs2 = new Polygon([pos, new Vector(225, 150), new Vector(225, 225), new Vector(150, 225)]);
+        pos = new Vector(800, 500);
+        const obs2 = new Polygon([pos, new Vector(900, 500), new Vector(900, 600), new Vector(800, 600)]);
         this.obstacles.push(obs2);
 
         pos = new Vector(400, 300);
         const obs3 = new Polygon([pos, new Vector(500, 300), new Vector(500, 400), new Vector(400, 400)]);
         this.obstacles.push(obs3);
 
-        pos = new Vector(600, 400);
-        const obs4 = new Polygon([pos, new Vector(650, 450), new Vector(615, 375)]);
+        pos = new Vector(1000, 750);
+        const obs4 = new Polygon([pos, new Vector(900, 800), new Vector(965, 725)]);
         this.obstacles.push(obs4);
 
-        pos = new Vector(150, 400);
+        pos = new Vector(150, 600);
         const obs5 = new Polygon([
             pos,
-            new Vector(150, 450),
-            new Vector(250, 500),
-            new Vector(350, 450),
-            new Vector(350, 400),
-            new Vector(250, 350),
+            new Vector(150, 650),
+            new Vector(250, 700),
+            new Vector(350, 650),
+            new Vector(350, 600),
+            new Vector(250, 550),
         ]);
         this.obstacles.push(obs5);
 
-        pos = new Vector(600, 100);
-        const obs6 = new Polygon([pos, new Vector(700, 175), new Vector(500, 175)]);
+        pos = new Vector(900, 100);
+        const obs6 = new Polygon([pos, new Vector(1000, 175), new Vector(800, 175)]);
         this.obstacles.push(obs6);
     }
 
@@ -104,10 +105,9 @@ export default class SATModule extends Module {
         this.obstacleRotation = 0;
     }
 
-    setupGUI(gui) {
+    setupGUI() {
         this.stop();
-        this.gui = gui;
-        this.folder = this.gui.addFolder('SAT Settings');
+        this.folder = store.gui.addFolder('SAT Settings');
         this.folder.add(this, 'boxSpeed', 0, 10).listen();
         this.folder.add(this, 'boxRotation', -20, 20).listen();
         this.folder.add(this, 'obstacleRotation', -20, 20).listen();
@@ -115,13 +115,13 @@ export default class SATModule extends Module {
         this.folder.open();
     }
 
-    setup(gui) {
+    setup() {
         this.edges = [];
         this.obstacles = [];
         this.gfx = new PIXI.Graphics();
         this.innerRegion = new Region(this.innerRegionOffset, this.innerRegionOffset, this.innerRegionWidth, this.innerRegionHeight)
 
-        this.setupGUI(gui);
+        this.setupGUI();
         this.drawBoundary();
         this.createObstacles();
         this.stage.addChild(this.gfx);
@@ -136,14 +136,6 @@ export default class SATModule extends Module {
         ];
         this.box = new Polygon(boxVertices);
         this.directionVector = new Vector(1, 1);
-    }
-
-    drawVector(pos, vector) {
-        this.gfx.beginFill();
-        this.gfx.lineStyle(3, 0xff0000);
-        this.gfx.moveTo(pos.x, pos.y);
-        this.gfx.lineTo(pos.x + vector.x, pos.y + vector.y);
-        this.gfx.endFill();
     }
 
     checkCollision(obj) {
@@ -191,8 +183,8 @@ export default class SATModule extends Module {
     }
 
     destroy() {
-        if (this.gui) {
-            this.gui.removeFolder(this.folder);
+        if (store.gui) {
+            store.gui.removeFolder(this.folder);
         }
 
         this.stage.removeChild(this.innerRegion.gfx);

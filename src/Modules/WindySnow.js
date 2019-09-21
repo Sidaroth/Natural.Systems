@@ -95,7 +95,7 @@ export default class WindySnow extends Module {
     }
 
     // TODO fix module options for wind speeds, gravity and number of snowflake modifiers.
-    setup(gui) {
+    setup() {
         this.time = 0;
         this.bgfx = new PIXI.Graphics();
         this.stage.addChild(this.bgfx);
