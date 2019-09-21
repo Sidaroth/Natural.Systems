@@ -49,7 +49,7 @@ export default class NoiseVisualizer extends Module {
         this.width = config.WORLD.width;
         this.canvas = new OffscreenCanvas(this.width, this.height);
         this.ctx = this.canvas.getContext('2d');
-        this.texture = PIXI.Texture.fromCanvas(this.canvas);
+        this.texture = PIXI.Texture.from(this.canvas);
         this.sprite = new PIXI.Sprite(this.texture);
         this.imageData = this.ctx.createImageData(this.width, this.height);
         this.pixels = new Int32Array(this.imageData.data.buffer);

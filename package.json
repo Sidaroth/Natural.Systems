@@ -18,16 +18,16 @@
         "url": "git+https://github.com/sidaroth/Natural.Systems.git"
     },
     "devDependencies": {
-        "@babel/core": "^7.2.2",
-        "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
-        "@babel/preset-env": "^7.2.3",
+        "@babel/core": "^7.6.0",
+        "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+        "@babel/preset-env": "^7.6.0",
         "babel-eslint": "^8.2.6",
-        "babel-loader": "^8.0.5",
+        "babel-loader": "^8.0.6",
         "copy-webpack-plugin": "^4.6.0",
         "eslint": "^4.18.0",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-config-standard": "^10.2.1",
-        "eslint-plugin-import": "^2.14.0",
+        "eslint-plugin-import": "^2.18.2",
         "eslint-plugin-node": "^4.2.2",
         "eslint-plugin-promise": "^3.8.0",
         "eslint-plugin-standard": "^3.0.1",
@@ -37,18 +37,18 @@
         "html-webpack-template": "^6.1.0",
         "mini-css-extract-plugin": "^0.4.5",
         "raw-loader": "^0.5.1",
-        "resolve-url-loader": "^2.3.1",
-        "rimraf": "^2.6.3",
-        "sass-loader": "^7.1.0",
+        "resolve-url-loader": "^2.3.2",
+        "rimraf": "^2.7.1",
+        "sass-loader": "^7.3.1",
         "style-loader": "^0.21.0",
         "webpack": "4.19.0",
         "webpack-cli": "^2.1.5",
-        "webpack-dev-server": "^3.1.11"
+        "webpack-dev-server": "^3.8.1"
     },
     "dependencies": {
-        "dat.gui": "^0.7.5",
+        "dat.gui": "^0.7.6",
         "noisejs": "^2.1.0",
-        "pixi.js": "^4.8.5",
+        "pixi.js": "^5.0",
         "sat": "^0.8.0"
     }
 }
