@@ -24,7 +24,7 @@ export default class QuadTreeMod extends Module {
         this.folder = store.gui.addFolder('QuadTree settings');
         this.folder.add(this, 'vision', 10, 200).listen();
         this.folder
-            .add(this, 'numPoints', 0, 2000)
+            .add(this, 'numPoints', 0, 5000)
             .listen()
             .onChange(() => {
                 this.addPoints();
@@ -37,6 +37,8 @@ export default class QuadTreeMod extends Module {
 
     addPoints() {
         this.recalculateTree();
+        this.points.forEach(p => p.sprite.destroy());
+
         this.points = [];
         for (let i = 0; i < this.numPoints; i += 1) {
             const entity = {
@@ -44,7 +46,13 @@ export default class QuadTreeMod extends Module {
                     x: getRandomInt(0, config.WORLD.width),
                     y: getRandomInt(0, config.WORLD.height),
                 },
+                sprite: new PIXI.Sprite(this.pointTexture),
             };
+
+            entity.sprite.position.x = entity.position.x;
+            entity.sprite.position.y = entity.position.y;
+
+            this.stage.addChild(entity.sprite);
             this.points.push(entity);
             this.qTree.insert(entity);
         }
@@ -67,15 +75,29 @@ export default class QuadTreeMod extends Module {
 
     setup() {
         this.setupGUI();
-        this.reset();
         this.gfx = new PIXI.Graphics();
         this.stage.addChild(this.gfx);
+
+        // Black texture
+        this.gfx.lineStyle(1, 0x000000);
+        this.gfx.beginFill(0x000000);
+        this.gfx.drawCircle(0, 0, 2);
+        this.gfx.endFill();
+        this.pointTexture = store.renderer.generateTexture(this.gfx);
+
+        // Highlight texture.
+        this.gfx.lineStyle(1, 0xff0000);
+        this.gfx.beginFill(0xff0000);
+        this.gfx.drawCircle(0, 0, 2);
+        this.gfx.endFill();
+        this.highlightTexture = store.renderer.generateTexture(this.gfx);
+
+        this.reset();
     }
 
     update() {
         store.count = 0;
         this.recalculateTree();
-        // const testShape = new Rect(store.mouse.x - this.vision / 2, store.mouse.y - this.vision / 2, this.vision, this.vision);
         const testShape = new Circle(store.mouse.x, store.mouse.y, this.vision);
 
         this.highlights = this.qTree.query(testShape);
@@ -85,19 +107,25 @@ export default class QuadTreeMod extends Module {
     render() {
         this.gfx.clear();
         this.qTree.render(this.gfx);
-
         this.gfx.lineStyle(2, 0xff0000);
         this.gfx.drawCircle(store.mouse.x, store.mouse.y, this.vision);
-        // this.gfx.drawRect(store.mouse.x - this.vision / 2, store.mouse.y - this.vision / 2, this.vision, this.vision);
 
-        this.gfx.beginFill(0x00ff00);
+        this.points
+            .filter(p => !this.highlights.find(point => p === point))
+            .forEach((p) => {
+                p.sprite.texture = this.pointTexture;
+            });
+
         this.highlights.forEach((point) => {
-            this.gfx.drawCircle(point.position.x, point.position.y, 1);
+            point.sprite.texture = this.highlightTexture;
         });
-        this.gfx.endFill();
     }
 
     destroy() {
+        this.points.forEach((p) => {
+            p.sprite.destroy();
+        });
+
         if (this.gfx) {
             this.stage.removeChild(this.gfx);
             this.gfx.destroy();

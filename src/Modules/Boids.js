@@ -5,18 +5,21 @@ import store from '../store';
 import Vector from '../math/Vector';
 import getRandomInt from '../math/getRandomInt';
 import degreesToRadians from '../math/degreesToRadians';
-import edgeIntersectPoint from '../math/edgeIntersectPoint';
 import Line from '../shapes/line';
-import drawVector from '../utils/graphicalUtils';
-import distanceToLine from '../math/distanceToLine';
 import createBoid from '../components/Boid';
+import createQuadTree from '../components/QuadTree';
 
 // 2D Boids - Flock behaviour, obstacle avoidance.
 export default class Boids extends Module {
-    numBoids = 5000;
-    boids = [];
+    numBoids = 200;
     obstacles = [];
     textures = [];
+    boids = [];
+    boidTree;
+    renderBoidConnections = false;
+    renderBoidVision = false;
+    treeSize = 1;
+    renderQuadTree = false;
 
     constructor(stage) {
         super();
@@ -49,7 +52,7 @@ export default class Boids extends Module {
 
     spawnBoid() {
         const textureIdx = getRandomInt(0, this.textures.length - 1);
-        const boid = createBoid(this.textures[textureIdx]);
+        const boid = createBoid(this.textures[textureIdx], this.edges, this.stage);
         boid.setPosition(getRandomInt(25, config.WORLD.width - 25), getRandomInt(25, config.WORLD.height - 25));
         boid.setRotation(degreesToRadians(getRandomInt(0, 360)));
 
@@ -63,7 +66,9 @@ export default class Boids extends Module {
 
         boid.direction.x = xDir;
         boid.direction.y = yDir;
+        boid.direction.setLength(1);
 
+        this.boidTree.insert(boid);
         this.boids.push(boid);
         this.stage.addChild(boid.sprite);
     }
@@ -77,6 +82,8 @@ export default class Boids extends Module {
         }
 
         this.boids = [];
+        this.boidTree = createQuadTree(store.worldBoundary, this.treeSize);
+
         for (let i = 0; i < this.numBoids; i += 1) {
             this.spawnBoid();
         }
@@ -92,6 +99,10 @@ export default class Boids extends Module {
 
     setupGUI() {
         this.folder = store.gui.addFolder('Boids Settings');
+        this.folder.add(this, 'treeSize', 1, 200).listen();
+        this.folder.add(this, 'renderQuadTree');
+        this.folder.add(this, 'renderBoidConnections');
+        this.folder.add(this, 'renderBoidVision');
         this.folder.add(this, 'spawnBoid');
         this.folder.add(this, 'reset');
         this.folder.open();
@@ -101,66 +112,23 @@ export default class Boids extends Module {
         this.setupGUI();
         this.createTextures();
         this.createEdges();
-
-        this.reset();
         this.gfx = new PIXI.Graphics();
         this.stage.addChild(this.gfx);
 
         this.obstacles = [];
-    }
-
-    isHeadingForCollision(boid) {
-        // vision debugs.
-        // drawVector(this.gfx, boid.position, Vector.multiply(boid.direction, boid.vision));
-        // this.gfx.beginFill(0xaaaaaa, 0.3);
-        // this.gfx.lineStyle(0.5, 0x000000);
-        // this.gfx.drawCircle(boid.position.x, boid.position.y, boid.vision);
-        // this.gfx.endFill();
-
-        for (let i = 0; i < this.edges.length; i += 1) {
-            const edge = this.edges[i];
-            const dist = distanceToLine(boid.position, edge);
-            if (dist < boid.vision) {
-                const ray = new Line(boid.position, Vector.add(boid.position, boid.direction));
-                const intersectPoint = edgeIntersectPoint(ray, edge);
-                if (intersectPoint && Vector.sub(boid.position, intersectPoint).getLength() < boid.vision) return edge;
-            }
-        }
-
-        return false;
-    }
-
-    avoidObstacles(boid) {
-        const firstCollidingEdge = this.isHeadingForCollision(boid);
-        if (firstCollidingEdge) {
-            let foundEscapeVector = false;
-            const testAngles = boid.getTestAngles();
-            testAngles.every((angle) => {
-                const directionVector = boid.direction.clone().rotateBy(angle);
-                const ray = new Line(boid.position, Vector.add(boid.position, directionVector));
-
-                const intersectPoint = edgeIntersectPoint(ray, firstCollidingEdge);
-                if (!intersectPoint || Vector.sub(boid.position, intersectPoint).getLength() > boid.vision) {
-                    boid.direction = directionVector.getUnit();
-                    foundEscapeVector = true;
-
-                    return false;
-                }
-
-                return true;
-            });
-
-            if (!foundEscapeVector) {
-                boid.direction = boid.direction.rotateBy(testAngles[testAngles.length - 1]).getUnit();
-            }
-        }
+        this.reset();
     }
 
     update(delta) {
         this.gfx.clear();
+        // Rearrange quad tree to reflect any changes in position.
+        this.boidTree = createQuadTree(store.worldBoundary, this.treeSize);
+        this.boids.forEach(boid => this.boidTree.insert(boid));
+
         this.boids.forEach((boid) => {
-            this.avoidObstacles(boid);
-            boid.update(delta);
+            boid.setRenderConnections(this.renderBoidConnections);
+            boid.setRenderVision(this.renderBoidVision);
+            boid.update(delta, this.boidTree);
         });
     }
 
@@ -168,6 +136,10 @@ export default class Boids extends Module {
         this.edges.forEach((edge) => {
             edge.render(this.gfx);
         });
+
+        if (this.renderQuadTree) {
+            this.boidTree.render(this.gfx);
+        }
     }
 
     destroy() {

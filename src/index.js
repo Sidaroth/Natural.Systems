@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import System from './system';
 import config from './config';
 import store from './store';
+import Rect from './shapes/rect';
 
 let type = 'WebGL';
 if (!PIXI.utils.isWebGLSupported) {
@@ -32,6 +33,7 @@ app.renderer.view.style.right = 0;
 store.app = app;
 store.renderer = app.renderer;
 store.mouse = app.renderer.plugins.interaction.mouse.global;
+store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
 
 // Source code link.
 const div = document.createElement('div');

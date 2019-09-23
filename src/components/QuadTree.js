@@ -56,15 +56,26 @@ const createQuadTree = (boundary, cap = Infinity) => {
         return true;
     }
 
+    function getAllEntities() {
+        if (isSubdivided) {
+            let ents = [];
+            subTrees.forEach((tree) => {
+                ents = [...ents, ...tree.getAllEntities()];
+            });
+
+            return ents;
+        }
+
+        return entities;
+    }
+
     // Returns any point within given range/shape.
     function query(shape) {
         let found = [];
 
         if (!bounds.intersects(shape)) return found;
         if (isSubdivided) {
-            subTrees.forEach((tree) => {
-                found = [...found, ...tree.query(shape)];
-            });
+            found = subTrees.reduce((arr, tree) => arr.concat(...tree.query(shape)), []);
         } else {
             entities.forEach((entity) => {
                 store.count += 1;
@@ -75,23 +86,19 @@ const createQuadTree = (boundary, cap = Infinity) => {
         return found;
     }
 
+    function clear() {
+        this.entities = [];
+        this.subTrees.forEach(tree => tree.clear());
+        this.subTrees = [];
+    }
+
     function render(context) {
         context.lineStyle(1, 0x000000);
         context.drawRect(bounds.x, bounds.y, bounds.w, bounds.h);
 
-        entities.forEach((entity) => {
-            context.beginFill(0x000000);
-            context.drawCircle(entity.position.x, entity.position.y, 1);
-            context.endFill();
-        });
-
         subTrees.forEach((tree) => {
             tree.render(context);
         });
-    }
-
-    function getEntities() {
-        return entities;
     }
 
     return Object.assign(state, {
@@ -99,7 +106,8 @@ const createQuadTree = (boundary, cap = Infinity) => {
         render,
         query,
         subdivide,
-        getEntities,
+        clear,
+        getAllEntities,
         entities,
         subTrees,
         // stuff
