@@ -97,6 +97,10 @@ export default class Vector {
         return this.x === vector.x && this.y === vector.y && this.z === vector.z;
     }
 
+    angle() {
+        return Math.atan2(this.x, -this.y);
+    }
+
     // Copy the values of another vector into this.
     copy(vector) {
         this.x = vector.x || 0;
@@ -219,6 +223,15 @@ export default class Vector {
     }
 
     // Static functions
+    static rotateBy(vec, radians, pivot) {
+        return vec.clone().rotateBy(radians, pivot);
+    }
+
+    static angle(vec) {
+        // Invert Y because of downward positive Y.
+        return Math.atan2(vec.x, -vec.y);
+    }
+
     static divide(vec, scalar) {
         return vec.clone().divide(scalar);
     }

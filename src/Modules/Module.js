@@ -10,15 +10,9 @@ export default class Module {
         this.name = `ModuleId: ${this.id}`;
     }
 
-    setup() {
-        console.error('must be implemented in child class');
-    }
+    setup() {}
 
-    update() {
-        console.error('must be implemented in child class');
-    }
+    update() {}
 
-    render() {
-        console.error('must be implemented in child class');
-    }
+    render() {}
 }
