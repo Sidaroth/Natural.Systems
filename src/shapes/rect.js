@@ -1,4 +1,6 @@
 import Vector from '../math/Vector';
+import constrain from '../math/constrain';
+import Circle from '../shapes/circle';
 
 export default class Rect {
     x;
@@ -13,6 +15,10 @@ export default class Rect {
         this.h = h;
     }
 
+    contains(point) {
+        return point.x >= this.x && point.x < this.x + this.w && point.y >= this.y && point.y < this.y + this.h;
+    }
+
     getVertices() {
         const pos = this.getPosition();
         const size = this.getSize();
@@ -25,6 +31,20 @@ export default class Rect {
         ];
 
         return vertices;
+    }
+
+    intersects(shape) {
+        if (shape instanceof Rect) {
+            return !(shape.x > this.x + this.w || shape.x + shape.w < this.x || shape.y > this.y + this.h || shape.y + shape.h < this.y);
+        } else if (shape instanceof Circle) {
+            const closestX = constrain(shape.x, this.x, this.x + this.w);
+            const closestY = constrain(shape.y, this.y, this.y + this.h);
+            const dist = new Vector(shape.x - closestX, shape.y - closestY);
+
+            return dist.squaredLength() < shape.r2;
+        }
+
+        return false;
     }
 
     getSize() {

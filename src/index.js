@@ -31,6 +31,7 @@ app.renderer.view.style.right = 0;
 
 store.app = app;
 store.renderer = app.renderer;
+store.mouse = app.renderer.plugins.interaction.mouse.global;
 
 // Source code link.
 const div = document.createElement('div');

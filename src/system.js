@@ -5,8 +5,9 @@ import GaussianDistribution from './Modules/GaussianDistribution';
 import NoiseVisualizer from './Modules/NoiseVizualizer';
 import WindySnow from './Modules/WindySnow';
 import SAT from './Modules/SATModule';
+import Boids from './Modules/Boids';
+import QuadtreeMod from './Modules/QuadTreeMod';
 import config from './config';
-import Boids from './Modules/BoidsModule';
 import store from './store';
 
 export default class System {
@@ -84,6 +85,7 @@ export default class System {
         this.windySnow = new WindySnow(this.stage);
         this.sat = new SAT(this.stage);
         this.boids = new Boids(this.stage);
+        this.quadTree = new QuadtreeMod(this.stage);
 
         this.modules.push(this.walker);
         this.modules.push(this.gaussianDistrib);
@@ -91,6 +93,7 @@ export default class System {
         this.modules.push(this.windySnow);
         this.modules.push(this.sat);
         this.modules.push(this.boids);
+        this.modules.push(this.quadTree);
     }
 
     update(delta) {
