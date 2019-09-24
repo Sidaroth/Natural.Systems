@@ -28,7 +28,7 @@ export default class Vector {
 
     // set the magnitude/length of the vector.
     setLength(length) {
-        return this.getUnit().multiply(length);
+        return this.copy(this.getUnit().multiply(length));
     }
 
     // Useful when comparing length of two vectors together, saves a sqrt call.
@@ -116,15 +116,15 @@ export default class Vector {
         }
 
         if (x instanceof Array) {
-            this.x += x[0] || 0;
-            this.y += x[1] || 0;
-            this.z += x[2] || 0;
+            this.x = x[0] || 0;
+            this.y = x[1] || 0;
+            this.z = x[2] || 0;
             return this;
         }
 
-        this.x += x || 0;
-        this.y += y || 0;
-        this.z += z || 0;
+        this.x = x || 0;
+        this.y = y || 0;
+        this.z = z || 0;
 
         return this;
     }
@@ -209,6 +209,11 @@ export default class Vector {
         return this;
     }
 
+    angleBetween2d(vec) {
+        return Math.acos(+this.dot(vec).toFixed(5));
+        // return Math.atan2(this.cross2d(vec), this.dot(vec));
+    }
+
     // products
     dot(vector) {
         return this.x * vector.x + this.y * vector.y + this.z * vector.z; // eslint-disable-line
@@ -220,6 +225,10 @@ export default class Vector {
         const z = this.x * vector.y - this.y * vector.x;
 
         return new Vector(x, y, z);
+    }
+
+    cross2d(vec) {
+        return this.x * vec.y - this.y * vec.x; // Z component of 3d cross.
     }
 
     // Static functions

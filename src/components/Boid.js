@@ -10,188 +10,163 @@ import getRandomInt from '../math/getRandomInt';
 // 1. Avoid obstacles/each other (Separation)
 // 2. Fly together in a unified direction. (Alignment)
 // 3. Move towards center of flock. (Cohesion)
-const createBoid = (texture, edges, debugStage = undefined) => {
+const createBoid = (texture, debugGfx = undefined) => {
     const state = {};
 
     const id = getUUID();
     const position = new Vector();
-    const direction = new Vector(0, -1);
     const velocity = new Vector();
+    const acceleration = new Vector();
     const sprite = new PIXI.Sprite(texture);
     sprite.anchor.set(0.5);
 
-    const fov = 100;
-    const visionRadius = 125;
+    const fov = degreesToRadians(90);
+    const visionRadius = 90;
+    const visionSquared = visionRadius * visionRadius;
     const visionShape = new Circle(position.x, position.y, visionRadius);
     const testAngles = [];
-    const fovSlices = 180;
+    const fovSlices = 120;
     const sliceWidth = fov / fovSlices;
-    let rotation = 0;
-    let staticSpeed = 2;
+    const maxForce = 0.1;
+    let maxSpeed = 5;
+
+    // Visualization vars
     let renderConnections = false;
     let renderVision = false;
+    let enableCohesion = true;
+    let enableAlignment = true;
+    let enableSeparation = true;
     let gfx;
 
-    if (debugStage) {
-        gfx = new PIXI.Graphics();
-        debugStage.addChild(gfx);
+    if (debugGfx) {
+        gfx = debugGfx;
     }
 
-    // i.e -45 degrees to +45 degrees.
+    // i.e -45 degrees to +45 degrees. (In radians)
     for (let angle = -fov / 2; angle <= fov / 2; angle += sliceWidth) {
-        if (angle !== 0) testAngles.push(degreesToRadians(angle));
+        if (angle !== 0) testAngles.push(angle);
     }
     testAngles.sort((a, b) => Math.abs(a) - Math.abs(b)); // Sort angles so they are increasingly larger in each direction.
 
     function getPosition() {
-        return position;
+        return state.position;
     }
 
-    function getCentroid(vertices) {
-        let centerX = 0;
-        let centerY = 0;
-        let area = 0;
+    function findHeading(tree) {
+        const nearbyBoids = tree
+            .query(visionShape)
+            .filter(b => b.id !== id && Math.abs(state.position.getUnit().angleBetween2d(b.position.getUnit())) < fov);
 
-        vertices.forEach((vertex, i) => {
-            const nextVertex = vertices[(i + 1) % vertices.length];
+        if (!nearbyBoids.length) return; // No boids in range other than self, or they're not in FOV.
 
-            const a = vertex.x * nextVertex.y - nextVertex.x * vertex.y;
-            centerX += (vertex.x + nextVertex.x) * a;
-            centerY += (vertex.y + nextVertex.y) * a;
-            area += a;
-        });
-
-        area *= 3;
-        centerX /= area;
-        centerY /= area;
-
-        return new Vector(centerX, centerY);
-    }
-
-    function findDirection(tree) {
-        const nearbyBoids = tree.query(visionShape).filter(b => b.id !== id);
-        if (!nearbyBoids.length) return;
-
-        const closest = {
-            distance: Infinity,
-            boid: undefined,
-        };
-
-        const flockVertices = [];
-        const flockDirections = [];
+        const flockPosition = new Vector();
+        const flockVelocity = new Vector();
+        const separation = new Vector();
 
         nearbyBoids.forEach((boid) => {
-            const distance = Vector.sub(boid.position, position).squaredLength();
-            if (distance < closest.distance) {
-                closest.boid = boid;
-                closest.distance = distance;
+            const diff = Vector.sub(state.position, boid.position);
+            const distance = diff.squaredLength();
+            if (distance < visionSquared) {
+                diff.divide(distance);
+                separation.add(diff);
             }
 
-            flockVertices.push(boid.position);
-            flockDirections.push(boid.direction);
+            flockPosition.add(boid.position);
+            flockVelocity.add(boid.velocity);
 
             if (renderConnections && gfx) {
                 gfx.lineStyle(1, 0x000000);
-                gfx.moveTo(position.x, position.y);
+                gfx.moveTo(state.position.x, state.position.y);
                 gfx.lineTo(boid.position.x, boid.position.y);
             }
         });
 
-        let avoidanceDirection;
-        let directionToCenter;
-        let flockDirection;
-        let numDirs = 0;
-
-        if (closest.boid) {
-            avoidanceDirection = direction.clone().rotateBy(testAngles[getRandomInt(3, 5)]);
-            numDirs += 1;
+        if (enableCohesion) {
+            flockPosition.divide(nearbyBoids.length);
+            flockPosition.sub(position);
+            flockPosition.limit(maxForce);
+            acceleration.add(flockPosition);
         }
 
-        if (flockVertices.length >= 3) {
-            const flockCenter = getCentroid(flockVertices);
-            directionToCenter = Vector.sub(flockCenter, position).getUnit();
-
-            flockDirection = { x: 0, y: 0 };
-            flockDirections.reduce((m, dir) => {
-                m.x += dir.x;
-                m.y += dir.y;
-                return m;
-            }, flockDirection);
-
-            flockDirection.x /= flockDirections.length;
-            flockDirection.y /= flockDirections.length;
-            numDirs += 2;
+        if (enableAlignment) {
+            flockVelocity.divide(nearbyBoids.length);
+            flockVelocity.sub(velocity);
+            flockVelocity.limit(maxForce);
+            acceleration.add(flockVelocity);
         }
 
-        // find final direction.
-        const finalDirection = new Vector()
-            .add(flockDirection)
-            .add(avoidanceDirection)
-            .add(directionToCenter)
-            .divide(numDirs);
+        if (enableSeparation) {
+            separation.divide(nearbyBoids.length);
+            separation.setLength(maxSpeed);
+            separation.sub(velocity);
+            separation.limit(maxForce);
+            acceleration.add(separation);
+        }
+    }
 
-        direction.set(finalDirection).getUnit();
+    function updateSpritePos() {
+        visionShape.setPosition(state.position);
+
+        state.sprite.position.x = state.position.x;
+        state.sprite.position.y = state.position.y;
     }
 
     function setPosition(x, y) {
-        position.x = x;
-        position.y = y;
-
-        visionShape.setPosition(position);
-
-        state.sprite.position.x = x;
-        state.sprite.position.y = y;
+        state.position.set(x, y);
+        updateSpritePos();
     }
 
     function setRotation(angle) {
-        rotation = angle;
         if (state.sprite) sprite.rotation = angle;
     }
 
     function checkBounds() {
-        if (state.position.x < store.worldBoundary.x) state.setPosition(store.worldBoundary.w, position.y);
-        if (state.position.x > store.worldBoundary.w) state.setPosition(store.worldBoundary.x, position.y);
-        if (state.position.y < store.worldBoundary.y) state.setPosition(position.x, store.worldBoundary.h);
-        if (state.position.y > store.worldBoundary.h) state.setPosition(position.x, store.worldBoundary.y);
+        if (state.position.x < store.worldBoundary.x) state.setPosition(store.worldBoundary.w, state.position.y);
+        if (state.position.x > store.worldBoundary.w) state.setPosition(store.worldBoundary.x, state.position.y);
+        if (state.position.y < store.worldBoundary.y) state.setPosition(state.position.x, store.worldBoundary.h);
+        if (state.position.y > store.worldBoundary.h) state.setPosition(state.position.x, store.worldBoundary.y);
     }
 
     function update(delta, tree) {
         if (gfx) {
-            gfx.clear();
-
             if (renderVision) {
                 gfx.lineStyle(1, 0xaaaaaa);
-                gfx.drawCircle(position.x, position.y, visionRadius);
+                gfx.drawCircle(state.position.x, state.position.y, visionRadius);
             }
         }
 
-        findDirection(tree);
-        state.setVelocity(Vector.multiply(state.direction.getUnit(), staticSpeed * delta));
-        state.setPosition(position.x + velocity.x, position.y + velocity.y);
-        state.setRotation(state.direction.angle());
+        acceleration.zero();
+        findHeading(tree);
+        state.velocity.add(acceleration);
+        state.velocity.setLength(maxSpeed * delta);
 
+        state.position.add(velocity);
+        updateSpritePos();
+        state.setRotation(state.velocity.getUnit().angle());
         checkBounds();
     }
 
-    function setRenderConnections(status) {
-        renderConnections = status;
-    }
-
-    function setRenderVision(status) {
-        renderVision = status;
+    function setVizualizationStatus(connections, vision, separation, alignment, cohesion) {
+        renderConnections = connections;
+        renderVision = vision;
+        enableSeparation = separation;
+        enableAlignment = alignment;
+        enableCohesion = cohesion;
     }
 
     function setVelocity(vel) {
         velocity.copy(vel);
     }
 
+    function addForce(x, y = undefined) {
+        acceleration.add(x, y);
+    }
+
     function setSpeed(speed) {
-        staticSpeed = speed;
+        maxSpeed = speed;
     }
 
     function destroy() {
-        if (debugStage && gfx) debugStage.removeChild(gfx);
-        if (gfx) gfx.destroy();
         state.sprite.destroy();
     }
 
@@ -203,16 +178,15 @@ const createBoid = (texture, edges, debugStage = undefined) => {
         // exposed vars
         id,
         position,
+        velocity,
         sprite,
-        rotation,
-        direction,
         texture,
         visionRadius,
         fov,
         // functions
+        addForce,
         getTestAngles,
-        setRenderConnections,
-        setRenderVision,
+        setVizualizationStatus,
         getPosition,
         setPosition,
         setRotation,

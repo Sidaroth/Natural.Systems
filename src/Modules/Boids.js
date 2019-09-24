@@ -4,22 +4,28 @@ import config from '../config';
 import store from '../store';
 import Vector from '../math/Vector';
 import getRandomInt from '../math/getRandomInt';
-import degreesToRadians from '../math/degreesToRadians';
 import Line from '../shapes/line';
 import createBoid from '../components/Boid';
 import createQuadTree from '../components/QuadTree';
 
 // 2D Boids - Flock behaviour, obstacle avoidance.
 export default class Boids extends Module {
-    numBoids = 200;
+    numBoids = 100;
     obstacles = [];
     textures = [];
     boids = [];
+    treeSize = 1;
     boidTree;
+
+    // Visualization
     renderBoidConnections = false;
     renderBoidVision = false;
-    treeSize = 1;
     renderQuadTree = false;
+    enableAlignment = true;
+    enableCohesion = true;
+    enableSeparation = true;
+    boidSpeed = 5;
+    debugGfx;
 
     constructor(stage) {
         super();
@@ -28,33 +34,34 @@ export default class Boids extends Module {
     }
 
     createTextures() {
-        const boidWidth = 9;
+        const boidWidth = 8.5;
         const boidHeight = boidWidth * 2.5;
 
         this.textures = [];
-        const gfx = new PIXI.Graphics();
         const p1 = new Vector(0, 0);
         const p2 = new Vector(-boidWidth, boidHeight);
         const p3 = new Vector(boidWidth, boidHeight);
 
+        let scalar = 1;
         const colors = [0x03a9f4, 0x009688, 0x607d8b, 0x00bcd4];
         for (let i = 0; i < colors.length; i += 1) {
-            gfx.clear();
-            gfx.beginFill(colors[i]);
-            gfx.moveTo(p1.x, p1.x);
-            gfx.lineTo(p2.x, p2.y);
-            gfx.lineTo(p3.x, p3.y);
-            gfx.endFill();
+            scalar += 0.1;
 
-            this.textures.push(store.renderer.generateTexture(gfx));
+            this.gfx.clear();
+            this.gfx.beginFill(colors[i]);
+            this.gfx.moveTo(p1.x / scalar, p1.x / scalar);
+            this.gfx.lineTo(p2.x / scalar, p2.y / scalar);
+            this.gfx.lineTo(p3.x / scalar, p3.y / scalar);
+            this.gfx.endFill();
+
+            this.textures.push(store.renderer.generateTexture(this.gfx));
         }
     }
 
     spawnBoid() {
         const textureIdx = getRandomInt(0, this.textures.length - 1);
-        const boid = createBoid(this.textures[textureIdx], this.edges, this.stage);
+        const boid = createBoid(this.textures[textureIdx], this.debugGfx);
         boid.setPosition(getRandomInt(25, config.WORLD.width - 25), getRandomInt(25, config.WORLD.height - 25));
-        boid.setRotation(degreesToRadians(getRandomInt(0, 360)));
 
         let xDir = 0;
         let yDir = 0;
@@ -64,13 +71,18 @@ export default class Boids extends Module {
             yDir = getRandomInt(0, 200) / 100 - 1;
         } while (xDir === 0 && yDir === 0);
 
-        boid.direction.x = xDir;
-        boid.direction.y = yDir;
-        boid.direction.setLength(1);
-
+        boid.velocity.set(xDir, yDir);
+        boid.setSpeed(this.boidSpeed);
         this.boidTree.insert(boid);
         this.boids.push(boid);
         this.stage.addChild(boid.sprite);
+        boid.setVizualizationStatus(
+            this.renderBoidConnections,
+            this.renderBoidVision,
+            this.enableSeparation,
+            this.enableAlignment,
+            this.enableCohesion,
+        );
     }
 
     reset() {
@@ -97,23 +109,44 @@ export default class Boids extends Module {
         this.edges.push(new Line(new Vector(0, config.WORLD.height), new Vector(config.WORLD.width, config.WORLD.height))); // BOTTOM
     }
 
+    onVizChange() {
+        this.boids.forEach((boid) => {
+            boid.setVizualizationStatus(
+                this.renderBoidConnections,
+                this.renderBoidVision,
+                this.enableSeparation,
+                this.enableAlignment,
+                this.enableCohesion,
+            );
+        });
+    }
+
     setupGUI() {
         this.folder = store.gui.addFolder('Boids Settings');
         this.folder.add(this, 'treeSize', 1, 200).listen();
+        this.folder
+            .add(this, 'boidSpeed', 0, 25)
+            .listen()
+            .onChange(v => this.boids.forEach(b => b.setSpeed(v)));
         this.folder.add(this, 'renderQuadTree');
-        this.folder.add(this, 'renderBoidConnections');
-        this.folder.add(this, 'renderBoidVision');
+        this.folder.add(this, 'renderBoidConnections').onChange(() => this.onVizChange());
+        this.folder.add(this, 'renderBoidVision').onChange(() => this.onVizChange());
+        this.folder.add(this, 'enableSeparation').onChange(() => this.onVizChange());
+        this.folder.add(this, 'enableAlignment').onChange(() => this.onVizChange());
+        this.folder.add(this, 'enableCohesion').onChange(() => this.onVizChange());
         this.folder.add(this, 'spawnBoid');
         this.folder.add(this, 'reset');
         this.folder.open();
     }
 
     setup() {
+        this.gfx = new PIXI.Graphics();
         this.setupGUI();
         this.createTextures();
         this.createEdges();
-        this.gfx = new PIXI.Graphics();
         this.stage.addChild(this.gfx);
+        this.debugGfx = new PIXI.Graphics();
+        this.stage.addChild(this.debugGfx);
 
         this.obstacles = [];
         this.reset();
@@ -121,13 +154,12 @@ export default class Boids extends Module {
 
     update(delta) {
         this.gfx.clear();
+        this.debugGfx.clear();
         // Rearrange quad tree to reflect any changes in position.
         this.boidTree = createQuadTree(store.worldBoundary, this.treeSize);
         this.boids.forEach(boid => this.boidTree.insert(boid));
 
         this.boids.forEach((boid) => {
-            boid.setRenderConnections(this.renderBoidConnections);
-            boid.setRenderVision(this.renderBoidVision);
             boid.update(delta, this.boidTree);
         });
     }

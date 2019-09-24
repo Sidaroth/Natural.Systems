@@ -16,11 +16,12 @@ module.exports = {
         sourceType: 'module',
     },
     settings: {
-        'import/resolver': {
-            webpack: {
-                config: 'webpack.config.js',
-            },
-        },
+        'import/resolver': 'webpack',
+        // 'import/resolver': {
+        //     webpack: {
+        //         config: 'webpack.config.js',
+        //     },
+        // },
     },
     rules: {
         strict: 'error',
