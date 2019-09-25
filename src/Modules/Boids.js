@@ -76,6 +76,7 @@ export default class Boids extends Module {
         this.boidTree.insert(boid);
         this.boids.push(boid);
         this.stage.addChild(boid.sprite);
+
         boid.setVizualizationStatus(
             this.renderBoidConnections,
             this.renderBoidVision,
@@ -89,7 +90,6 @@ export default class Boids extends Module {
         if (this.boids.length) {
             this.boids.forEach((boid) => {
                 this.stage.removeChild(boid.sprite);
-                boid.destroy();
             });
         }
 
@@ -178,7 +178,6 @@ export default class Boids extends Module {
         if (this.boids.length) {
             this.boids.forEach((boid) => {
                 this.stage.removeChild(boid.sprite);
-                boid.destroy();
             });
         }
 

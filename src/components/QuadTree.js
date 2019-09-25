@@ -3,14 +3,17 @@ import Rect from '../shapes/rect';
 import store from '../store';
 
 // https://www.wikiwand.com/en/Quadtree
-const createQuadTree = (boundary, cap = Infinity) => {
+const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivision = 0, parentNode = undefined) => {
     const state = {};
 
     const capacity = cap;
+    const maxDivisions = divisions;
     const bounds = boundary;
     const entities = [];
-    const subTrees = [];
+    const division = subDivision;
+    const parent = parentNode;
 
+    let subTrees = [];
     let isSubdivided = false;
 
     function subdivide() {
@@ -25,10 +28,10 @@ const createQuadTree = (boundary, cap = Infinity) => {
         const se = new Rect(midPoint.x, midPoint.y, width, height);
         const sw = new Rect(bounds.x, midPoint.y, width, height);
 
-        subTrees.push(createQuadTree(ne, capacity));
-        subTrees.push(createQuadTree(nw, capacity));
-        subTrees.push(createQuadTree(se, capacity));
-        subTrees.push(createQuadTree(sw, capacity));
+        subTrees.push(createQuadTree(ne, capacity, maxDivisions, division + 1, state));
+        subTrees.push(createQuadTree(nw, capacity, maxDivisions, division + 1, state));
+        subTrees.push(createQuadTree(se, capacity, maxDivisions, division + 1, state));
+        subTrees.push(createQuadTree(sw, capacity, maxDivisions, division + 1, state));
 
         // Redistribute current points.
         for (let i = entities.length; i > 0; i -= 1) {
@@ -40,9 +43,41 @@ const createQuadTree = (boundary, cap = Infinity) => {
         }
     }
 
+    function cleanup() {
+        const subEntities = subTrees.reduce((ents, tree) => ents + tree.entities.length, 0);
+        if (subEntities === 0) {
+            subTrees = [];
+            isSubdivided = false;
+        }
+
+        if (parent) parent.cleanup();
+    }
+
+    function remove(entity) {
+        if (!bounds.contains(entity.position)) return;
+        if (isSubdivided) {
+            subTrees.every((tree) => {
+                const idx = tree.entities.findIndex(e => e.id === entity.id);
+                if (idx !== -1) {
+                    tree.entities.splice(idx, 1);
+                    cleanup();
+                    return false;
+                }
+
+                return true;
+            });
+        } else {
+            const idx = entities.findIndex(e => e.id === entity.id);
+            if (idx !== -1) {
+                entities.splice(idx, 1);
+                cleanup();
+            }
+        }
+    }
+
     function insert(entity) {
         if (!bounds.contains(entity.position)) return false;
-        if (!isSubdivided && entities.length + 1 > capacity) subdivide();
+        if (!isSubdivided && !(division + 1 > maxDivisions) && entities.length + 1 > capacity) subdivide();
 
         if (isSubdivided) {
             subTrees.every((tree) => {
@@ -103,6 +138,7 @@ const createQuadTree = (boundary, cap = Infinity) => {
 
     return Object.assign(state, {
         insert,
+        remove,
         render,
         query,
         subdivide,
@@ -110,6 +146,7 @@ const createQuadTree = (boundary, cap = Infinity) => {
         getAllEntities,
         entities,
         subTrees,
+        cleanup,
         // stuff
     });
 };

@@ -4,7 +4,6 @@ import degreesToRadians from '../math/degreesToRadians';
 import Circle from '../shapes/circle';
 import store from '../store';
 import getUUID from '../math/getUUID';
-import getRandomInt from '../math/getRandomInt';
 
 // Boid logic:
 // 1. Avoid obstacles/each other (Separation)
@@ -97,7 +96,7 @@ const createBoid = (texture, debugGfx = undefined) => {
 
         if (enableSeparation) {
             separation.divide(nearbyBoids.length);
-            separation.setLength(maxSpeed);
+            separation.setLength(maxSpeed * 3);
             separation.sub(velocity);
             separation.limit(maxForce);
             acceleration.add(separation);
@@ -166,10 +165,6 @@ const createBoid = (texture, debugGfx = undefined) => {
         maxSpeed = speed;
     }
 
-    function destroy() {
-        state.sprite.destroy();
-    }
-
     function getTestAngles() {
         return testAngles;
     }
@@ -193,7 +188,6 @@ const createBoid = (texture, debugGfx = undefined) => {
         setVelocity,
         setSpeed,
         update,
-        destroy,
     });
 };
 

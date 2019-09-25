@@ -11,6 +11,7 @@ export default class QuadTreeMod extends Module {
     vision = 0;
     numPoints = 0;
     treeCapacity = 0;
+    treeDepth = 8;
     checks = 0;
     points = [];
 
@@ -29,6 +30,13 @@ export default class QuadTreeMod extends Module {
             .onChange(() => {
                 this.addPoints();
             });
+        this.folder
+            .add(this, 'treeDepth', 0, 15)
+            .listen()
+            .onChange((v) => {
+                this.treeDepth = parseInt(v);
+                this.addPoints();
+            });
         this.folder.add(this, 'treeCapacity', 1, 200).listen();
         this.folder.add(this, 'checks').listen();
         this.folder.add(this, 'reset');
@@ -37,7 +45,7 @@ export default class QuadTreeMod extends Module {
 
     addPoints() {
         this.recalculateTree();
-        this.points.forEach(p => p.sprite.destroy());
+        this.points.forEach(p => this.stage.removeChild(p.sprite));
 
         this.points = [];
         for (let i = 0; i < this.numPoints; i += 1) {
@@ -67,7 +75,7 @@ export default class QuadTreeMod extends Module {
 
     recalculateTree() {
         const boundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
-        this.qTree = createQuadTree(boundary, this.treeCapacity);
+        this.qTree = createQuadTree(boundary, this.treeCapacity, this.treeDepth);
         for (let i = 0; i < this.points.length; i += 1) {
             this.qTree.insert(this.points[i]);
         }
@@ -102,6 +110,15 @@ export default class QuadTreeMod extends Module {
 
         this.highlights = this.qTree.query(testShape);
         this.checks = store.count;
+
+        // Left mouse click
+        if (store.renderer.plugins.interaction.mouse.button === 0) {
+            this.highlights.forEach((p) => {
+                this.qTree.remove(p);
+                this.points.splice(this.points.indexOf(p), 1);
+                this.stage.removeChild(p.sprite);
+            });
+        }
     }
 
     render() {
@@ -123,7 +140,7 @@ export default class QuadTreeMod extends Module {
 
     destroy() {
         this.points.forEach((p) => {
-            p.sprite.destroy();
+            this.stage.removeChild(p.sprite);
         });
 
         if (this.gfx) {
