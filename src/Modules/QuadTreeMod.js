@@ -6,6 +6,7 @@ import createQuadTree from '../components/QuadTree';
 import Rect from '../shapes/rect';
 import Circle from '../shapes/circle';
 import store from '../store';
+import getUUID from '../math/getUUID';
 
 export default class QuadTreeMod extends Module {
     vision = 0;
@@ -35,21 +36,24 @@ export default class QuadTreeMod extends Module {
             .listen()
             .onChange((v) => {
                 this.treeDepth = parseInt(v);
-                this.addPoints();
+                this.recalculateTree();
             });
-        this.folder.add(this, 'treeCapacity', 1, 200).listen();
+        this.folder
+            .add(this, 'treeCapacity', 1, 200)
+            .listen()
+            .onChange(() => this.recalculateTree());
         this.folder.add(this, 'checks').listen();
         this.folder.add(this, 'reset');
         this.folder.open();
     }
 
     addPoints() {
-        this.recalculateTree();
         this.points.forEach(p => this.stage.removeChild(p.sprite));
 
         this.points = [];
         for (let i = 0; i < this.numPoints; i += 1) {
             const entity = {
+                id: getUUID(),
                 position: {
                     x: getRandomInt(0, config.WORLD.width),
                     y: getRandomInt(0, config.WORLD.height),
@@ -62,12 +66,13 @@ export default class QuadTreeMod extends Module {
 
             this.stage.addChild(entity.sprite);
             this.points.push(entity);
-            this.qTree.insert(entity);
         }
+
+        this.recalculateTree();
     }
 
     reset() {
-        this.numPoints = 1000;
+        this.numPoints = 500;
         this.treeCapacity = 25;
         this.vision = 80;
         this.addPoints();
@@ -99,26 +104,29 @@ export default class QuadTreeMod extends Module {
         this.gfx.drawCircle(0, 0, 2);
         this.gfx.endFill();
         this.highlightTexture = store.renderer.generateTexture(this.gfx);
+        store.renderer.plugins.interaction.on('mousedown', this.onMouseDown, this);
 
         this.reset();
     }
 
     update() {
         store.count = 0;
-        this.recalculateTree();
         const testShape = new Circle(store.mouse.x, store.mouse.y, this.vision);
 
         this.highlights = this.qTree.query(testShape);
         this.checks = store.count;
+    }
 
-        // Left mouse click
-        if (store.renderer.plugins.interaction.mouse.button === 0) {
-            this.highlights.forEach((p) => {
-                this.qTree.remove(p);
-                this.points.splice(this.points.indexOf(p), 1);
-                this.stage.removeChild(p.sprite);
-            });
-        }
+    onMouseDown() {
+        this.highlights.forEach((entity) => {
+            const idx = this.points.indexOf(entity);
+            if (idx !== -1) {
+                this.qTree.remove(entity);
+                this.points.splice(idx, 1);
+                this.stage.removeChild(entity.sprite);
+            }
+        });
+        this.highlights = [];
     }
 
     render() {

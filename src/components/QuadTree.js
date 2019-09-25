@@ -9,16 +9,16 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
     const capacity = cap;
     const maxDivisions = divisions;
     const bounds = boundary;
-    const entities = [];
     const division = subDivision;
     const parent = parentNode;
 
+    let entities = [];
     let subTrees = [];
-    let isSubdivided = false;
+    const isDivided = false;
 
     function subdivide() {
         // split boundary into 4 subRegions and redistribute entities to their new owners.
-        isSubdivided = true;
+        state.isDivided = true;
         const width = bounds.w / 2;
         const height = bounds.h / 2;
 
@@ -33,7 +33,7 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
         subTrees.push(createQuadTree(se, capacity, maxDivisions, division + 1, state));
         subTrees.push(createQuadTree(sw, capacity, maxDivisions, division + 1, state));
 
-        // Redistribute current points.
+        // Redistribute current entities.
         for (let i = entities.length; i > 0; i -= 1) {
             const entity = entities.pop();
             subTrees.every((tree) => {
@@ -43,30 +43,36 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
         }
     }
 
+    // Collapse empty subtrees back into this node --> ask parent to check to collapse us if we're now empty.
     function cleanup() {
-        const subEntities = subTrees.reduce((ents, tree) => ents + tree.entities.length, 0);
-        if (subEntities === 0) {
-            subTrees = [];
-            isSubdivided = false;
-        }
+        if (state.isDivided) {
+            let dividedSubTree = false;
+            let entitiesInSubtrees = 0;
+            subTrees.every((tree) => {
+                dividedSubTree = tree.isDivided;
+                if (dividedSubTree) return false;
 
-        if (parent) parent.cleanup();
+                entitiesInSubtrees += tree.entities.length;
+
+                return true;
+            });
+
+            if (!dividedSubTree && entitiesInSubtrees === 0) {
+                subTrees = [];
+                state.isDivided = false;
+                if (parent) parent.cleanup();
+            }
+
+            if (parent) parent.cleanup();
+        } else if (!entities.length && parent) parent.cleanup();
     }
 
     function remove(entity) {
         if (!bounds.contains(entity.position)) return;
-        if (isSubdivided) {
-            subTrees.every((tree) => {
-                const idx = tree.entities.findIndex(e => e.id === entity.id);
-                if (idx !== -1) {
-                    tree.entities.splice(idx, 1);
-                    cleanup();
-                    return false;
-                }
-
-                return true;
-            });
+        if (state.isDivided) {
+            subTrees.forEach(tree => tree.remove(entity));
         } else {
+            // We're in a leaf node.
             const idx = entities.findIndex(e => e.id === entity.id);
             if (idx !== -1) {
                 entities.splice(idx, 1);
@@ -77,9 +83,9 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
 
     function insert(entity) {
         if (!bounds.contains(entity.position)) return false;
-        if (!isSubdivided && !(division + 1 > maxDivisions) && entities.length + 1 > capacity) subdivide();
+        if (!state.isDivided && !(division + 1 > maxDivisions) && entities.length + 1 > capacity) subdivide();
 
-        if (isSubdivided) {
+        if (state.isDivided) {
             subTrees.every((tree) => {
                 if (tree.insert(entity)) return false;
                 return true;
@@ -92,7 +98,7 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
     }
 
     function getAllEntities() {
-        if (isSubdivided) {
+        if (state.isDivided) {
             let ents = [];
             subTrees.forEach((tree) => {
                 ents = [...ents, ...tree.getAllEntities()];
@@ -104,12 +110,16 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
         return entities;
     }
 
+    function getSubtrees() {
+        return subTrees;
+    }
+
     // Returns any point within given range/shape.
     function query(shape) {
         let found = [];
 
         if (!bounds.intersects(shape)) return found;
-        if (isSubdivided) {
+        if (state.isDivided) {
             found = subTrees.reduce((arr, tree) => arr.concat(...tree.query(shape)), []);
         } else {
             entities.forEach((entity) => {
@@ -122,9 +132,8 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
     }
 
     function clear() {
-        this.entities = [];
-        this.subTrees.forEach(tree => tree.clear());
-        this.subTrees = [];
+        entities = [];
+        subTrees = [];
     }
 
     function render(context) {
@@ -144,9 +153,11 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
         subdivide,
         clear,
         getAllEntities,
+        getSubtrees,
         entities,
         subTrees,
         cleanup,
+        isDivided,
         // stuff
     });
 };
