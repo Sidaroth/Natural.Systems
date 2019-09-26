@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const pkg = require('../package.json');
 
@@ -13,6 +12,9 @@ const PATHS = {
 module.exports = {
     context: __dirname,
     mode: 'development',
+    node: {
+        fs: 'empty',
+    },
     entry: {
         app: [PATHS.src],
         vendors: Object.keys(pkg.dependencies),

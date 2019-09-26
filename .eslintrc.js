@@ -9,19 +9,11 @@ module.exports = {
         node: true,
     },
     parserOptions: {
-        ecmaVersion: 2017,
-        ecmaFeatures: {
-            experimentalObjectRestSpread: true,
-        },
+        ecmaVersion: 2018,
         sourceType: 'module',
     },
     settings: {
         'import/resolver': 'webpack',
-        // 'import/resolver': {
-        //     webpack: {
-        //         config: 'webpack.config.js',
-        //     },
-        // },
     },
     rules: {
         strict: 'error',
