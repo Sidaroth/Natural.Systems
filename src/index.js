@@ -43,6 +43,14 @@ sourceTag.innerHTML = 'Source code';
 div.appendChild(sourceTag);
 content.appendChild(div);
 
+// TODO Move this to a more sensible location.
+const descriptionDiv = document.createElement('div');
+const p = document.createElement('p');
+p.innerHTML = 'Placeholder Description';
+p.id = 'description';
+descriptionDiv.appendChild(p);
+content.appendChild(descriptionDiv);
+
 const system = new System(app.stage, app.renderer);
 
 function mainLoop(delta) {

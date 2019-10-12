@@ -9,6 +9,7 @@ import Boids from './Modules/Boids';
 import QuadtreeMod from './Modules/QuadTreeMod';
 import config from './config';
 import store from './store';
+import Roses from './Modules/Roses';
 
 export default class System {
     stage = null;
@@ -75,6 +76,7 @@ export default class System {
 
             mod.setup();
             this.activeModule = mod;
+            document.getElementById('description').innerHTML = mod.description;
         }
     }
 
@@ -86,6 +88,7 @@ export default class System {
         this.sat = new SAT(this.stage);
         this.boids = new Boids(this.stage);
         this.quadTree = new QuadtreeMod(this.stage);
+        this.roses = new Roses(this.stage);
 
         this.modules.push(this.walker);
         this.modules.push(this.gaussianDistrib);
@@ -94,6 +97,7 @@ export default class System {
         this.modules.push(this.sat);
         this.modules.push(this.boids);
         this.modules.push(this.quadTree);
+        this.modules.push(this.roses);
     }
 
     update(delta) {
