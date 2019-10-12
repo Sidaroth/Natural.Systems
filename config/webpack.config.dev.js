@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
 const pkg = require('../package.json');
 
 const PATHS = {
@@ -24,6 +23,7 @@ module.exports = {
         filename: '[name].js',
         path: PATHS.dist,
         publicPath: '/',
+        globalObject: 'this',
     },
     resolve: {
         extensions: ['.js', '.jsx', '.jsm'],
@@ -88,6 +88,10 @@ module.exports = {
                 test: /\.(jpg|png|woff)$/,
                 use: 'file-loader',
             },
+            {
+                test: /\.worker\.js$/,
+                use: 'worker-loader',
+            },
         ],
     },
     plugins: [
@@ -113,22 +117,5 @@ module.exports = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin(),
-        // new CopyWebpackPlugin([
-        //     {
-        //         from: path.join(__dirname, '../assets/images/**/*'),
-        //         to: path.join(PATHS.dist, 'images/'),
-        //         flatten: false,
-        //     },
-        //     {
-        //         from: path.join(__dirname, '../assets/sounds/**/*'),
-        //         to: path.join(PATHS.dist, 'sounds/'),
-        //         flatten: false,
-        //     },
-        //     {
-        //         from: path.join(__dirname, '../assets/spritesheets/**/*'),
-        //         to: path.join(PATHS.dist, 'spritesheets/'),
-        //         flatten: false,
-        //     },
-        // ]),
     ],
 };

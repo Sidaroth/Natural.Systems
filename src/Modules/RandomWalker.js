@@ -4,6 +4,7 @@ import Module from './Module';
 
 import getRandomInt from 'math/getRandomInt';
 import constrain from 'math/constrain';
+import Worker from '../components/test.worker';
 
 export default class RandomWalker extends Module {
     stage = null;
@@ -27,6 +28,14 @@ export default class RandomWalker extends Module {
     setup() {
         this.gfx = new PIXI.Graphics();
         this.stage.addChild(this.gfx);
+
+        const worker = new Worker('components/Worker.js');
+        worker.onmessage = (e) => {
+            console.log('message from worker: ', e);
+        };
+
+        worker.postMessage([1, 2, 3]);
+        console.log('Message posted to worker');
     }
 
     update() {
