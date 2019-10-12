@@ -32,11 +32,13 @@ export default class Roses extends Module {
         petals = 4; d = 31;<br/>
         petals = 5; d = 97;<br/>
         petals = 6; d = 71;<br/>
-        petals = 7; d = 19;<br/>`;
+        petals = 7; d = 19;<br/><br/>
+        Make use of the panel on the right to play around with some settings.`;
     }
 
     setupGUI() {
         this.folder = store.gui.addFolder('Rose Settings');
+        this.folder.add(this, 'radius', 5, 600).listen();
         this.folder.add(this, 'petals', 1, 15).listen().onChange((v) => {
             this.petals = parseInt(v);
         });
@@ -59,6 +61,7 @@ export default class Roses extends Module {
     }
 
     reset() {
+        this.radius = 300;
         this.petals = 2;
         this.d = 39;
         this.outerColor = '#ff0000';
@@ -69,8 +72,13 @@ export default class Roses extends Module {
 
     render() {
         this.gfx.clear();
-        const centerX = config.WORLD.width / 2;
         const centerY = config.WORLD.height / 2;
+        let centerX = config.WORLD.width / 2;
+
+        if (this.petals === 1) {
+            centerX -= this.radius / 2;
+            // centery -= this.radius / 2;
+        }
 
         this.gfx.moveTo(centerX, centerY);
         this.gfx.lineStyle(this.innerWidth, PIXI.utils.string2hex(this.innerColor));
