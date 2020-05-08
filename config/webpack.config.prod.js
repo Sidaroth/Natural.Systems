@@ -91,18 +91,18 @@ module.exports = {
             },
             mobile: true,
         }),
-        // new CopyWebpackPlugin([
-        //     {
-        //         from: path.join(__dirname, '../assets/images/**/*'),
-        //         to: path.join(PATHS.dist, 'assets/images/'),
-        //         flatten: false,
-        //     },
-        //     {
-        //         from: path.join(__dirname, '../assets/sounds/**/*'),
-        //         to: path.join(PATHS.dist, 'assets/sounds/'),
-        //         flatten: false,
-        //     },
-        // ]),
+        new CopyWebpackPlugin([
+            {
+                from: path.join(__dirname, '../assets/images/**/*'),
+                to: path.join(PATHS.dist, 'images/'),
+                flatten: false,
+            },
+            {
+                from: path.join(__dirname, '../assets/sounds/**/*'),
+                to: path.join(PATHS.dist, 'sounds/'),
+                flatten: false,
+            },
+        ]),
     ],
     node: {
         fs: 'empty',

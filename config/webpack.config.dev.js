@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const pkg = require('../package.json');
 
 const PATHS = {
@@ -117,5 +118,17 @@ module.exports = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin(),
+        new CopyWebpackPlugin([
+            {
+                from: path.join(__dirname, '../assets/images/**/*'),
+                to: path.join(PATHS.dist, 'images/'),
+                flatten: false,
+            },
+            {
+                from: path.join(__dirname, '../assets/sounds/**/*'),
+                to: path.join(PATHS.dist, 'sounds/'),
+                flatten: false,
+            },
+        ]),
     ],
 };

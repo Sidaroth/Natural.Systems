@@ -4,8 +4,8 @@ function test() {
 }
 
 onmessage = (msg) => {
-    console.log('Worker: Message received');
-    const res = test();
+    // console.log('Worker: Message received');
+    // const res = test();
 
-    postMessage(res);
+    // postMessage(res);
 };

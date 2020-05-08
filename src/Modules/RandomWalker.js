@@ -29,13 +29,13 @@ export default class RandomWalker extends Module {
         this.gfx = new PIXI.Graphics();
         this.stage.addChild(this.gfx);
 
-        const worker = new Worker('components/Worker.js');
-        worker.onmessage = (e) => {
-            console.log('message from worker: ', e);
-        };
+        // const worker = new Worker('components/Worker.js');
+        // worker.onmessage = (e) => {
+        //     console.log('message from worker: ', e);
+        // };
 
-        worker.postMessage([1, 2, 3]);
-        console.log('Message posted to worker');
+        // worker.postMessage([1, 2, 3]);
+        // console.log('Message posted to worker');
     }
 
     update() {

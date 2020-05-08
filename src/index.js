@@ -30,6 +30,7 @@ app.renderer.view.style.bottom = 0;
 app.renderer.view.style.left = 0;
 app.renderer.view.style.right = 0;
 
+
 store.app = app;
 store.renderer = app.renderer;
 store.mouse = app.renderer.plugins.interaction.mouse.global;
@@ -75,6 +76,7 @@ function start() {
     const params = getURLParams();
     system.setup(params);
 
+    app.ticker.maxFPS = 60;
     app.ticker.add(delta => mainLoop(delta));
 }
 

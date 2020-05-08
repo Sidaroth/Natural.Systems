@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import Module from './Module';
-import PhysicsObject from '../components/PhysicsObject';
+import PhysicsBody from '../components/PhysicsBody';
 import config from '../config';
 import getRandomInt from '../math/getRandomInt';
 import Vector from '../math/Vector';
@@ -68,7 +68,7 @@ export default class WindySnow extends Module {
     }
 
     addSnowflake() {
-        const snowFlake = new PhysicsObject();
+        const snowFlake = new PhysicsBody();
         const size = getRandomInt(1, 3);
         snowFlake.setMass(size / 100000); // The weight of a snowflake is about 0.02 grams, generate flakes in weightrange 0.01 - 0.03 grams.
         snowFlake.setTexture(this.snowflakeTextures[size - 1]);

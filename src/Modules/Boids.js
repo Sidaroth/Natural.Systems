@@ -6,6 +6,7 @@ import Vector from '../math/Vector';
 import getRandomInt from '../math/getRandomInt';
 import Line from '../shapes/line';
 import createBoid from '../components/Boid';
+import createBoidTextures from '../components/createBoidTextures';
 import createQuadTree from '../components/QuadTree';
 
 // 2D Boids - Flock behaviour, obstacle avoidance.
@@ -31,31 +32,6 @@ export default class Boids extends Module {
         super();
         this.stage = stage;
         this.name = 'boids';
-    }
-
-    createTextures() {
-        const boidWidth = 8.5;
-        const boidHeight = boidWidth * 2.5;
-
-        this.textures = [];
-        const p1 = new Vector(0, 0);
-        const p2 = new Vector(-boidWidth, boidHeight);
-        const p3 = new Vector(boidWidth, boidHeight);
-
-        let scalar = 1;
-        const colors = [0x03a9f4, 0x009688, 0x607d8b, 0x00bcd4];
-        for (let i = 0; i < colors.length; i += 1) {
-            scalar += 0.1;
-
-            this.gfx.clear();
-            this.gfx.beginFill(colors[i]);
-            this.gfx.moveTo(p1.x / scalar, p1.x / scalar);
-            this.gfx.lineTo(p2.x / scalar, p2.y / scalar);
-            this.gfx.lineTo(p3.x / scalar, p3.y / scalar);
-            this.gfx.endFill();
-
-            this.textures.push(store.renderer.generateTexture(this.gfx));
-        }
     }
 
     spawnBoid() {
@@ -142,7 +118,7 @@ export default class Boids extends Module {
     setup() {
         this.gfx = new PIXI.Graphics();
         this.setupGUI();
-        this.createTextures();
+        this.textures = createBoidTextures();
         this.createEdges();
         this.stage.addChild(this.gfx);
         this.debugGfx = new PIXI.Graphics();

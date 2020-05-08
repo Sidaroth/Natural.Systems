@@ -1,7 +1,9 @@
 import * as PIXI from 'pixi.js';
 import Vector from 'math/Vector';
 
-export default class PhysicsObject {
+// TODO Seperate sprite from a physicsbody to hasSprite.
+// TODO Convert to hasPhysicsBody.
+export default class PhysicsBody {
     mass = 1; // in kg.
     position;
     velocity;
@@ -21,6 +23,15 @@ export default class PhysicsObject {
         this.mass = mass;
     }
 
+    setDrag(drag) {
+        this.dragCoeff = drag;
+    }
+
+    setPosition(x, y) {
+        this.position.x = x;
+        this.position.y = y;
+    }
+
     calculateDrag(fluidDensity) {
         const speed = this.velocity.getLength();
         const dragMagnitude = fluidDensity * this.dragCoeff * speed * speed;
@@ -30,7 +41,7 @@ export default class PhysicsObject {
         this.acceleration.add(drag);
     }
 
-    update() {
+    update(delta) {
         this.position.add(this.velocity);
         this.velocity.add(this.acceleration);
 
@@ -40,6 +51,13 @@ export default class PhysicsObject {
         if (this.sprite) {
             this.sprite.position.x = this.position.x;
             this.sprite.position.y = this.position.y;
+        }
+    }
+
+    setScale(xScale, yScale) {
+        if (this.sprite) {
+            this.sprite.scale.x = xScale;
+            this.sprite.scale.y = yScale;
         }
     }
 

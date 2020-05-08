@@ -6,8 +6,6 @@ export default class Circle {
     r;
     r2;
 
-    sprite;
-
     constructor(x, y, r) {
         this.x = x;
         this.y = y;
