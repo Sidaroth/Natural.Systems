@@ -14,10 +14,12 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
     const startPos = new Vector(400, 400);
     const maxSpeed = maxSp;
     const minTimeBetweenFlaps = 16.67; // in ms
+
     if (spriteTexture) {
         body.setTexture(spriteTexture);
         body.sprite.anchor.set(0.5);
     }
+
     body.setPosition(startPos.x, startPos.y);
     const collisionRadius = 42; // Aka. how fat is the bird.
     const collider = new Circle(body.position.x, body.position.y, collisionRadius);
@@ -93,7 +95,6 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
 
         updateCollision();
         flapDetected = false;
-
 
         if (debugGfx) {
             debugGfx.lineStyle(5, 0xFF0000);

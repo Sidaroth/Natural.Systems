@@ -64,7 +64,7 @@ export default class System {
             return obj;
         }, {});
 
-        const guiController = this.gui.add(this.guiData, 'active', modules);
+        const guiController = this.gui.add(this.guiData, 'active', modules).listen();
         guiController.onChange(id => this.switchModule(id));
     }
 

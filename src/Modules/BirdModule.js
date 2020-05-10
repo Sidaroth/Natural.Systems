@@ -26,13 +26,27 @@ export default class BirdModule extends Module {
         this.worldHeight = 800;
         this.textures = [];
         this.pipes = [];
+        this.fgSprites = [];
+        this.bushSprites = [];
         this.pipeGap = 250;
+        this.bgmVolume = 0;
         this.pipeTexture = PIXI.Texture.from('../../assets/images/greenPipe.png');
         this.birdTexture = PIXI.Texture.from('../../assets/images/bird.png');
-        this.bgTexture = PIXI.Texture.from('../../assets/images/bg.png');
-        this.bgmVolume = 50;
         PIXI.Loader.shared.add('birdBgm', 'assets/sounds/bgm.wav');
+
+        // Parallax
+        this.loadBackgroundTextures();
     }
+
+    /* eslint-disable class-methods-use-this */
+    loadBackgroundTextures() {
+        PIXI.Loader.shared.add('skyTexture', '../../assets/images/sky.png')
+            .add('farTreesTexture', '../../assets/images/furthest_trees.png')
+            .add('nearTreesTexture', '../../assets/images/nearest__trees.png')
+            .add('bushesTexture', '../../assets/images/background_bushes.png')
+            .add('foregroundTexture', '../../assets/images/foreground_tile.png');
+    }
+    /* eslint-enable class-methods-use-this */
 
     setupGui() {
         this.folder = store.gui.addFolder('Bird Settings');
@@ -73,6 +87,8 @@ export default class BirdModule extends Module {
         this.gfx.clear();
         this.bird.applyForce(this.birdGravity);
         this.bird.update(delta);
+        this.updateBackground();
+
 
         for (let i = this.pipes.length - 1; i >= 0; i -= 1) {
             const pipe = this.pipes[i];
@@ -86,40 +102,52 @@ export default class BirdModule extends Module {
             }
         }
 
-        if (this.firstPipeAdded) {
+        if (this.isFlying) {
             this.distanceToNextPipe -= this.speed;
             if (this.distanceToNextPipe < 0) {
                 this.addPipePair();
                 this.distanceToNextPipe = getRandomInt(700, 900);
             }
         }
+
+        this.gfx.beginFill(0x333333);
+        this.gfx.drawRect(100, 100, 1000, 20);
+        this.gfx.endFill();
     }
 
     updateScore() {
         this.score += 1;
         this.scoreText.text = this.score;
+        this.scoreText.position.x = config.WORLD.width / 2 - this.scoreText.width / 2;
     }
 
     addPipePair() {
+        // Special case handling of first pipe pair so that it spawns a bit further away from the bird.
         let spawnPoint = 1400;
-        if (!this.firstPipeAdded) {
+        if (!this.isFlying) {
             this.distanceToNextPipe = spawnPoint;
-            this.firstPipeAdded = true;
+            this.isFlying = true;
             spawnPoint *= 1.5;
         }
 
-        this.distanceToEdge = config.WORLD.width - this.bird.body.position.x;
+        // Spawns a top/bottom pipe pair at X pos = spawnPoint, and top pipe y protruding spawnHeight down.
+        // the bottom pipe then spawns itself based on the gap and spawnHeight.
         const spawnHeight = getRandomInt(150, 500);
         const topPipe = createPipe(this.bird, this.pipeTexture, 'top', spawnPoint, this.pipeGap, spawnHeight);
         const bottomPipe = createPipe(this.bird, this.pipeTexture, 'bottom', spawnPoint, this.pipeGap, spawnHeight);
+
+        // We don't need to listen on both pipes as they're (currently) always on the same X coordinate.
         topPipe.once(config.EVENTS.ENTITY.PASSED, () => this.updateScore());
-        this.stage.addChildAt(topPipe.sprite, 1); // zIndex 1, 0 is the bg.
-        this.stage.addChildAt(bottomPipe.sprite, 1);
+
+        // TODO Fix Z-indexing.
+        this.stage.addChildAt(topPipe.sprite, this.stage.children.length - this.fgSprites.length);
+        this.stage.addChildAt(bottomPipe.sprite, this.stage.children.length - this.fgSprites.length);
         this.pipes.push(topPipe);
         this.pipes.push(bottomPipe);
     }
 
     reset() {
+        this.birdGravity = new Vector(0, this.gravity);
         this.score = 0;
         this.scoreText.text = 0;
         this.scoreText.visible = false;
@@ -134,7 +162,7 @@ export default class BirdModule extends Module {
         });
         this.pipes = [];
 
-        this.firstPipeAdded = false;
+        this.isFlying = false;
         this.bird = createBird(this.birdTexture, new Vector(0, -this.flapForce), this.maxSpeed);
         this.bird.enableMouse();
         this.bird.once(config.EVENTS.ENTITY.DIE, e => this.onBirdDeath(e));
@@ -147,29 +175,23 @@ export default class BirdModule extends Module {
         this.stage.addChild(this.bird.body.sprite);
     }
 
-    setup() {
-        store.renderer.view.style.width = `${this.worldWidth}px`;
-        store.renderer.view.style.height = `${this.worldHeight}px`;
-        this.bgSprite = new PIXI.Sprite(this.bgTexture);
-        this.stage.addChild(this.bgSprite);
-        this.birdGravity = new Vector(0, this.gravity);
-
+    addText() {
         this.bgText = new PIXI.Text('Flap to begin!', {
             fontFamily: 'Tahoma',
             fontSize: 72,
-            fill: 0x505050,
+            fill: 0xFFFFFF,
             align: 'center',
             fontWeight: 'bold',
             strokeThickness: 3,
             dropShadow: true,
         });
         this.bgText.position.x = config.WORLD.width / 2 - this.bgText.width / 2;
-        this.bgText.position.y = config.WORLD.height / 2 - this.bgText.height * 2;
+        this.bgText.position.y = config.WORLD.height / 10;
 
         this.scoreText = new PIXI.Text('0', {
             fontFamily: 'Tahoma',
             fontSize: 100,
-            fill: 0xEEEEEE,
+            fill: 0xFFFFFF,
             align: 'center',
             fontWeight: 'bold',
             strokeThickness: 4,
@@ -177,7 +199,65 @@ export default class BirdModule extends Module {
         });
         this.scoreText.position.x = config.WORLD.width / 2 - this.scoreText.width / 2;
         this.scoreText.position.y = config.WORLD.height / 10;
+    }
 
+    /* eslint-disable class-methods-use-this */
+    parallaxSprite(sprite, array, idx, speed) {
+        sprite.position.x -= speed;
+        if (sprite.position.x + sprite.width < 0) {
+            // The previous sprite, if we need to move, should be the one at the end currently.
+            const index = idx ? idx - 1 : array.length - 1;
+            const lastSprite = array[index];
+            sprite.position.x = lastSprite.x + lastSprite.width - speed;
+        }
+    }
+    /* eslint-enable class-methods-use-this */
+
+    createBgSprites(count, texture, heightModifier = 1) {
+        const sprites = [];
+        for (let i = 0; i < count; i += 1) {
+            const sprite = new PIXI.Sprite(texture);
+            sprite.position.x = sprite.width * i;
+            sprite.position.y = config.WORLD.height - sprite.height / heightModifier;
+            sprites.push(sprite);
+            this.stage.addChild(sprite);
+        }
+
+        return sprites;
+    }
+
+    updateBackground() {
+        if (!this.isFlying) return;
+        this.fgSprites.forEach((sprite, i) => {
+            this.parallaxSprite(sprite, this.fgSprites, i, this.speed);
+        });
+
+        this.bushSprites.forEach((sprite, i) => {
+            this.parallaxSprite(sprite, this.bushSprites, i, this.speed / 3);
+        });
+
+        this.nearTreeSprites.forEach((sprite, i) => {
+            this.parallaxSprite(sprite, this.nearTreeSprites, i, this.speed / 5);
+        });
+
+        this.farTreeSprite.forEach((sprite, i) => {
+            this.parallaxSprite(sprite, this.farTreeSprite, i, this.speed / 7);
+        });
+    }
+
+    createBackground(resources) {
+        this.backgroundSprites = [];
+        this.skySprite = new PIXI.Sprite(resources.skyTexture.texture);
+
+        this.stage.addChild(this.skySprite);
+
+        this.farTreeSprite = this.createBgSprites(2, resources.farTreesTexture.texture);
+        this.nearTreeSprites = this.createBgSprites(2, resources.nearTreesTexture.texture);
+        this.bushSprites = this.createBgSprites(3, resources.bushesTexture.texture, 0.9);
+        this.fgSprites = this.createBgSprites(5, resources.foregroundTexture.texture, 1.5);
+    }
+
+    setup() {
         PIXI.Loader.shared.load((loader, resources) => {
             this.birdBgm = resources.birdBgm;
             this.birdBgm.sound.play({
@@ -185,15 +265,22 @@ export default class BirdModule extends Module {
                 singleInstance: true,
             });
             this.birdBgm.sound.volume = this.bgmVolume / 100;
+
+            this.createBackground(resources);
         });
+        this.farTreeSprite = [];
+        this.nearTreeSprites = [];
+        this.bushSprites = [];
+        this.fgSprites = [];
 
-        this.gfx = new PIXI.Graphics();
-        this.setupGui();
-
-        this.reset();
-        this.stage.addChild(this.gfx);
+        this.addText();
         this.stage.addChild(this.bgText);
         this.stage.addChild(this.scoreText);
+        this.setupGui();
+        this.reset();
+
+        this.gfx = new PIXI.Graphics();
+        this.stage.addChild(this.gfx);
     }
 
     destroy() {
@@ -234,13 +321,13 @@ export default class BirdModule extends Module {
             texture.destroy();
         });
 
-        if (this.bgSprite) {
-            this.stage.removeChild(this.bgSprite);
-            this.bgSprite.destroy();
-        }
+        // this.backgroundSprites.forEach((sprite) => {
+        //     this.stage.removeChild(sprite);
+        //     sprite.destroy();
+        // });
 
-        store.renderer.view.style.width = `${config.WORLD.width}px`;
-        store.renderer.view.style.height = `${config.WORLD.height}px`;
+        // store.renderer.view.style.width = `${config.WORLD.width}px`;
+        // store.renderer.view.style.height = `${config.WORLD.height}px`;
     }
 
     render() { }
