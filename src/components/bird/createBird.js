@@ -2,18 +2,24 @@ import PhysicsBody from '../PhysicsBody';
 import store from '../../store';
 import Vector from '../../math/Vector';
 import Circle from '../../shapes/circle';
+import canEmit from 'components/events/canEmit';
+import createState from 'utils/createState';
+import config from '../../config';
 
 // TODO When Sprites are seperated from physicsbody, update here...
-const createBird = () => {
+const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5), maxSp = 11) => {
     const state = {};
     const body = new PhysicsBody();
-    const flapForce = new Vector(0, -0.5);
+    const flapForce = flapVector || new Vector();
     const startPos = new Vector(400, 400);
-    const maxSpeed = 9;
-    const minTimeBetweenFlaps = 16; // in ms.
-
+    const maxSpeed = maxSp;
+    const minTimeBetweenFlaps = 16.67; // in ms
+    if (spriteTexture) {
+        body.setTexture(spriteTexture);
+        body.sprite.anchor.set(0.5);
+    }
     body.setPosition(startPos.x, startPos.y);
-    const collisionRadius = 20; // Aka. how fat is the bird.
+    const collisionRadius = 42; // Aka. how fat is the bird.
     const collider = new Circle(body.position.x, body.position.y, collisionRadius);
 
     let lastFlap = 0;
@@ -38,16 +44,25 @@ const createBird = () => {
 
     function setTexture(texture) {
         body.setTexture(texture);
-        // body.sprite.scale.x = 0.25;
-        // body.sprite.scale.y = 0.25;
+        body.sprite.anchor.set(0.5);
+    }
+
+    function die() {
+        body.setPosition(startPos.x, startPos.y);
+        body.velocity.zero();
+        body.sprite.visible = false;
+        firstFlapDone = false;
+        state.emit(config.EVENTS.ENTITY.DIE, 'I died');
+    }
+
+    function onCollision(data) {
+        die();
     }
 
     function updateCollision() {
         collider.setPosition(body.position);
         if (body.position.y > store.worldBoundary.h) {
-            body.setPosition(startPos.x, startPos.y);
-            body.velocity.zero();
-            firstFlapDone = false;
+            die();
         }
     }
 
@@ -55,14 +70,17 @@ const createBird = () => {
         flapForce.y = yValue;
     }
 
-    function update(delta) {
+    function update(delta, debugGfx = undefined) {
         const timeNow = Date.now();
         if (flapDetected && timeNow - lastFlap > minTimeBetweenFlaps) {
             body.velocity.zero();
             body.applyForce(flapForce);
             lastFlap = timeNow;
 
-            if (!firstFlapDone) firstFlapDone = true;
+            if (!firstFlapDone) {
+                firstFlapDone = true;
+                state.emit(config.EVENTS.ENTITY.FIRSTFLAP, 'I flapped');
+            }
         }
 
         if (!firstFlapDone) {
@@ -75,6 +93,12 @@ const createBird = () => {
 
         updateCollision();
         flapDetected = false;
+
+
+        if (debugGfx) {
+            debugGfx.lineStyle(5, 0xFF0000);
+            debugGfx.drawCircle(collider.x, collider.y, collider.getRadius());
+        }
     }
 
     function applyForce(force) {
@@ -82,14 +106,16 @@ const createBird = () => {
     }
 
     function destroy() {
+        state.destroyed = true;
         state.disableMouse();
         body.destroy();
     }
 
-    return Object.assign(state, {
+    const localState = {
         body,
         update,
         flap,
+        collider,
         onMouseDown,
         enableMouse,
         disableMouse,
@@ -97,6 +123,13 @@ const createBird = () => {
         setTexture,
         setFlapForce,
         applyForce,
+        onCollision,
+        destroyed: false,
+    };
+
+    return createState('bird', state, {
+        localState,
+        canEmit: canEmit(state),
     });
 };
 

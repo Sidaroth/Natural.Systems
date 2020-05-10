@@ -3,6 +3,7 @@ import System from './system';
 import config from './config';
 import store from './store';
 import Rect from './shapes/rect';
+import Sound from 'pixi-sound';
 
 let type = 'WebGL';
 if (!PIXI.utils.isWebGLSupported) {
@@ -30,7 +31,6 @@ app.renderer.view.style.bottom = 0;
 app.renderer.view.style.left = 0;
 app.renderer.view.style.right = 0;
 
-
 store.app = app;
 store.renderer = app.renderer;
 store.mouse = app.renderer.plugins.interaction.mouse.global;
@@ -44,7 +44,6 @@ sourceTag.innerHTML = 'Source code';
 div.appendChild(sourceTag);
 content.appendChild(div);
 
-// TODO Move this to a more sensible location.
 const descriptionDiv = document.createElement('div');
 const p = document.createElement('p');
 p.innerHTML = 'Placeholder Description';

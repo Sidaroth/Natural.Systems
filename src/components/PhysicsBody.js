@@ -74,7 +74,7 @@ export default class PhysicsBody {
     }
 
     destroy() {
-        if (this.texture) this.texture.destroy();
+        // if (this.texture) this.texture.destroy();
         if (this.sprite) this.sprite.destroy();
     }
 }

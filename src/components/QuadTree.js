@@ -1,6 +1,7 @@
 import Vector from '../math/Vector';
 import Rect from '../shapes/rect';
 import store from '../store';
+import createState from 'utils/createState';
 
 // https://www.wikiwand.com/en/Quadtree
 const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivision = 0, parentNode = undefined) => {
@@ -145,7 +146,7 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
         });
     }
 
-    return Object.assign(state, {
+    const localState = {
         insert,
         remove,
         render,
@@ -158,8 +159,9 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
         subTrees,
         cleanup,
         isDivided,
-        // stuff
-    });
+    };
+
+    return createState('QuadTree', state, { localState });
 };
 
 export default createQuadTree;

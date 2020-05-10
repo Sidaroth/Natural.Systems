@@ -4,6 +4,7 @@ import degreesToRadians from '../math/degreesToRadians';
 import Circle from '../shapes/circle';
 import store from '../store';
 import getUUID from '../math/getUUID';
+import createState from 'utils/createState';
 
 // Boid logic:
 // 1. Avoid obstacles/each other (Separation)
@@ -169,7 +170,8 @@ const createBoid = (texture, debugGfx = undefined) => {
         return testAngles;
     }
 
-    return Object.assign(state, {
+
+    const localState = {
         // exposed vars
         id,
         position,
@@ -188,6 +190,10 @@ const createBoid = (texture, debugGfx = undefined) => {
         setVelocity,
         setSpeed,
         update,
+    };
+
+    return createState('Boid', state, {
+        localState,
     });
 };
 
