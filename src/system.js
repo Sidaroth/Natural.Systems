@@ -27,6 +27,9 @@ export default class System {
     setup(params) {
         this.createModules();
         this.setupGui();
+        this.fps = 0;
+        this.lastTick = 0;
+        this.lastFPSUpdate = 0;
 
         this.startText = new PIXI.Text('Use the selector to select a module');
         this.startText.anchor.set(0.5, 0.5);
@@ -54,6 +57,7 @@ export default class System {
         this.gui.addFolder('Module Select');
         this.guiData = {
             active: '',
+            fps: 0,
         };
 
         store.gui = this.gui;
@@ -66,6 +70,7 @@ export default class System {
 
         const guiController = this.gui.add(this.guiData, 'active', modules).listen();
         guiController.onChange(id => this.switchModule(id));
+        this.gui.add(this.guiData, 'fps').listen();
     }
 
     switchModule(id) {
@@ -104,6 +109,13 @@ export default class System {
     }
 
     update(delta) {
+        const now = Date.now();
+        if (now - this.lastFPSUpdate > 200) {
+            this.guiData.fps = Math.floor(1000 / (now - this.lastTick));
+            this.lastFPSUpdate = now;
+        }
+        this.lastTick = now;
+
         if (this.activeModule) {
             this.activeModule.update(delta);
         }

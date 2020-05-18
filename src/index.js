@@ -75,7 +75,7 @@ function start() {
     const params = getURLParams();
     system.setup(params);
 
-    app.ticker.maxFPS = 60;
+    // app.ticker.maxFPS = 60;
     app.ticker.add(delta => mainLoop(delta));
 }
 
