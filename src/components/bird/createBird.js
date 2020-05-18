@@ -14,6 +14,7 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
     const startPos = new Vector(400, 400);
     const maxSpeed = maxSp;
     const minTimeBetweenFlaps = 16.67; // in ms
+    const groundLevel = 150;
 
     if (spriteTexture) {
         body.setTexture(spriteTexture);
@@ -63,7 +64,7 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
 
     function updateCollision() {
         collider.setPosition(body.position);
-        if (body.position.y > store.worldBoundary.h) {
+        if (body.position.y > config.WORLD.height - groundLevel) {
             die();
         }
     }
@@ -90,7 +91,7 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
             body.acceleration.zero();
         }
 
-        body.update();
+        body.update(delta);
         body.velocity.limit(maxSpeed);
 
         updateCollision();

@@ -42,7 +42,7 @@ export default class PhysicsBody {
     }
 
     update(delta) {
-        this.position.add(this.velocity);
+        this.position.add(Vector.multiply(this.velocity, delta));
         this.velocity.add(this.acceleration);
 
         // because force application is additive each frame, we have to zero inbetween updates.

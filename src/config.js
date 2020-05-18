@@ -7,6 +7,8 @@ const config = {
         ENTITY: {
             DIE: 'entity die',
             FIRSTFLAP: 'entity flap',
+            DEACTIVATE: 'entity deactivate',
+            PASSED: 'entity passed',
         },
     },
     COMPOSITION_INFO: {
