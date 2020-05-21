@@ -222,15 +222,18 @@ export default class BirdModule extends Module {
 
     update(delta) {
         if (!this.isLoaded) return;
+        this.debugGfx.clear();
 
         this.bird.applyForce(Vector.multiply(this.birdGravity, delta));
-        this.bird.update(delta);
+        this.bird.update(delta, this.debugGfx);
         this.updateBackground(delta);
 
         for (let i = this.trees.length - 1; i >= 0; i -= 1) {
             const tree = this.trees[i];
             tree.update(delta, this.speed);
         }
+
+        // this.addTree(getRandomInt(500, 500));
 
         if (this.isFlying) {
             this.distanceToNextTree -= this.speed * delta;
@@ -276,6 +279,8 @@ export default class BirdModule extends Module {
             this.addText();
             this.createTrees();
             this.reset();
+            this.debugGfx = new PIXI.Graphics();
+            this.stage.addChild(this.debugGfx);
         });
 
         this.farTreeSprite = [];
