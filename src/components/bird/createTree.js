@@ -4,22 +4,20 @@ import canEmit from 'components/events/canEmit';
 import config from '../../config';
 import getUUID from 'math/getUUID';
 import getRandomInt from '../../math/getRandomInt';
-import Rect from '../../shapes/rect';
+import { cloneDeep } from 'lodash';
 
-const createTree = (spawnPoint, textureMap, scene, birdRef) => {
+const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     const state = {};
     const id = getUUID();
 
     const scale = 0.375;
     const groundLevel = 150;
-    const treeTypes = 4;
+    const treeTypes = 10;
 
-    let type = `tree${getRandomInt(1, 1)}`;
+    let type = `tree${getRandomInt(1, treeTypes)}`;
     let isPassed = false;
 
-    let collider1;
-    let collider2;
-
+    let colliders;
     const bird = birdRef;
     const sprite = new PIXI.Sprite(textureMap.get(type));
     sprite.scale.set(scale);
@@ -27,42 +25,36 @@ const createTree = (spawnPoint, textureMap, scene, birdRef) => {
     const debugGfx = new PIXI.Graphics();
 
     function __constructor() {
-        sprite.position.x = spawnPoint;
+        state.setPosition(spawnPoint, config.WORLD.height - groundLevel - sprite.height);
         scene.addChildAt(sprite, scene.children.length - 1);
-        sprite.position.y = config.WORLD.height - groundLevel - sprite.height;
-
-        switch (type) {
-            case 'tree1':
-                collider1 = new Rect(sprite.position.x + sprite.width / 3.1, 0, 160, 350);
-                collider2 = new Rect(sprite.position.x + sprite.width / 3.1, config.WORLD.height - groundLevel - 150, 160, 150);
-                break;
-            case 'tree2':
-                collider1 = new Rect(sprite.position.x + sprite.width / 3.1, 0, 160, 168);
-                collider2 = new Rect(sprite.position.x + sprite.width / 3.1, 415, 160, 450);
-                break;
-            case 'tree3':
-                collider1 = new Rect(sprite.position.x + sprite.width / 3.1, 0, 160, 168);
-                collider2 = new Rect(sprite.position.x + sprite.width / 3.1, 415, 160, 450);
-                break;
-            case 'tree4':
-                collider1 = new Rect(sprite.position.x + sprite.width / 3.1, 0, 160, 70);
-                collider2 = new Rect(sprite.position.x + sprite.width / 3.1, 310, 160, 450);
-                break;
-            default:
-                collider1 = new Rect(0, 0, 0, 0);
-                collider2 = new Rect(0, 0, 0, 0);
-        }
-
         scene.addChild(debugGfx);
     }
 
+    // eslint-disable-next-line
+    function drawColliders() {
+        colliders.forEach((collider) => {
+            debugGfx.beginFill(0x000000, 0.85);
+            debugGfx.drawRect(collider.x, collider.y, collider.w, collider.h);
+            debugGfx.endFill();
+        });
+    }
+
+    function updateCollision(delta, speed) {
+        colliders.forEach((collider) => {
+            collider.x -= speed * delta;
+            if (collider.intersects(bird.collider)) {
+                bird.die();
+            }
+            // drawColliders();
+        });
+    }
+
     function update(delta, speed) {
-        if (!state.isActive) return;
         debugGfx.clear();
+        if (!state.isActive) return;
 
         sprite.position.x -= speed * delta;
-        collider1.x -= speed * delta;
-        collider2.x -= speed * delta;
+        updateCollision(delta, speed);
 
         if (sprite.position.x + sprite.width < 0) {
             state.deactivate();
@@ -74,25 +66,23 @@ const createTree = (spawnPoint, textureMap, scene, birdRef) => {
             state.emit(config.EVENTS.ENTITY.PASSED);
             isPassed = true;
         }
+    }
 
-        const hit1 = collider1.intersects(bird.collider);
-        const hit2 = collider2.intersects(bird.collider);
-
-        console.log(hit1, hit2);
-
-        if (hit1 || hit2) {
-            bird.die();
-        }
-
-        debugGfx.beginFill(0x000000, 0.85);
-        debugGfx.drawRect(collider1.x, collider1.y, collider1.w, collider1.h);
-        debugGfx.drawRect(collider2.x, collider2.y, collider2.w, collider2.h);
-        debugGfx.endFill();
+    // Whenever we reset colliders, we adjust it based on scale....
+    function syncCollision() {
+        colliders = cloneDeep(colliderMap.get(type));
+        colliders.forEach((collider) => {
+            collider.x = sprite.position.x + collider.x * scale;
+            collider.y *= scale;
+            collider.w *= scale;
+            collider.h *= scale;
+        });
     }
 
     function setType(t) {
         type = t;
         sprite.texture = textureMap.get(type);
+        syncCollision();
     }
 
     function deactivate() {
@@ -100,10 +90,11 @@ const createTree = (spawnPoint, textureMap, scene, birdRef) => {
         state.isActive = false;
     }
 
-    function setPosition(position) {
-        sprite.position.x = spawnPoint;
-        collider1.x = sprite.position.x + sprite.width / 3.1;
-        collider2.x = sprite.position.x + sprite.width / 3.1;
+
+    function setPosition(x, y = undefined) {
+        sprite.position.x = x;
+        if (y) sprite.position.y = y;
+        syncCollision();
     }
 
     function activate() {

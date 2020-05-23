@@ -51,6 +51,7 @@
     "dependencies": {
         "babel-plugin-transform-class-properties": "^6.24.1",
         "dat.gui": "^0.7.7",
+        "lodash": "^4.17.15",
         "noisejs": "^2.1.0",
         "path": "^0.12.7",
         "pixi-sound": "^3.0.4",

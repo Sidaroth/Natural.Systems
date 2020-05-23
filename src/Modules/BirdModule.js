@@ -6,6 +6,7 @@ import createBird from '../components/bird/createBird';
 import Vector from '../math/Vector';
 import config from '../config';
 import createTree from '../components/bird/createTree';
+import Rect from '../shapes/rect';
 
 // TODO List:
 // ** Add bird animations.
@@ -32,13 +33,42 @@ export default class BirdModule extends Module {
         this.pipeGap = 250;
         this.groundLevel = 150;
         this.bgmVolume = 0;
-        this.pipeTexture = PIXI.Texture.from('../../assets/images/greenPipe.png');
+        this.treeColliderMap = new Map();
         this.birdTexture = PIXI.Texture.from('../../assets/images/bird.png');
         PIXI.Loader.shared.add('birdBgm', 'assets/sounds/bgm.wav');
 
         // Parallax
         this.loadBackgroundTextures();
         this.loadTreeAndBushTrextures();
+    }
+
+    // Load collision rects from Tiled Tsx dataset.
+    // NOTE: Support polygons using the SAT module instead of just rects? Probably overkill.
+    loadTiledData() {
+        const xmlhttp = new XMLHttpRequest();
+        xmlhttp.open('GET', '../../assets/images/trees/trees.tsx', false);
+        xmlhttp.send();
+        const tiledXml = xmlhttp.responseXML;
+        const tiles = tiledXml.getElementsByTagName('tile');
+
+        for (let i = 0; i < tiles.length; i += 1) {
+            const tile = tiles[i];
+            const colliders = [];
+            const colliderObjects = tile.getElementsByTagName('object');
+
+            for (let j = 0; j < colliderObjects.length; j += 1) {
+                const colliderObj = colliderObjects[j];
+                const x = +colliderObj.getAttribute('x');
+                const y = +colliderObj.getAttribute('y');
+                const width = +colliderObj.getAttribute('width');
+                const height = +colliderObj.getAttribute('height');
+
+                const collider = new Rect(x, y, width, height);
+                colliders.push(collider);
+            }
+
+            this.treeColliderMap.set(`tree${i + 1}`, colliders);
+        }
     }
 
     /* eslint-disable class-methods-use-this */
@@ -56,6 +86,12 @@ export default class BirdModule extends Module {
             .add('tree2', '../../assets/images/trees/completeTree2.png')
             .add('tree3', '../../assets/images/trees/completeTree3.png')
             .add('tree4', '../../assets/images/trees/completeTree4.png')
+            .add('tree5', '../../assets/images/trees/completeTree5.png')
+            .add('tree6', '../../assets/images/trees/completeTree6.png')
+            .add('tree7', '../../assets/images/trees/completeTree7.png')
+            .add('tree8', '../../assets/images/trees/completeTree8.png')
+            .add('tree9', '../../assets/images/trees/completeTree9.png')
+            .add('tree10', '../../assets/images/trees/completeTree10.png')
             .add('bushOne', '../../assets/images/bushes/bush_04.png');
     }
     /* eslint-enable class-methods-use-this */
@@ -114,6 +150,12 @@ export default class BirdModule extends Module {
         this.treeAndBushTextureMap.set('tree2', resources.tree2.texture);
         this.treeAndBushTextureMap.set('tree3', resources.tree3.texture);
         this.treeAndBushTextureMap.set('tree4', resources.tree4.texture);
+        this.treeAndBushTextureMap.set('tree5', resources.tree5.texture);
+        this.treeAndBushTextureMap.set('tree6', resources.tree6.texture);
+        this.treeAndBushTextureMap.set('tree7', resources.tree7.texture);
+        this.treeAndBushTextureMap.set('tree8', resources.tree8.texture);
+        this.treeAndBushTextureMap.set('tree9', resources.tree9.texture);
+        this.treeAndBushTextureMap.set('tree10', resources.tree10.texture);
         this.treeAndBushTextureMap.set('bushOne', resources.bushOne.texture);
     }
 
@@ -132,7 +174,7 @@ export default class BirdModule extends Module {
 
     createTrees() {
         for (let i = 0; i < 10; i += 1) {
-            const tree = createTree(2000, this.treeAndBushTextureMap, this.stage, this.bird);
+            const tree = createTree(2000, this.treeAndBushTextureMap, this.treeColliderMap, this.stage, this.bird);
             tree.on(config.EVENTS.ENTITY.PASSED, this.updateScore, this);
             this.trees.push(tree);
         }
@@ -215,7 +257,7 @@ export default class BirdModule extends Module {
             tree.activate();
             tree.setPosition(spawnPoint);
         } else {
-            const tree = createTree(spawnPoint, this.treeAndBushTextureMap, this.stage, this.bird);
+            const tree = createTree(spawnPoint, this.treeAndBushTextureMap, this.treeColliderMap, this.stage, this.bird);
             this.trees.push(tree);
         }
     }
@@ -232,8 +274,6 @@ export default class BirdModule extends Module {
             const tree = this.trees[i];
             tree.update(delta, this.speed);
         }
-
-        // this.addTree(getRandomInt(500, 500));
 
         if (this.isFlying) {
             this.distanceToNextTree -= this.speed * delta;
@@ -262,8 +302,10 @@ export default class BirdModule extends Module {
         this.stage.addChild(this.bird.body.sprite);
     }
 
-    setup() {
+    async setup() {
         this.isLoaded = false;
+        this.loadTiledData();
+
         PIXI.Loader.shared.load((loader, resources) => {
             this.isLoaded = true;
             this.birdBgm = resources.birdBgm;
@@ -279,6 +321,8 @@ export default class BirdModule extends Module {
             this.addText();
             this.createTrees();
             this.reset();
+            // this.addTree(getRandomInt(500, 500));
+
             this.debugGfx = new PIXI.Graphics();
             this.stage.addChild(this.debugGfx);
         });
@@ -296,6 +340,7 @@ export default class BirdModule extends Module {
         this.score = 0;
         if (this.scoreText) {
             this.scoreText.text = 0;
+            this.scoreText.position.x = config.WORLD.width / 2 - this.scoreText.width / 2;
             this.scoreText.visible = false;
         }
 
