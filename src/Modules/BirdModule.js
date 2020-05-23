@@ -92,7 +92,16 @@ export default class BirdModule extends Module {
             .add('tree8', '../../assets/images/trees/completeTree8.png')
             .add('tree9', '../../assets/images/trees/completeTree9.png')
             .add('tree10', '../../assets/images/trees/completeTree10.png')
-            .add('bushOne', '../../assets/images/bushes/bush_04.png');
+            .add('bush1', '../../assets/images/bushes/bush_04.png')
+            .add('bush2', '../../assets/images/bushes/bush_05.png')
+            .add('bush3', '../../assets/images/bushes/bush_06.png')
+            .add('bush4', '../../assets/images/bushes/bush_12.png')
+            .add('bush5', '../../assets/images/bushes/bush_14.png')
+            .add('bush6', '../../assets/images/bushes/bush_19.png')
+            .add('bush7', '../../assets/images/bushes/bush_20.png')
+            .add('bush8', '../../assets/images/bushes/bush_25.png')
+            .add('bush9', '../../assets/images/bushes/bush_34.png')
+            .add('bush10', '../../assets/images/bushes/bush_39.png');
     }
     /* eslint-enable class-methods-use-this */
 
@@ -156,7 +165,18 @@ export default class BirdModule extends Module {
         this.treeAndBushTextureMap.set('tree8', resources.tree8.texture);
         this.treeAndBushTextureMap.set('tree9', resources.tree9.texture);
         this.treeAndBushTextureMap.set('tree10', resources.tree10.texture);
-        this.treeAndBushTextureMap.set('bushOne', resources.bushOne.texture);
+
+        // Bushes
+        this.treeAndBushTextureMap.set('bush1', resources.bush1.texture);
+        this.treeAndBushTextureMap.set('bush2', resources.bush2.texture);
+        this.treeAndBushTextureMap.set('bush3', resources.bush3.texture);
+        this.treeAndBushTextureMap.set('bush4', resources.bush4.texture);
+        this.treeAndBushTextureMap.set('bush5', resources.bush5.texture);
+        this.treeAndBushTextureMap.set('bush6', resources.bush6.texture);
+        this.treeAndBushTextureMap.set('bush7', resources.bush7.texture);
+        this.treeAndBushTextureMap.set('bush8', resources.bush8.texture);
+        this.treeAndBushTextureMap.set('bush9', resources.bush9.texture);
+        this.treeAndBushTextureMap.set('bush10', resources.bush10.texture);
     }
 
     createBgSprites(count, texture, heightModifier = 1) {
