@@ -63,7 +63,7 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
         bushSprite.position.x -= speed * delta;
         updateCollision(delta, speed);
 
-        if (sprite.position.x + sprite.width < 0) {
+        if (Math.max(sprite.position.x + sprite.width, bushSprite.position.x + bushSprite.width) < 0) {
             state.deactivate();
         }
 

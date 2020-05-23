@@ -9,7 +9,7 @@ import createTree from '../components/bird/createTree';
 import Rect from '../shapes/rect';
 
 // TODO List:
-// ** Add bird animations.
+// ** TexturePack all assets.
 // ** More effects, visually and auditory.
 // ** Add in more foreground/background clutter.
 // ** Make autoflapper.
@@ -34,10 +34,9 @@ export default class BirdModule extends Module {
         this.groundLevel = 150;
         this.bgmVolume = 0;
         this.treeColliderMap = new Map();
-        this.birdTexture = PIXI.Texture.from('../../assets/images/bird.png');
         PIXI.Loader.shared.add('birdBgm', 'assets/sounds/bgm.wav');
 
-        // Parallax
+        this.loadBirdAssets();
         this.loadBackgroundTextures();
         this.loadTreeAndBushTrextures();
     }
@@ -72,6 +71,10 @@ export default class BirdModule extends Module {
     }
 
     /* eslint-disable class-methods-use-this */
+    loadBirdAssets() {
+        PIXI.Loader.shared.add('birdSheet', 'assets/images/bird/bird_packed.json');
+    }
+
     loadBackgroundTextures() {
         PIXI.Loader.shared.add('skyTexture', '../../assets/images/sky.png')
             .add('farTreesTexture', '../../assets/images/furthest_trees.png')
@@ -284,7 +287,7 @@ export default class BirdModule extends Module {
 
     update(delta) {
         if (!this.isLoaded) return;
-        this.debugGfx.clear();
+        if (this.debugGfx) this.debugGfx.clear();
 
         this.bird.applyForce(Vector.multiply(this.birdGravity, delta));
         this.bird.update(delta, this.debugGfx);
@@ -306,10 +309,10 @@ export default class BirdModule extends Module {
 
     createBird() {
         if (this.bird) {
-            this.stage.removeChild(this.bird.body.sprite);
+            this.stage.removeChild(this.bird.getSprite());
             this.bird.destroy();
         }
-        this.bird = createBird(this.birdTexture, new Vector(0, -this.flapForce), this.maxSpeed);
+        this.bird = createBird(new Vector(0, -this.flapForce), this.maxSpeed, this.birdSheet);
         this.bird.enableMouse();
         this.bird.once(config.EVENTS.ENTITY.DIE, e => this.onBirdDeath(e));
         this.bird.once(config.EVENTS.ENTITY.FIRSTFLAP, (e) => {
@@ -319,7 +322,7 @@ export default class BirdModule extends Module {
             this.isFlying = true;
         });
 
-        this.stage.addChild(this.bird.body.sprite);
+        this.stage.addChild(this.bird.getSprite());
     }
 
     async setup() {
@@ -327,13 +330,13 @@ export default class BirdModule extends Module {
         this.loadTiledData();
 
         PIXI.Loader.shared.load((loader, resources) => {
-            this.isLoaded = true;
             this.birdBgm = resources.birdBgm;
             this.birdBgm.sound.play({
                 loop: true,
                 singleInstance: true,
             });
             this.birdBgm.sound.volume = this.bgmVolume / 100;
+            this.birdSheet = resources.birdSheet.spritesheet;
 
             this.createBird();
             this.createBackground(resources);
@@ -345,6 +348,7 @@ export default class BirdModule extends Module {
 
             this.debugGfx = new PIXI.Graphics();
             this.stage.addChild(this.debugGfx);
+            this.isLoaded = true;
         });
 
         this.farTreeSprite = [];

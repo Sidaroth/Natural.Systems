@@ -5,9 +5,9 @@ import Circle from '../../shapes/circle';
 import canEmit from 'components/events/canEmit';
 import createState from 'utils/createState';
 import config from '../../config';
+import hasAnimation from '../hasAnimation';
 
-// TODO When Sprites are seperated from physicsbody, update here...
-const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5), maxSp = 11) => {
+const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = undefined) => {
     const state = {};
     const body = new PhysicsBody();
     const flapForce = flapVector || new Vector();
@@ -16,12 +16,6 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
     const minTimeBetweenFlaps = 16.67; // in ms
     const groundLevel = 150;
 
-    if (spriteTexture) {
-        body.setTexture(spriteTexture);
-        body.sprite.anchor.set(0.5);
-    }
-
-    body.setPosition(startPos.x, startPos.y);
     const collisionRadius = 42; // Aka. how fat is the bird.
     const collider = new Circle(body.position.x, body.position.y, collisionRadius);
 
@@ -29,8 +23,8 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
     let flapDetected = false;
     let firstFlapDone = false;
 
-    function flap() {
-        this.body.applyForce(flapForce);
+    function __constructor() {
+        state.setPosition(startPos);
     }
 
     function onMouseDown() {
@@ -45,25 +39,21 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
         store.renderer.plugins.interaction.off('mousedown', state.onMouseDown, state);
     }
 
-    function setTexture(texture) {
-        body.setTexture(texture);
-        body.sprite.anchor.set(0.5);
+    function setPosition(pos) {
+        body.setPosition(pos.x, pos.y);
+        collider.setPosition(pos.x, pos.y);
+        return pos;
     }
 
     function die() {
-        body.setPosition(startPos.x, startPos.y);
+        state.setPosition(startPos);
         body.velocity.zero();
-        body.sprite.visible = false;
+        state.setRenderable(false);
         firstFlapDone = false;
         state.emit(config.EVENTS.ENTITY.DIE, 'I died');
     }
 
-    function onCollision(data) {
-        die();
-    }
-
     function updateCollision() {
-        collider.setPosition(body.position);
         if (body.position.y > config.WORLD.height - groundLevel) {
             die();
         }
@@ -94,6 +84,9 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
         body.update(delta);
         body.velocity.limit(maxSpeed);
 
+        // TL;DR fix hasPhysicsBody instead...
+        state.setPosition(body.position);
+
         updateCollision();
         flapDetected = false;
 
@@ -108,31 +101,29 @@ const createBird = (spriteTexture = undefined, flapVector = new Vector(0, -0.5),
     }
 
     function destroy() {
-        state.destroyed = true;
         state.disableMouse();
         body.destroy();
     }
 
     const localState = {
+        __constructor,
         body,
         update,
-        flap,
         collider,
         die,
         onMouseDown,
         enableMouse,
         disableMouse,
         destroy,
-        setTexture,
         setFlapForce,
         applyForce,
-        onCollision,
-        destroyed: false,
+        setPosition,
     };
 
     return createState('bird', state, {
         localState,
         canEmit: canEmit(state),
+        hasAnimation: hasAnimation(state, birdSheet, 'normal'),
     });
 };
 
