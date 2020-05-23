@@ -118,7 +118,6 @@ export default class QuadTreeMod extends Module {
     }
 
     onMouseDown() {
-        console.log('test');
         this.highlights.forEach((entity) => {
             const idx = this.points.indexOf(entity);
             if (idx !== -1) {
