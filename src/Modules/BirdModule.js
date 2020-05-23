@@ -17,21 +17,17 @@ export default class BirdModule extends Module {
     constructor(stage) {
         super();
         this.name = 'bird';
-        this.description = 'Bird, pipes, flapping, what more do you need?';
+        this.description = 'Bird, trees, flapping, what more do you need?';
         this.stage = stage;
         this.autoBird = false;
         this.speed = 16;
         this.maxSpeed = 20;
         this.flapForce = 11;
         this.gravity = 0.7;
-        this.worldWidth = 600;
-        this.worldHeight = 800;
         this.textures = [];
         this.trees = [];
         this.fgSprites = [];
         this.bushSprites = [];
-        this.pipeGap = 250;
-        this.groundLevel = 150;
         this.bgmVolume = 0;
         this.treeColliderMap = new Map();
         PIXI.Loader.shared.add('birdBgm', 'assets/sounds/bgm.wav');
@@ -313,6 +309,7 @@ export default class BirdModule extends Module {
             this.bird.destroy();
         }
         this.bird = createBird(new Vector(0, -this.flapForce), this.maxSpeed, this.birdSheet);
+        this.bird.setAnimationSpeed(0.35);
         this.bird.enableMouse();
         this.bird.once(config.EVENTS.ENTITY.DIE, e => this.onBirdDeath(e));
         this.bird.once(config.EVENTS.ENTITY.FIRSTFLAP, (e) => {

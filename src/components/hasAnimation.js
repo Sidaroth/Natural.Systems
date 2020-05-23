@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js';
 const hasAnimation = function hasAnimationFunc(state, sheet, animationKey) {
     let textureSheet = sheet;
     let currentAnimation = animationKey;
-    let animationSpeed = 0.25;
+    let animationSpeed = 1;
 
     const animatedSprite = new PIXI.AnimatedSprite(textureSheet.animations[currentAnimation]);
     animatedSprite.animationSpeed = animationSpeed;
