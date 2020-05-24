@@ -30,4 +30,9 @@ export default class Circle {
     getPosition() {
         return new Vector(this.x, this.y);
     }
+
+    render(context) {
+        context.lineStyle(5, 0xFF0000);
+        context.drawCircle(this.x, this.y, this.r);
+    }
 }

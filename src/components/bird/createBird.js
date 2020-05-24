@@ -6,6 +6,7 @@ import canEmit from 'components/events/canEmit';
 import createState from 'utils/createState';
 import config from '../../config';
 import hasAnimation from '../hasAnimation';
+import hasCollision from '../hasCollision';
 
 const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = undefined) => {
     const state = {};
@@ -16,8 +17,6 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
     const minTimeBetweenFlaps = 16.67; // in ms
     const groundLevel = 150;
 
-    const collisionRadius = 42; // Aka. how fat is the bird.
-    const collider = new Circle(body.position.x, body.position.y, collisionRadius);
 
     let lastFlap = 0;
     let flapDetected = false;
@@ -25,6 +24,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
 
     function __constructor() {
         state.setPosition(startPos);
+        state.setCollisionAnchor({ x: 0.52, y: 0.58 });
     }
 
     function onMouseDown() {
@@ -41,7 +41,6 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
 
     function setPosition(pos) {
         body.setPosition(pos.x, pos.y);
-        collider.setPosition(pos.x, pos.y);
         return pos;
     }
 
@@ -90,10 +89,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         updateCollision();
         flapDetected = false;
 
-        if (debugGfx) {
-            debugGfx.lineStyle(5, 0xFF0000);
-            debugGfx.drawCircle(collider.x, collider.y, collider.getRadius());
-        }
+        state.renderCollider(debugGfx);
     }
 
     function applyForce(force) {
@@ -109,7 +105,6 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         __constructor,
         body,
         update,
-        collider,
         die,
         onMouseDown,
         enableMouse,
@@ -124,6 +119,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         localState,
         canEmit: canEmit(state),
         hasAnimation: hasAnimation(state, birdSheet, 'normal'),
+        hasCollision: hasCollision(state, new Circle(body.position.x, body.position.y, 44)),
     });
 };
 

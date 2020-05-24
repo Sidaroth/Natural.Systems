@@ -36,22 +36,14 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
         scene.addChild(debugGfx);
     }
 
-    // eslint-disable-next-line
-    function drawColliders() {
-        colliders.forEach((collider) => {
-            debugGfx.beginFill(0x000000, 0.85);
-            debugGfx.drawRect(collider.x, collider.y, collider.w, collider.h);
-            debugGfx.endFill();
-        });
-    }
-
     function updateCollision(delta, speed) {
         colliders.forEach((collider) => {
             collider.x -= speed * delta;
-            if (collider.intersects(bird.collider)) {
+            if (collider.intersects(bird.getCollider())) {
                 bird.die();
             }
-            // drawColliders();
+
+            collider.render(debugGfx);
         });
     }
 

@@ -14,7 +14,7 @@ export default class Region {
     }
 
     setPosition(x, y) {
-        this.bounds.setPosition(x, y);
+        this.bounds.setPosition({ x, y });
     }
 
     setSize(w, h) {

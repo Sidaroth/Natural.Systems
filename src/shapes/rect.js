@@ -55,13 +55,19 @@ export default class Rect {
         return new Vector(this.x, this.y);
     }
 
-    setPosition(x, y) {
-        this.x = x;
-        this.y = y;
+    setPosition(vec) {
+        this.x = vec.x;
+        this.y = vec.y;
     }
 
     setSize(w, h) {
         this.w = w;
         this.h = h;
+    }
+
+    render(context) {
+        context.beginFill(0x000000, 0.85);
+        context.drawRect(this.x, this.y, this.w, this.h);
+        context.endFill();
     }
 }

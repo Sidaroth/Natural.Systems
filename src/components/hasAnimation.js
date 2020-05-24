@@ -29,10 +29,12 @@ const hasAnimation = function hasAnimationFunc(state, sheet, animationKey) {
     function setPosition(pos) {
         animatedSprite.position.x = pos.x;
         animatedSprite.position.y = pos.y;
+
+        return pos;
     }
 
     function destroy() {
-        animatedSprite.destroy();
+        // animatedSprite.destroy();
     }
 
     function setRenderable(renderable) {

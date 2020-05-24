@@ -10,7 +10,6 @@ import Rect from '../shapes/rect';
 
 // TODO List:
 // ** TexturePack all assets.
-// ** More effects, visually and auditory.
 // ** Add in more foreground/background clutter.
 // ** Make autoflapper.
 export default class BirdModule extends Module {
@@ -39,6 +38,7 @@ export default class BirdModule extends Module {
 
     // Load collision rects from Tiled Tsx dataset.
     // NOTE: Support polygons using the SAT module instead of just rects? Probably overkill.
+    // TODO: Swap to async load, or use a pixi loader.
     loadTiledData() {
         const xmlhttp = new XMLHttpRequest();
         xmlhttp.open('GET', '../../assets/images/trees/trees.tsx', false);
@@ -106,7 +106,7 @@ export default class BirdModule extends Module {
 
     setupGui() {
         this.folder = store.gui.addFolder('Bird Settings');
-        this.folder.add(this, 'autoBird').listen().onChange(() => this.onAutoBird());
+        // this.folder.add(this, 'autoBird').listen().onChange(() => this.onAutoBird());
         this.folder.add(this, 'flapForce', 0, 50).listen().onChange(v => this.onFlapForceChanged(v));
         this.folder.add(this, 'maxSpeed', 0, 100).listen();
         this.folder.add(this, 'gravity', 0, 1.5).listen().onChange(v => this.onGravityChanged(v));
