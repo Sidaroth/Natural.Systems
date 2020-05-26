@@ -119,17 +119,21 @@ module.exports = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin(),
-        new CopyWebpackPlugin([
-            {
-                from: path.join(__dirname, '../assets/images/**/*'),
-                to: path.join(PATHS.dist, 'images/'),
+        new CopyWebpackPlugin({
+            patterns: [{
+                from: '../assets/images/**/*',
+                to: 'images/',
                 flatten: false,
             },
             {
-                from: path.join(__dirname, '../assets/sounds/**/*'),
-                to: path.join(PATHS.dist, 'sounds/'),
+                from: '../assets/sounds/**/*',
+                to: 'sounds/',
                 flatten: false,
             },
-        ]),
+            ],
+            options: {
+                concurrency: 100,
+            },
+        }),
     ],
 };

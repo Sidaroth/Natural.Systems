@@ -10,6 +10,7 @@ import Rect from '../shapes/rect';
 
 // TODO List:
 // ** TexturePack all assets.
+// ** Properly destroy everything for module swapping.
 // ** Add in more foreground/background clutter.
 // ** Make autoflapper.
 export default class BirdModule extends Module {
