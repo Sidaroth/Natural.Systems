@@ -85,9 +85,9 @@ export default class NoiseVisualizer extends Module {
                 }
 
                 /* eslint-disable no-bitwise */
-                const R = (val /*+ Math.max(0, (this.redThreshold - val) */ * this.red);
-                const G = (val /*+ Math.max(0, (this.greenThreshold - val) */ * this.green);
-                const B = (val /*+ Math.max(0, (this.blueThreshold - val) */ * this.blue);
+                const R = (val /* + Math.max(0, (this.redThreshold - val) */ * this.red);
+                const G = (val /* + Math.max(0, (this.greenThreshold - val) */ * this.green);
+                const B = (val /* + Math.max(0, (this.blueThreshold - val) */ * this.blue);
 
                 this.pixels[bufferIndex] = (this.alpha << 24) | (B << 16) | (G << 8) | R;
                 /* eslint-enable */

@@ -29,6 +29,7 @@ module.exports = {
             root: path.resolve(__dirname, '../src'),
             math: path.resolve(__dirname, '../src/math'),
             utils: path.resolve(__dirname, '../src/utils'),
+            shaders: path.resolve(__dirname, '../src/shaders'),
         },
         extensions: ['.js', '.jsx'],
     },

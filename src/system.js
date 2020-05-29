@@ -12,6 +12,7 @@ import store from './store';
 import Roses from './Modules/Roses';
 import BirdModule from './Modules/BirdModule';
 import FractalTreesMod from './Modules/FractalTrees';
+import ShaderMod from './Modules/ShaderMod';
 
 export default class System {
     stage = null;
@@ -98,6 +99,8 @@ export default class System {
         this.roses = new Roses(this.stage);
         this.bird = new BirdModule(this.stage);
         this.fractalTrees = new FractalTreesMod(this.stage);
+        this.shaderMod = new ShaderMod(this.stage);
+
 
         this.modules.push(this.walker);
         this.modules.push(this.gaussianDistrib);
@@ -109,6 +112,7 @@ export default class System {
         this.modules.push(this.roses);
         this.modules.push(this.bird);
         this.modules.push(this.fractalTrees);
+        this.modules.push(this.shaderMod);
     }
 
     update(delta) {
