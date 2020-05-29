@@ -9,8 +9,10 @@ import createTree from '../components/bird/createTree';
 import Rect from '../shapes/rect';
 
 // TODO List:
+// ** Fix bird resetting
 // ** Fix annoying bird "stutter" in animation loop.
 // ** Add a proper death animation and respawn timer.
+// ** Do something to avoid birdies flying *above* the trees.
 // ** TexturePack all assets.
 // ** Properly destroy everything for module swapping.
 // ** Add in more foreground/background clutter.
@@ -286,10 +288,11 @@ export default class BirdModule extends Module {
     }
 
     update(delta) {
+        if (this.debugGfx) this.debugGfx.clear();
         if (!this.isLoaded) return;
 
         this.bird.applyForce(Vector.multiply(this.birdGravity, delta));
-        this.bird.update(delta);
+        this.bird.update(delta, this.speed);
         this.updateBackground(delta);
 
         for (let i = this.trees.length - 1; i >= 0; i -= 1) {
@@ -312,7 +315,8 @@ export default class BirdModule extends Module {
             this.bird.destroy();
         }
         this.bird = createBird(new Vector(0, -this.flapForce), this.maxSpeed, this.birdSheet);
-        this.bird.setAnimationSpeed(0.35);
+        this.bird.setAnimationSpeed(0.30);
+        this.bird.getSprite().anchor.set(0.5);
         this.bird.enableMouse();
         this.bird.on(config.EVENTS.ENTITY.DIE, e => this.onBirdDeath(e));
         this.bird.on(config.EVENTS.ENTITY.FIRSTFLAP, (e) => {
@@ -347,8 +351,8 @@ export default class BirdModule extends Module {
             this.reset();
 
             // this.debugCollider = new Circle(0, 0, 50);
-            // this.debugGfx = new PIXI.Graphics();
-            // this.stage.addChild(this.debugGfx);
+            this.debugGfx = new PIXI.Graphics();
+            this.stage.addChild(this.debugGfx);
             this.isLoaded = true;
         });
 

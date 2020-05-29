@@ -23,7 +23,6 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
 
     function __constructor() {
         state.setPosition(startPos);
-        state.setCollisionAnchor({ x: 0.52, y: 0.58 });
     }
 
     function onMouseDown() {
@@ -60,7 +59,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         flapForce.y = yValue;
     }
 
-    function update(delta, debugGfx = undefined) {
+    function update(delta, speed, debugGfx = undefined) {
         const timeNow = Date.now();
         if (flapDetected && timeNow - lastFlap > minTimeBetweenFlaps) {
             body.velocity.zero();
@@ -86,6 +85,8 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
 
         updateCollision();
         flapDetected = false;
+        const angle = new Vector(speed, body.velocity.y).angle();
+        state.getSprite().rotation = angle - Math.PI / 2;
 
         state.renderCollider(debugGfx);
     }
@@ -117,7 +118,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         localState,
         canEmit: canEmit(state),
         hasAnimation: hasAnimation(state, birdSheet, 'normal'),
-        hasCollision: hasCollision(state, new Circle(body.position.x, body.position.y, 44)),
+        hasCollision: hasCollision(state, new Circle(body.position.x, body.position.y, 45)),
     });
 };
 
