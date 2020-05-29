@@ -19,7 +19,6 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     let type = `tree${getRandomInt(1, treeTypes)}`;
     let isPassed = false;
 
-    let colliders;
     const bird = birdRef;
     const sprite = new PIXI.Sprite(textureMap.get(type));
     sprite.scale.set(scale);
@@ -27,28 +26,28 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     const bushSprite = new PIXI.Sprite(textureMap.get(`bush${getRandomInt(1, bushTypes)}`));
     bushSprite.scale.set(bushScale);
 
-    const debugGfx = new PIXI.Graphics();
+    // const debugGfx = new PIXI.Graphics();
 
     function __constructor() {
         state.setPosition(spawnPoint, config.WORLD.height - groundLevel - sprite.height);
         scene.addChild(sprite);
         scene.addChild(bushSprite);
-        scene.addChild(debugGfx);
+        // scene.addChild(debugGfx);
     }
 
     function updateCollision(delta, speed) {
-        colliders.forEach((collider) => {
+        state.colliders.forEach((collider) => {
             collider.x -= speed * delta;
             if (collider.intersects(bird.getCollider())) {
                 bird.die();
             }
 
-            collider.render(debugGfx);
+            // collider.render(debugGfx);
         });
     }
 
     function update(delta, speed) {
-        debugGfx.clear();
+        // debugGfx.clear();
         if (!state.isActive) return;
 
         sprite.position.x -= speed * delta;
@@ -69,8 +68,8 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
 
     // Whenever we reset colliders, we adjust it based on scale....
     function syncCollision() {
-        colliders = cloneDeep(colliderMap.get(type));
-        colliders.forEach((collider) => {
+        state.colliders = cloneDeep(colliderMap.get(type));
+        state.colliders.forEach((collider) => {
             collider.x = sprite.position.x + collider.x * scale;
             collider.y *= scale;
             collider.w *= scale;
@@ -109,6 +108,7 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     }
 
     function destroy() {
+        state.colliders = [];
         scene.removeChild(bushSprite);
         scene.removeChild(sprite);
     }
@@ -116,12 +116,14 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     const localState = {
         destroyed: false,
         isActive: false,
+        colliders: [],
         __constructor,
         id,
         setType,
         update,
         deactivate,
         setPosition,
+        updateCollision,
         activate,
         destroy,
     };

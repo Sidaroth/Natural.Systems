@@ -9,6 +9,8 @@ import createTree from '../components/bird/createTree';
 import Rect from '../shapes/rect';
 
 // TODO List:
+// ** Fix annoying bird "stutter" in animation loop.
+// ** Add a proper death animation and respawn timer.
 // ** TexturePack all assets.
 // ** Properly destroy everything for module swapping.
 // ** Add in more foreground/background clutter.
@@ -137,7 +139,6 @@ export default class BirdModule extends Module {
 
     onBirdDeath(e) {
         this.bgText.visible = true;
-        this.bgText.zIndex = 1000;
         this.reset();
     }
 
@@ -218,6 +219,7 @@ export default class BirdModule extends Module {
         });
         this.bgText.position.x = config.WORLD.width / 2 - this.bgText.width / 2;
         this.bgText.position.y = config.WORLD.height / 10;
+        this.bgText.zIndex = 999;
 
         this.scoreText = new PIXI.Text('0', {
             fontFamily: 'Tahoma',
@@ -228,6 +230,7 @@ export default class BirdModule extends Module {
             strokeThickness: 4,
             dropShadow: true,
         });
+        this.scoreText.zIndex = 999;
         this.scoreText.position.x = config.WORLD.width / 2 - this.scoreText.width / 2;
         this.scoreText.position.y = config.WORLD.height / 10;
         this.scoreText.visible = false;
@@ -284,10 +287,9 @@ export default class BirdModule extends Module {
 
     update(delta) {
         if (!this.isLoaded) return;
-        if (this.debugGfx) this.debugGfx.clear();
 
         this.bird.applyForce(Vector.multiply(this.birdGravity, delta));
-        this.bird.update(delta, this.debugGfx);
+        this.bird.update(delta);
         this.updateBackground(delta);
 
         for (let i = this.trees.length - 1; i >= 0; i -= 1) {
@@ -312,14 +314,15 @@ export default class BirdModule extends Module {
         this.bird = createBird(new Vector(0, -this.flapForce), this.maxSpeed, this.birdSheet);
         this.bird.setAnimationSpeed(0.35);
         this.bird.enableMouse();
-        this.bird.once(config.EVENTS.ENTITY.DIE, e => this.onBirdDeath(e));
-        this.bird.once(config.EVENTS.ENTITY.FIRSTFLAP, (e) => {
+        this.bird.on(config.EVENTS.ENTITY.DIE, e => this.onBirdDeath(e));
+        this.bird.on(config.EVENTS.ENTITY.FIRSTFLAP, (e) => {
             this.bgText.visible = false;
             this.scoreText.visible = true;
             this.distanceToNextTree = 1400;
             this.isFlying = true;
         });
 
+        this.bird.getSprite().zIndex = 1000;
         this.stage.addChild(this.bird.getSprite());
     }
 
@@ -342,10 +345,10 @@ export default class BirdModule extends Module {
             this.addText();
             this.createTrees();
             this.reset();
-            // this.addTree(getRandomInt(500, 500));
 
-            this.debugGfx = new PIXI.Graphics();
-            this.stage.addChild(this.debugGfx);
+            // this.debugCollider = new Circle(0, 0, 50);
+            // this.debugGfx = new PIXI.Graphics();
+            // this.stage.addChild(this.debugGfx);
             this.isLoaded = true;
         });
 
@@ -366,13 +369,13 @@ export default class BirdModule extends Module {
             this.scoreText.visible = false;
         }
 
-
         this.trees.forEach((tree) => {
             tree.deactivate();
         });
 
+        this.stage.sortChildren();
+
         this.isFlying = false;
-        this.createBird();
     }
 
     destroy() {

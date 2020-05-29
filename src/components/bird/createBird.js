@@ -17,7 +17,6 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
     const minTimeBetweenFlaps = 16.67; // in ms
     const groundLevel = 150;
 
-
     let lastFlap = 0;
     let flapDetected = false;
     let firstFlapDone = false;
@@ -47,7 +46,6 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
     function die() {
         state.setPosition(startPos);
         body.velocity.zero();
-        state.setRenderable(false);
         firstFlapDone = false;
         state.emit(config.EVENTS.ENTITY.DIE, 'I died');
     }
@@ -83,7 +81,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         body.update(delta);
         body.velocity.limit(maxSpeed);
 
-        // TL;DR fix hasPhysicsBody instead...
+        // TODO fix hasPhysicsBody instead...
         state.setPosition(body.position);
 
         updateCollision();

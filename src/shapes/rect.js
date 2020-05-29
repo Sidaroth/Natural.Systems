@@ -40,6 +40,7 @@ export default class Rect {
             const closestX = constrain(shape.x, this.x, this.x + this.w);
             const closestY = constrain(shape.y, this.y, this.y + this.h);
             const dist = new Vector(shape.x - closestX, shape.y - closestY);
+            // console.log('circle', this.x, this.y, this.w, this.y, closestX, closestY, dist, dist.squaredLength(), shape.r2);
 
             return dist.squaredLength() < shape.r2;
         }

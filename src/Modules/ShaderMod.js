@@ -27,7 +27,6 @@ export default class ShaderMod extends Module {
 
     update(delta) {
         this.uniforms.u_time += delta / 1000;
-
         this.sprite.filters = [new PIXI.Filter(undefined, testFragment, this.uniforms)];
     }
 
