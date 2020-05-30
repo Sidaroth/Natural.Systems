@@ -11,7 +11,6 @@ import Rect from '../shapes/rect';
 // TODO List:
 // ** Add SFX for death and flapping.
 // ** Add in more foreground/background clutter.
-// ** TexturePack all assets.
 // ** Make autoflapper.
 export default class BirdModule extends Module {
     constructor(stage) {
@@ -32,9 +31,7 @@ export default class BirdModule extends Module {
         this.treeColliderMap = new Map();
         PIXI.Loader.shared.add('birdBgm', 'assets/sounds/bgm.wav');
 
-        this.loadBirdAssets();
-        this.loadBackgroundTextures();
-        this.loadTreeAndBushTrextures();
+        this.loadSpritesheets();
     }
 
     // Load collision rects from Tiled Tsx dataset.
@@ -68,40 +65,11 @@ export default class BirdModule extends Module {
     }
 
     /* eslint-disable class-methods-use-this */
-    loadBirdAssets() {
+    loadSpritesheets() {
         PIXI.Loader.shared.add('birdSheet', 'assets/images/bird/bird_packed.json');
-    }
-
-    loadBackgroundTextures() {
-        PIXI.Loader.shared.add('skyTexture', '../../assets/images/sky.png')
-            .add('farTreesTexture', '../../assets/images/furthest_trees.png')
-            .add('nearTreesTexture', '../../assets/images/nearest__trees.png')
-            .add('bushesTexture', '../../assets/images/background_bushes.png')
-            .add('foregroundTexture', '../../assets/images/foreground_tile.png');
-    }
-
-    loadTreeAndBushTrextures() {
-        PIXI.Loader.shared
-            .add('tree1', '../../assets/images/trees/completeTree1.png')
-            .add('tree2', '../../assets/images/trees/completeTree2.png')
-            .add('tree3', '../../assets/images/trees/completeTree3.png')
-            .add('tree4', '../../assets/images/trees/completeTree4.png')
-            .add('tree5', '../../assets/images/trees/completeTree5.png')
-            .add('tree6', '../../assets/images/trees/completeTree6.png')
-            .add('tree7', '../../assets/images/trees/completeTree7.png')
-            .add('tree8', '../../assets/images/trees/completeTree8.png')
-            .add('tree9', '../../assets/images/trees/completeTree9.png')
-            .add('tree10', '../../assets/images/trees/completeTree10.png')
-            .add('bush1', '../../assets/images/bushes/bush_04.png')
-            .add('bush2', '../../assets/images/bushes/bush_05.png')
-            .add('bush3', '../../assets/images/bushes/bush_06.png')
-            .add('bush4', '../../assets/images/bushes/bush_12.png')
-            .add('bush5', '../../assets/images/bushes/bush_14.png')
-            .add('bush6', '../../assets/images/bushes/bush_19.png')
-            .add('bush7', '../../assets/images/bushes/bush_20.png')
-            .add('bush8', '../../assets/images/bushes/bush_25.png')
-            .add('bush9', '../../assets/images/bushes/bush_34.png')
-            .add('bush10', '../../assets/images/bushes/bush_39.png');
+        PIXI.Loader.shared.add('parallaxSheet', '../../assets/images/parallax/parallax.json');
+        PIXI.Loader.shared.add('treeSheet', '../../assets/images/trees/trees.json');
+        PIXI.Loader.shared.add('clutterSheet', '../../assets/images/clutter/clutter.json');
     }
     /* eslint-enable class-methods-use-this */
 
@@ -140,40 +108,43 @@ export default class BirdModule extends Module {
     }
 
     createBackground(resources) {
-        this.skySprite = new PIXI.Sprite(resources.skyTexture.texture);
-
+        const { textures } = resources.parallaxSheet.spritesheet;
+        this.skySprite = new PIXI.Sprite(textures['sky.png']);
         this.stage.addChild(this.skySprite);
 
-        this.farTreeSprites = this.createBgSprites(2, resources.farTreesTexture.texture);
-        this.nearTreeSprites = this.createBgSprites(2, resources.nearTreesTexture.texture);
-        this.bushSprites = this.createBgSprites(3, resources.bushesTexture.texture, 0.9);
-        this.fgSprites = this.createBgSprites(5, resources.foregroundTexture.texture, 1.5);
+        this.farTreeSprites = this.createBgSprites(2, textures['furthest_trees.png']);
+        this.nearTreeSprites = this.createBgSprites(2, textures['nearest_trees.png']);
+        this.bushSprites = this.createBgSprites(3, textures['background_bushes.png'], 0.9);
+        this.fgSprites = this.createBgSprites(5, textures['foreground_tile.png'], 1.5);
     }
 
-    createTreesAndBushes(resources) {
-        this.treeAndBushTextureMap = new Map();
-        this.treeAndBushTextureMap.set('tree1', resources.tree1.texture);
-        this.treeAndBushTextureMap.set('tree2', resources.tree2.texture);
-        this.treeAndBushTextureMap.set('tree3', resources.tree3.texture);
-        this.treeAndBushTextureMap.set('tree4', resources.tree4.texture);
-        this.treeAndBushTextureMap.set('tree5', resources.tree5.texture);
-        this.treeAndBushTextureMap.set('tree6', resources.tree6.texture);
-        this.treeAndBushTextureMap.set('tree7', resources.tree7.texture);
-        this.treeAndBushTextureMap.set('tree8', resources.tree8.texture);
-        this.treeAndBushTextureMap.set('tree9', resources.tree9.texture);
-        this.treeAndBushTextureMap.set('tree10', resources.tree10.texture);
+    // Create a map of textures for easy access.
+    mapTextures(resources) {
+        const treeTextures = resources.treeSheet.spritesheet.textures;
+        const clutterTextures = resources.clutterSheet.spritesheet.textures;
 
-        // Bushes
-        this.treeAndBushTextureMap.set('bush1', resources.bush1.texture);
-        this.treeAndBushTextureMap.set('bush2', resources.bush2.texture);
-        this.treeAndBushTextureMap.set('bush3', resources.bush3.texture);
-        this.treeAndBushTextureMap.set('bush4', resources.bush4.texture);
-        this.treeAndBushTextureMap.set('bush5', resources.bush5.texture);
-        this.treeAndBushTextureMap.set('bush6', resources.bush6.texture);
-        this.treeAndBushTextureMap.set('bush7', resources.bush7.texture);
-        this.treeAndBushTextureMap.set('bush8', resources.bush8.texture);
-        this.treeAndBushTextureMap.set('bush9', resources.bush9.texture);
-        this.treeAndBushTextureMap.set('bush10', resources.bush10.texture);
+        this.textureMap = new Map();
+        this.textureMap.set('tree1', treeTextures['completeTree1.png']);
+        this.textureMap.set('tree2', treeTextures['completeTree2.png']);
+        this.textureMap.set('tree3', treeTextures['completeTree3.png']);
+        this.textureMap.set('tree4', treeTextures['completeTree4.png']);
+        this.textureMap.set('tree5', treeTextures['completeTree5.png']);
+        this.textureMap.set('tree6', treeTextures['completeTree6.png']);
+        this.textureMap.set('tree7', treeTextures['completeTree7.png']);
+        this.textureMap.set('tree8', treeTextures['completeTree8.png']);
+        this.textureMap.set('tree9', treeTextures['completeTree9.png']);
+        this.textureMap.set('tree10', treeTextures['completeTree10.png']);
+
+        this.textureMap.set('bush1', clutterTextures['bush_04.png']);
+        this.textureMap.set('bush2', clutterTextures['bush_05.png']);
+        this.textureMap.set('bush3', clutterTextures['bush_06.png']);
+
+        this.textureMap.set('clutter1', clutterTextures['rocks_01.png']);
+        this.textureMap.set('clutter2', clutterTextures['rocks_02.png']);
+        this.textureMap.set('clutter3', clutterTextures['rocks_03.png']);
+        this.textureMap.set('clutter4', clutterTextures['rocks_04.png']);
+        this.textureMap.set('clutter5', clutterTextures['rocks_05.png']);
+        this.textureMap.set('clutter6', clutterTextures['rocks_06.png']);
     }
 
     createBgSprites(count, texture, heightModifier = 1) {
@@ -191,7 +162,7 @@ export default class BirdModule extends Module {
 
     createTrees() {
         for (let i = 0; i < 20; i += 1) {
-            const tree = createTree(2000, this.treeAndBushTextureMap, this.treeColliderMap, this.stage, this.bird);
+            const tree = createTree(2000, this.textureMap, this.treeColliderMap, this.stage, this.bird);
             tree.on(config.EVENTS.ENTITY.PASSED, this.updateScore, this);
             this.trees.push(tree);
         }
@@ -277,7 +248,7 @@ export default class BirdModule extends Module {
             tree.activate();
             tree.setPosition(spawnPoint);
         } else {
-            const tree = createTree(spawnPoint, this.treeAndBushTextureMap, this.treeColliderMap, this.stage, this.bird);
+            const tree = createTree(spawnPoint, this.textureMap, this.treeColliderMap, this.stage, this.bird);
             this.trees.push(tree);
         }
     }
@@ -340,7 +311,7 @@ export default class BirdModule extends Module {
 
             this.createBird();
             this.createBackground(resources);
-            this.createTreesAndBushes(resources);
+            this.mapTextures(resources);
             this.addText();
             this.createTrees();
             this.reset();

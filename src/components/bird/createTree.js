@@ -2,30 +2,23 @@ import * as PIXI from 'pixi.js';
 import createState from 'utils/createState';
 import canEmit from 'components/events/canEmit';
 import config from '../../config';
-import getUUID from 'math/getUUID';
 import getRandomInt from '../../math/getRandomInt';
 import { cloneDeep } from 'lodash';
 
 const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     const state = {};
-    const id = getUUID();
 
-    const scale = 0.375;
-    const bushScale = 0.45;
+    const colliderScale = 0.375;
     const groundLevel = 150;
     const treeTypes = 10;
-    const bushTypes = 5;
+    const bushTypes = 3;
 
     let type = `tree${getRandomInt(1, treeTypes)}`;
     let isPassed = false;
 
     const bird = birdRef;
     const sprite = new PIXI.Sprite(textureMap.get(type));
-    sprite.scale.set(scale);
-
     const bushSprite = new PIXI.Sprite(textureMap.get(`bush${getRandomInt(1, bushTypes)}`));
-    bushSprite.scale.set(bushScale);
-
     // const debugGfx = new PIXI.Graphics();
 
     function __constructor() {
@@ -70,10 +63,10 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     function syncCollision() {
         state.colliders = cloneDeep(colliderMap.get(type));
         state.colliders.forEach((collider) => {
-            collider.x = sprite.position.x + collider.x * scale;
-            collider.y *= scale;
-            collider.w *= scale;
-            collider.h *= scale;
+            collider.x = sprite.position.x + collider.x * colliderScale;
+            collider.y *= colliderScale;
+            collider.w *= colliderScale;
+            collider.h *= colliderScale;
         });
     }
 
@@ -118,7 +111,6 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
         isActive: false,
         colliders: [],
         __constructor,
-        id,
         setType,
         update,
         deactivate,

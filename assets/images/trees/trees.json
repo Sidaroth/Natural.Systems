@@ -1,0 +1,94 @@
+{"frames": {
+
+"completeTree1.png":
+{
+	"frame": {"x":1,"y":1,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+},
+"completeTree2.png":
+{
+	"frame": {"x":329,"y":1,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+},
+"completeTree3.png":
+{
+	"frame": {"x":329,"y":753,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+},
+"completeTree4.png":
+{
+	"frame": {"x":657,"y":1,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+},
+"completeTree5.png":
+{
+	"frame": {"x":657,"y":753,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+},
+"completeTree6.png":
+{
+	"frame": {"x":985,"y":1,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+},
+"completeTree7.png":
+{
+	"frame": {"x":985,"y":753,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+},
+"completeTree8.png":
+{
+	"frame": {"x":1313,"y":1,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+},
+"completeTree9.png":
+{
+	"frame": {"x":1313,"y":753,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+},
+"completeTree10.png":
+{
+	"frame": {"x":1,"y":753,"w":326,"h":750},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":326,"h":750},
+	"sourceSize": {"w":326,"h":750}
+}},
+"animations": {
+	"completeTree": ["completeTree1.png","completeTree2.png","completeTree3.png","completeTree4.png","completeTree5.png","completeTree6.png","completeTree7.png","completeTree8.png","completeTree9.png","completeTree10.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "trees.png",
+	"format": "RGBA8888",
+	"size": {"w":1640,"h":1504},
+	"smartupdate": "$TexturePacker:SmartUpdate:6b8d464afbbb429bd18904861e81ed1a:196330d1fbac8a4a3b99552acae0374d:ead410b59bd7de5235399502333842d0$"
+}
+}
