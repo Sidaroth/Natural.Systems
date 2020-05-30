@@ -14,12 +14,13 @@ import config from '../../config';
 import store from '../../store';
 
 // TODO List:
-// ** Seperate out the level(s) from the game module.
 // ** Add in more foreground/background clutter.
 // ** Make autoflapper.
 const createEndlessForest = function createEndlessForestFunc(settings) {
     const state = {};
 
+
+    // Expose this to Dat.GUI instead of taking in a settings object....
     let {
         flapForce, maxSpeed, autoBird,
     } = settings;
@@ -119,8 +120,6 @@ const createEndlessForest = function createEndlessForestFunc(settings) {
         setupParallaxBG();
         setupBird();
         createTrees();
-
-        spawnTree(500);
 
         state.playMusic('endlessForestBGM');
 

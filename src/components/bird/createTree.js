@@ -37,9 +37,9 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
         bird.die();
     }
 
-    function updateCollision(delta, speed) {
+    function updateCollision(deltaSpeed) {
         state.colliders.forEach((collider) => {
-            collider.x -= speed * delta;
+            collider.x -= deltaSpeed;
             if (collider.intersects(bird.getCollider())) {
                 birdCrash();
             }
@@ -52,9 +52,10 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
         // debugGfx.clear();
         if (!state.isActive) return;
 
-        sprite.position.x -= speed * delta;
-        bushSprite.position.x -= speed * delta;
-        updateCollision(delta, speed);
+        const deltaSpeed = Math.round(speed * delta);
+        sprite.position.x -= deltaSpeed;
+        bushSprite.position.x -= deltaSpeed;
+        updateCollision(deltaSpeed);
 
         if (Math.max(sprite.position.x + sprite.width, bushSprite.position.x + bushSprite.width) < 0) {
             state.deactivate();

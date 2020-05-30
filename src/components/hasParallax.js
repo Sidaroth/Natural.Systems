@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import config from '../config';
 
+// Dependency: hasContainer
 const hasParallax = function hasParallaxFunc(state) {
     const parallaxLayers = [];
 
@@ -25,13 +26,12 @@ const hasParallax = function hasParallaxFunc(state) {
     function addParallaxLayer(key, texture, count, speed, heightModifier = 1) {
         const sprites = [];
 
-
         for (let i = 0; i < count; i += 1) {
             const sprite = new PIXI.Sprite(texture);
             sprite.position.x = sprite.width * i;
             sprite.position.y = config.WORLD.height - sprite.height / heightModifier;
             sprites.push(sprite);
-            state.getContainer().addChild(sprite);
+            state.addChild(sprite);
         }
 
         parallaxLayers.push({
@@ -41,21 +41,19 @@ const hasParallax = function hasParallaxFunc(state) {
         });
     }
 
-    function parallaxSprite(sprite, array, idx, speed) {
+    function parallaxSprite(sprite, count, speed) {
         sprite.position.x -= speed;
         if (sprite.position.x + sprite.width < 0) {
-            // The previous sprite, if we need to move, should be the one at the end currently.
-            const index = idx ? idx - 1 : array.length - 1;
-            const lastSprite = array[index];
-            sprite.position.x = lastSprite.x + lastSprite.width - speed;
+            sprite.position.x += count * sprite.width;
         }
     }
 
 
     function updateParallax(delta) {
         parallaxLayers.forEach((layer) => {
-            layer.sprites.forEach((sprite, index) => {
-                parallaxSprite(sprite, layer.sprites, index, layer.speed * delta);
+            const speed = Math.round(layer.speed * delta);
+            layer.sprites.forEach((sprite) => {
+                parallaxSprite(sprite, layer.sprites.length, speed);
             });
         });
 
@@ -65,7 +63,7 @@ const hasParallax = function hasParallaxFunc(state) {
     function destroy() {
         parallaxLayers.forEach((layer) => {
             layer.sprites.forEach((sprite) => {
-                state.levelContainer.removeChild(sprite);
+                state.removeChild(sprite);
                 sprite.destroy();
             });
         });

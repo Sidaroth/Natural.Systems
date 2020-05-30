@@ -133,15 +133,22 @@ export default class BirdModule extends Module {
     setupGui() {
         this.folder = store.gui.addFolder('Settings');
         this.folder.add(this.settings, 'flapForce', 0, 50).listen().onChange(v => this.onSettingsChanged());
-        this.folder.add(this.settings, 'maxSpeed', 0, 100).listen().onChange(v => this.onSettingsChanged());
         this.folder.add(this.settings, 'gravity', 0, 1.5).listen().onChange(v => this.onSettingsChanged());
         this.folder.add(this.settings, 'speed', 0, 30).listen().onChange(v => this.onSettingsChanged());
 
         this.folder.add(this, 'BGMVolume', 0, 100).listen().onChange(v => this.onVolumeChanged());
         this.folder.add(this, 'SFXVolume', 0, 100).listen().onChange(v => this.onVolumeChanged());
 
-        this.folder.add(this, 'reset');
+        this.folder.add(this, 'makeItFast');
         this.folder.open();
+    }
+
+    makeItFast() {
+        this.settings.flapForce = 15;
+        this.settings.gravity = 1.3;
+        this.settings.speed = 30;
+
+        this.onSettingsChanged();
     }
 
     updateScore() {
