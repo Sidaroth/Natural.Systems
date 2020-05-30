@@ -20,6 +20,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
     let lastFlap = 0;
     let flapDetected = false;
     let firstFlapDone = false;
+    let alive = true;
 
     function __constructor() {
         state.setPosition(startPos);
@@ -43,15 +44,30 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
     }
 
     function die() {
-        state.setPosition(startPos);
-        body.velocity.zero();
-        firstFlapDone = false;
+        if (!alive) return;
+
+        state.setAnimation('dead');
+        state.body.velocity.zero();
+        alive = false;
+    }
+
+    function onDeath() {
+        state.reset();
         state.emit(config.EVENTS.ENTITY.DIE, 'I died');
     }
 
     function updateCollision() {
         if (body.position.y > config.WORLD.height - groundLevel) {
             die();
+        }
+
+        // We don't want any cheeky birds flying above the trees.
+        if (body.position.y < 0 - state.getSprite().height * 0.5) {
+            die();
+        }
+
+        if (body.position.y > config.WORLD.height) {
+            onDeath();
         }
     }
 
@@ -60,39 +76,54 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
     }
 
     function update(delta, speed, debugGfx = undefined) {
-        const timeNow = Date.now();
-        if (flapDetected && timeNow - lastFlap > minTimeBetweenFlaps) {
-            body.velocity.zero();
-            body.applyForce(flapForce);
-            lastFlap = timeNow;
+        let forwardSpeed = speed;
+        if (alive) {
+            const timeNow = Date.now();
+            if (flapDetected && timeNow - lastFlap > minTimeBetweenFlaps) {
+                body.velocity.zero();
+                body.applyForce(flapForce);
+                lastFlap = timeNow;
+
+                if (!firstFlapDone) {
+                    firstFlapDone = true;
+                    state.emit(config.EVENTS.ENTITY.FIRSTFLAP, 'I flapped');
+                }
+            }
 
             if (!firstFlapDone) {
-                firstFlapDone = true;
-                state.emit(config.EVENTS.ENTITY.FIRSTFLAP, 'I flapped');
+                // Apply no forces internal or external until first flap has been done.
+                body.acceleration.zero();
             }
-        }
-
-        if (!firstFlapDone) {
-            // Apply no forces internal or external until first flap has been done.
-            body.acceleration.zero();
+        } else {
+            forwardSpeed = 0;
         }
 
         body.update(delta);
         body.velocity.limit(maxSpeed);
-
-        // TODO fix hasPhysicsBody instead...
         state.setPosition(body.position);
 
         updateCollision();
-        flapDetected = false;
-        const angle = new Vector(speed, body.velocity.y).angle();
-        state.getSprite().rotation = angle - Math.PI / 2;
+        // state.renderCollider(debugGfx);
 
-        state.renderCollider(debugGfx);
+        const angle = new Vector(forwardSpeed, body.velocity.y).angle();
+        state.getSprite().rotation = angle - Math.PI / 2;
+        flapDetected = false;
+    }
+
+    function isAlive() {
+        return alive;
     }
 
     function applyForce(force) {
         body.applyForce(force);
+    }
+
+    function reset() {
+        state.setPosition(startPos);
+        body.velocity.zero();
+        firstFlapDone = false;
+        alive = true;
+        state.setAnimation('normal');
     }
 
     function destroy() {
@@ -109,7 +140,9 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         enableMouse,
         disableMouse,
         destroy,
+        reset,
         setFlapForce,
+        isAlive,
         applyForce,
         setPosition,
     };

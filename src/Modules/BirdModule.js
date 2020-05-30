@@ -9,22 +9,18 @@ import createTree from '../components/bird/createTree';
 import Rect from '../shapes/rect';
 
 // TODO List:
-// ** Fix bird resetting
-// ** Fix annoying bird "stutter" in animation loop.
-// ** Add a proper death animation and respawn timer.
-// ** Do something to avoid birdies flying *above* the trees.
-// ** TexturePack all assets.
-// ** Properly destroy everything for module swapping.
+// ** Add SFX for death and flapping.
 // ** Add in more foreground/background clutter.
+// ** TexturePack all assets.
 // ** Make autoflapper.
 export default class BirdModule extends Module {
     constructor(stage) {
         super();
         this.name = 'bird';
-        this.description = 'Bird, trees, flapping, what more do you need?';
+        this.description = 'Trees, flapping, what more do you need?\nPress LMB to flap!';
         this.stage = stage;
         this.autoBird = false;
-        this.speed = 16;
+        this.speed = 12.5;
         this.maxSpeed = 20;
         this.flapForce = 11;
         this.gravity = 0.7;
@@ -32,7 +28,7 @@ export default class BirdModule extends Module {
         this.trees = [];
         this.fgSprites = [];
         this.bushSprites = [];
-        this.bgmVolume = 0;
+        this.bgmVolume = 30;
         this.treeColliderMap = new Map();
         PIXI.Loader.shared.add('birdBgm', 'assets/sounds/bgm.wav');
 
@@ -140,17 +136,15 @@ export default class BirdModule extends Module {
     }
 
     onBirdDeath(e) {
-        this.bgText.visible = true;
         this.reset();
     }
 
     createBackground(resources) {
-        this.backgroundSprites = [];
         this.skySprite = new PIXI.Sprite(resources.skyTexture.texture);
 
         this.stage.addChild(this.skySprite);
 
-        this.farTreeSprite = this.createBgSprites(2, resources.farTreesTexture.texture);
+        this.farTreeSprites = this.createBgSprites(2, resources.farTreesTexture.texture);
         this.nearTreeSprites = this.createBgSprites(2, resources.nearTreesTexture.texture);
         this.bushSprites = this.createBgSprites(3, resources.bushesTexture.texture, 0.9);
         this.fgSprites = this.createBgSprites(5, resources.foregroundTexture.texture, 1.5);
@@ -196,7 +190,7 @@ export default class BirdModule extends Module {
     }
 
     createTrees() {
-        for (let i = 0; i < 10; i += 1) {
+        for (let i = 0; i < 20; i += 1) {
             const tree = createTree(2000, this.treeAndBushTextureMap, this.treeColliderMap, this.stage, this.bird);
             tree.on(config.EVENTS.ENTITY.PASSED, this.updateScore, this);
             this.trees.push(tree);
@@ -256,6 +250,7 @@ export default class BirdModule extends Module {
 
     updateBackground(delta) {
         if (!this.isFlying) return;
+
         this.fgSprites.forEach((sprite, i) => {
             this.parallaxSprite(sprite, this.fgSprites, i, this.speed * delta);
         });
@@ -268,8 +263,8 @@ export default class BirdModule extends Module {
             this.parallaxSprite(sprite, this.nearTreeSprites, i, this.speed * delta / 5);
         });
 
-        this.farTreeSprite.forEach((sprite, i) => {
-            this.parallaxSprite(sprite, this.farTreeSprite, i, this.speed * delta / 7);
+        this.farTreeSprites.forEach((sprite, i) => {
+            this.parallaxSprite(sprite, this.farTreeSprites, i, this.speed * delta / 7);
         });
     }
 
@@ -303,7 +298,7 @@ export default class BirdModule extends Module {
         if (this.isFlying) {
             this.distanceToNextTree -= this.speed * delta;
             if (this.distanceToNextTree < 0) {
-                this.addTree(getRandomInt(1400, 1700));
+                this.addTree(1300);
                 this.distanceToNextTree = getRandomInt(700, 900);
             }
         }
@@ -322,7 +317,7 @@ export default class BirdModule extends Module {
         this.bird.on(config.EVENTS.ENTITY.FIRSTFLAP, (e) => {
             this.bgText.visible = false;
             this.scoreText.visible = true;
-            this.distanceToNextTree = 1400;
+            this.distanceToNextTree = 400;
             this.isFlying = true;
         });
 
@@ -356,11 +351,6 @@ export default class BirdModule extends Module {
             this.isLoaded = true;
         });
 
-        this.farTreeSprite = [];
-        this.nearTreeSprites = [];
-        this.bushSprites = [];
-        this.fgSprites = [];
-
         this.setupGui();
     }
 
@@ -373,11 +363,14 @@ export default class BirdModule extends Module {
             this.scoreText.visible = false;
         }
 
+        this.bgText.visible = true;
+
         this.trees.forEach((tree) => {
             tree.deactivate();
         });
 
         this.stage.sortChildren();
+        this.bird.reset();
 
         this.isFlying = false;
     }
@@ -402,7 +395,7 @@ export default class BirdModule extends Module {
         }
 
         if (this.bird) {
-            this.stage.removeChild(this.bird.body.sprite);
+            this.stage.removeChild(this.bird.getSprite());
             this.bird.destroy();
             this.bird = null;
         }
@@ -410,6 +403,22 @@ export default class BirdModule extends Module {
         this.trees.forEach((tree) => {
             tree.destroy();
         });
+        this.trees = [];
+
+        this.farTreeSprites.forEach((tree) => {
+            tree.destroy();
+        });
+        this.nearTreeSprites.forEach((tree) => {
+            tree.destroy();
+        });
+        this.bushSprites.forEach((tree) => {
+            tree.destroy();
+        });
+        this.fgSprites.forEach((tree) => {
+            tree.destroy();
+        });
+
+        this.skySprite.destroy();
 
         this.textures.forEach((texture) => {
             texture.destroy();

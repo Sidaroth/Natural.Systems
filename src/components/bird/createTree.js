@@ -61,7 +61,7 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
         if (isPassed) return;
 
         if (bird && bird.body.position.x > sprite.position.x + sprite.width) {
-            state.emit(config.EVENTS.ENTITY.PASSED);
+            if (bird.isAlive()) state.emit(config.EVENTS.ENTITY.PASSED);
             isPassed = true;
         }
     }

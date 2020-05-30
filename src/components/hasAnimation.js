@@ -15,6 +15,8 @@ const hasAnimation = function hasAnimationFunc(state, sheet, animationKey) {
 
     function setAnimation(key) {
         currentAnimation = key;
+        animatedSprite.textures = textureSheet.animations[currentAnimation];
+        animatedSprite.play();
     }
 
     function setAnimationSpeed(speed) {
@@ -34,7 +36,7 @@ const hasAnimation = function hasAnimationFunc(state, sheet, animationKey) {
     }
 
     function destroy() {
-        // animatedSprite.destroy();
+        animatedSprite.destroy();
     }
 
     function setRenderable(renderable) {
