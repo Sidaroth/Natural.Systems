@@ -102,13 +102,13 @@ export default class BirdModule extends Module {
         }
 
         // Rocks and other clutter.
-        for (let i = 1; i <= 6; i += 1) {
-            store.textureMap.set(`clutter${i}`, clutterTextures[`rocks_0${i}.png`]);
+        for (let i = 1; i <= 11; i += 1) {
+            store.textureMap.set(`clutter${i}`, clutterTextures[`groundClutter${i}.png`]);
         }
 
-        store.textureMap.set('bush1', clutterTextures['bush_04.png']);
-        store.textureMap.set('bush2', clutterTextures['bush_05.png']);
-        store.textureMap.set('bush3', clutterTextures['bush_06.png']);
+        for (let i = 1; i <= 3; i += 1) {
+            store.textureMap.set(`bush${i}`, clutterTextures[`bush${i}.png`]);
+        }
 
         store.textureMap.set('sky', parallaxTextures['sky.png']);
         store.textureMap.set('farTrees', parallaxTextures['furthest_trees.png']);

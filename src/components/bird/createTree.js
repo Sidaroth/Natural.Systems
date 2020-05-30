@@ -21,13 +21,11 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     const bird = birdRef;
     const sprite = new PIXI.Sprite(textureMap.get(type));
     const bushSprite = new PIXI.Sprite(textureMap.get(`bush${getRandomInt(1, bushTypes)}`));
-    // const debugGfx = new PIXI.Graphics();
 
     function __constructor() {
         state.setPosition(spawnPoint, config.WORLD.height - groundLevel - sprite.height);
         scene.addChild(sprite);
         scene.addChild(bushSprite);
-        // scene.addChild(debugGfx);
     }
 
     function birdCrash() {
@@ -117,7 +115,6 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     }
 
     const localState = {
-        destroyed: false,
         isActive: false,
         colliders: [],
         __constructor,
@@ -130,7 +127,7 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
         destroy,
     };
 
-    return createState('Pipe', state, {
+    return createState('Tree', state, {
         localState,
         canEmit: canEmit(state),
         hasSFX: hasSFX(state),

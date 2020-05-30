@@ -159,7 +159,7 @@
         <key>globalSpriteSettings</key>
         <struct type="SpriteSettings">
             <key>scale</key>
-            <double>0.45</double>
+            <double>0.33</double>
             <key>scaleMode</key>
             <enum type="ScaleMode">Smooth</enum>
             <key>extrude</key>
@@ -181,7 +181,7 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">bushes/bush_04.png</key>
+            <key type="filename">bush1.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -196,7 +196,7 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">bushes/bush_05.png</key>
+            <key type="filename">bush2.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -211,7 +211,7 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">bushes/bush_06.png</key>
+            <key type="filename">bush3.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -226,7 +226,10 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">rocks/rocks_01.png</key>
+            <key type="filename">groundClutter1.png</key>
+            <key type="filename">groundClutter10.png</key>
+            <key type="filename">groundClutter8.png</key>
+            <key type="filename">groundClutter9.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -235,13 +238,13 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>185,113,369,225</rect>
+                <rect>45,50,90,99</rect>
                 <key>scale9Paddings</key>
-                <rect>185,113,369,225</rect>
+                <rect>45,50,90,99</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">rocks/rocks_02.png</key>
+            <key type="filename">groundClutter2.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -250,13 +253,13 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>126,106,252,212</rect>
+                <rect>55,87,111,173</rect>
                 <key>scale9Paddings</key>
-                <rect>126,106,252,212</rect>
+                <rect>55,87,111,173</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">rocks/rocks_03.png</key>
+            <key type="filename">groundClutter3.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -265,13 +268,13 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>191,74,381,147</rect>
+                <rect>71,84,141,168</rect>
                 <key>scale9Paddings</key>
-                <rect>191,74,381,147</rect>
+                <rect>71,84,141,168</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">rocks/rocks_04.png</key>
+            <key type="filename">groundClutter4.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -280,13 +283,13 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>335,177,669,354</rect>
+                <rect>36,28,71,55</rect>
                 <key>scale9Paddings</key>
-                <rect>335,177,669,354</rect>
+                <rect>36,28,71,55</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">rocks/rocks_05.png</key>
+            <key type="filename">groundClutter5.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -295,13 +298,13 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>360,300,719,599</rect>
+                <rect>29,24,57,47</rect>
                 <key>scale9Paddings</key>
-                <rect>360,300,719,599</rect>
+                <rect>29,24,57,47</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">rocks/rocks_06.png</key>
+            <key type="filename">groundClutter6.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -310,17 +313,43 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>121,67,243,134</rect>
+                <rect>76,85,151,169</rect>
                 <key>scale9Paddings</key>
-                <rect>121,67,243,134</rect>
+                <rect>76,85,151,169</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">groundClutter7.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>104,69,209,139</rect>
+                <key>scale9Paddings</key>
+                <rect>104,69,209,139</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
         </map>
         <key>fileList</key>
         <array>
-            <filename>bushes</filename>
-            <filename>rocks</filename>
+            <filename>bush1.png</filename>
+            <filename>bush2.png</filename>
+            <filename>bush3.png</filename>
+            <filename>groundClutter1.png</filename>
+            <filename>groundClutter10.png</filename>
+            <filename>groundClutter2.png</filename>
+            <filename>groundClutter3.png</filename>
+            <filename>groundClutter4.png</filename>
+            <filename>groundClutter5.png</filename>
+            <filename>groundClutter6.png</filename>
+            <filename>groundClutter7.png</filename>
+            <filename>groundClutter8.png</filename>
+            <filename>groundClutter9.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

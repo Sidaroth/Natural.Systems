@@ -48,7 +48,6 @@ const hasParallax = function hasParallaxFunc(state) {
         }
     }
 
-
     function updateParallax(delta) {
         parallaxLayers.forEach((layer) => {
             const speed = Math.round(layer.speed * delta);

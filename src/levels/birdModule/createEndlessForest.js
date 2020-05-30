@@ -12,6 +12,7 @@ import Vector from 'math/Vector';
 
 import config from '../../config';
 import store from '../../store';
+import createGroundClutter from '../../components/bird/createGroundClutter';
 
 // TODO List:
 // ** Add in more foreground/background clutter.
@@ -29,12 +30,15 @@ const createEndlessForest = function createEndlessForestFunc(settings) {
     let flightSpeed = 12;
 
     const trees = [];
+    const groundClutter = [];
 
     let distanceToNextTree = 400;
+    let distanceToNextClutter = 200;
     let isFlying = false;
     let bird;
     let skySprite;
 
+    // TODO Consider unifying spawnTree and spawnClutter as they are very similar.
     function spawnTree(spawnPoint = config.WORLD.width) {
         const inactiveTrees = trees.filter(tree => !tree.isActive);
 
@@ -46,9 +50,29 @@ const createEndlessForest = function createEndlessForestFunc(settings) {
             tree.setPosition(spawnPoint);
         } else {
             // We're out of inactive trees to activate, we have to add another tree. Unlikely to happen.
-            const tree = createTree(spawnPoint, state.textureMap, state.treeColliderMap, state.stage, state.bird);
+            const tree = createTree(spawnPoint, store.textureMap, store.treeColliderMap, state.getContainer(), bird);
             trees.push(tree);
         }
+    }
+
+    function spawnClutter(spawnPoint = config.WORLD.width) {
+        const inactiveClutter = groundClutter.filter(clutter => !clutter.isActive);
+
+        if (inactiveClutter.length) {
+            const index = getRandomInt(0, inactiveClutter.length - 1);
+            const clutter = inactiveClutter[index];
+            clutter.activate();
+            clutter.setPosition(spawnPoint);
+        } else {
+            const clutter = createGroundClutter(spawnPoint, state.getContainer());
+            groundClutter.push(clutter);
+        }
+    }
+
+    function updateGroundClutter(delta, speed) {
+        groundClutter.forEach((clutter) => {
+            clutter.update(delta, speed);
+        });
     }
 
     function update(delta) {
@@ -57,6 +81,7 @@ const createEndlessForest = function createEndlessForestFunc(settings) {
 
         if (!isFlying) return;
 
+        updateGroundClutter(delta, flightSpeed);
         state.updateParallax(delta);
         for (let i = trees.length - 1; i >= 0; i -= 1) {
             trees[i].update(delta, flightSpeed);
@@ -67,9 +92,22 @@ const createEndlessForest = function createEndlessForestFunc(settings) {
             distanceToNextTree = getRandomInt(700, 900);
             spawnTree();
         }
+
+        distanceToNextClutter -= flightSpeed * delta;
+        if (distanceToNextClutter < 0) {
+            distanceToNextClutter = getRandomInt(235, 550);
+            spawnClutter();
+        }
     }
 
     // --------------- Setup and Plumbing ----------------
+    function setupGroundClutter() {
+        for (let i = 0; i < 50; i += 1) {
+            const clutter = createGroundClutter(2000, state.getContainer());
+            groundClutter.push(clutter);
+        }
+    }
+
     function setupBird() {
         bird = createBird(new Vector(0, -flapForce), maxSpeed, store.textureMap.get('birdSpritesheet'));
         bird.enableMouse();
@@ -120,6 +158,7 @@ const createEndlessForest = function createEndlessForestFunc(settings) {
         setupParallaxBG();
         setupBird();
         createTrees();
+        setupGroundClutter();
 
         state.playMusic('endlessForestBGM');
 
