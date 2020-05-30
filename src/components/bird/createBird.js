@@ -7,6 +7,8 @@ import createState from 'utils/createState';
 import config from '../../config';
 import hasAnimation from '../hasAnimation';
 import hasCollision from '../hasCollision';
+import getRandomInt from '../../math/getRandomInt';
+import playSFX from 'utils/playSFX';
 
 const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = undefined) => {
     const state = {};
@@ -43,6 +45,10 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         return pos;
     }
 
+    function setFlapForce(yValue) {
+        flapForce.y = yValue;
+    }
+
     function die() {
         if (!alive) return;
 
@@ -56,46 +62,52 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         state.emit(config.EVENTS.ENTITY.DIE, 'I died');
     }
 
+    function flap() {
+        body.velocity.zero();
+        body.applyForce(flapForce);
+
+        const SFXKey = `swoosh${getRandomInt(1, 3)}`;
+        playSFX(SFXKey);
+
+        if (!firstFlapDone) {
+            firstFlapDone = true;
+            state.emit(config.EVENTS.ENTITY.FIRSTFLAP, 'I flapped');
+        }
+    }
+
     function updateCollision() {
-        if (body.position.y > config.WORLD.height - groundLevel) {
-            die();
-        }
-
-        // We don't want any cheeky birds flying above the trees.
-        if (body.position.y < 0 - state.getSprite().height * 0.5) {
-            die();
-        }
-
         if (body.position.y > config.WORLD.height) {
             onDeath();
         }
+
+        // We don't need to die twice...
+        if (!alive) return;
+
+        // We don't want any cheeky birds flying above the trees.
+        const groundCollision = body.position.y > config.WORLD.height - groundLevel;
+        const skyCollision = body.position.y < 0 - state.getSprite().height * 0.5;
+
+        if (groundCollision || skyCollision) {
+            playSFX('crashGround');
+            die();
+        }
     }
 
-    function setFlapForce(yValue) {
-        flapForce.y = yValue;
-    }
 
     function update(delta, speed, debugGfx = undefined) {
-        let forwardSpeed = speed;
+        const forwardSpeed = alive ? speed : 0;
+
         if (alive) {
             const timeNow = Date.now();
             if (flapDetected && timeNow - lastFlap > minTimeBetweenFlaps) {
-                body.velocity.zero();
-                body.applyForce(flapForce);
+                flap();
                 lastFlap = timeNow;
-
-                if (!firstFlapDone) {
-                    firstFlapDone = true;
-                    state.emit(config.EVENTS.ENTITY.FIRSTFLAP, 'I flapped');
-                }
             }
+        }
 
-            if (!firstFlapDone) {
-                // Apply no forces internal or external until first flap has been done.
-                body.acceleration.zero();
-            }
-        } else {
-            forwardSpeed = 0;
+        if (!firstFlapDone) {
+            // Apply no forces internal or external until first flap has been done.
+            body.acceleration.zero();
         }
 
         body.update(delta);

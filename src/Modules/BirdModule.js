@@ -27,11 +27,14 @@ export default class BirdModule extends Module {
         this.trees = [];
         this.fgSprites = [];
         this.bushSprites = [];
-        this.bgmVolume = 30;
+        this.bgmVolume = 25;
         this.treeColliderMap = new Map();
-        PIXI.Loader.shared.add('birdBgm', 'assets/sounds/bgm.wav');
+
+        this.SFXVolume = 50;
+        store.SFXVolume = this.SFXVolume / 100;
 
         this.loadSpritesheets();
+        this.loadAudio();
     }
 
     // Load collision rects from Tiled Tsx dataset.
@@ -65,11 +68,29 @@ export default class BirdModule extends Module {
     }
 
     /* eslint-disable class-methods-use-this */
+    loadAudio() {
+        PIXI.Loader.shared.add('birdBgm', 'assets/sounds/bgm.wav');
+        PIXI.Loader.shared.add('swoosh1', 'assets/sounds/Swoosh_Swipe-Thick_01.wav');
+        PIXI.Loader.shared.add('swoosh2', 'assets/sounds/Swoosh_Swipe-Thick_02.wav');
+        PIXI.Loader.shared.add('swoosh3', 'assets/sounds/Swoosh_Swipe-Thick_03.wav');
+        PIXI.Loader.shared.add('crashGround', 'assets/sounds/collision_paper_soft_02.wav');
+        PIXI.Loader.shared.add('crashTree', 'assets/sounds/collision_hallow_01.wav');
+    }
+
     loadSpritesheets() {
         PIXI.Loader.shared.add('birdSheet', 'assets/images/bird/bird_packed.json');
-        PIXI.Loader.shared.add('parallaxSheet', '../../assets/images/parallax/parallax.json');
-        PIXI.Loader.shared.add('treeSheet', '../../assets/images/trees/trees.json');
-        PIXI.Loader.shared.add('clutterSheet', '../../assets/images/clutter/clutter.json');
+        PIXI.Loader.shared.add('parallaxSheet', 'assets/images/parallax/parallax.json');
+        PIXI.Loader.shared.add('treeSheet', 'assets/images/trees/trees.json');
+        PIXI.Loader.shared.add('clutterSheet', 'assets/images/clutter/clutter.json');
+    }
+
+    mapSFX(resources) {
+        store.SFXMap = new Map();
+        store.SFXMap.set('swoosh1', resources.swoosh1.sound);
+        store.SFXMap.set('swoosh2', resources.swoosh2.sound);
+        store.SFXMap.set('swoosh3', resources.swoosh3.sound);
+        store.SFXMap.set('crashGround', resources.crashGround.sound);
+        store.SFXMap.set('crashTree', resources.crashTree.sound);
     }
     /* eslint-enable class-methods-use-this */
 
@@ -81,6 +102,11 @@ export default class BirdModule extends Module {
         this.folder.add(this, 'gravity', 0, 1.5).listen().onChange(v => this.onGravityChanged(v));
         this.folder.add(this, 'speed', 0, 30).listen();
         this.folder.add(this, 'bgmVolume', 0, 100).listen().onChange(v => this.onBgmVolumeChanged(v));
+
+        this.folder.add(this, 'SFXVolume', 0, 100).listen().onChange((v) => {
+            store.SFXVolume = v / 100;
+        });
+
         this.folder.add(this, 'reset');
         this.folder.open();
     }
@@ -312,6 +338,7 @@ export default class BirdModule extends Module {
             this.createBird();
             this.createBackground(resources);
             this.mapTextures(resources);
+            this.mapSFX(resources);
             this.addText();
             this.createTrees();
             this.reset();

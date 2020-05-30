@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import createState from 'utils/createState';
+import playSFX from 'utils/playSFX';
 import canEmit from 'components/events/canEmit';
 import config from '../../config';
 import getRandomInt from '../../math/getRandomInt';
@@ -28,11 +29,18 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
         // scene.addChild(debugGfx);
     }
 
+    function birdCrash() {
+        if (!bird.isAlive()) return;
+
+        playSFX('crashTree');
+        bird.die();
+    }
+
     function updateCollision(delta, speed) {
         state.colliders.forEach((collider) => {
             collider.x -= speed * delta;
             if (collider.intersects(bird.getCollider())) {
-                bird.die();
+                birdCrash();
             }
 
             // collider.render(debugGfx);
