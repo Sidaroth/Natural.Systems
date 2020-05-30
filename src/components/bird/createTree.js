@@ -1,9 +1,10 @@
 import * as PIXI from 'pixi.js';
 import createState from 'utils/createState';
-import playSFX from 'utils/playSFX';
 import canEmit from 'components/events/canEmit';
+import hasSFX from 'components/audio/hasSFX';
+import getRandomInt from 'math/getRandomInt';
+
 import config from '../../config';
-import getRandomInt from '../../math/getRandomInt';
 import { cloneDeep } from 'lodash';
 
 const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
@@ -32,7 +33,7 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     function birdCrash() {
         if (!bird.isAlive()) return;
 
-        playSFX('crashTree');
+        state.playSFX('crashTree');
         bird.die();
     }
 
@@ -131,6 +132,7 @@ const createTree = (spawnPoint, textureMap, colliderMap, scene, birdRef) => {
     return createState('Pipe', state, {
         localState,
         canEmit: canEmit(state),
+        hasSFX: hasSFX(state),
     });
 };
 

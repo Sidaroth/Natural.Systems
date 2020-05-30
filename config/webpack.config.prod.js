@@ -23,13 +23,14 @@ module.exports = {
     },
     resolve: {
         alias: {
-            styles: path.resolve(__dirname, '../styles'),
             assets: path.resolve(__dirname, '../assets'),
-            components: path.resolve(__dirname, '../src/components'),
+            styles: path.resolve(__dirname, '../styles'),
             root: path.resolve(__dirname, '../src'),
             math: path.resolve(__dirname, '../src/math'),
             utils: path.resolve(__dirname, '../src/utils'),
+            levels: path.resolve(__dirname, '../src/levels'),
             shaders: path.resolve(__dirname, '../src/shaders'),
+            components: path.resolve(__dirname, '../src/components'),
         },
         extensions: ['.js', '.jsx'],
     },

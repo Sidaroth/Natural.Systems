@@ -24,6 +24,14 @@ const hasAnimation = function hasAnimationFunc(state, sheet, animationKey) {
         animatedSprite.animationSpeed = animationSpeed;
     }
 
+    function setZIndex(index) {
+        animatedSprite.zIndex = index;
+    }
+
+    function setSpriteAnchor(x, y = undefined) {
+        animatedSprite.anchor.set(x, y);
+    }
+
     function getSprite() {
         return animatedSprite;
     }
@@ -47,6 +55,8 @@ const hasAnimation = function hasAnimationFunc(state, sheet, animationKey) {
         setAnimation,
         setTextureSheet,
         setAnimationSpeed,
+        setZIndex,
+        setSpriteAnchor,
         getSprite,
         setPosition,
         setRenderable,

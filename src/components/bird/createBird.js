@@ -1,23 +1,24 @@
+import canEmit from 'components/events/canEmit';
+import hasSFX from 'components/audio/hasSFX';
+import hasAnimation from 'components/hasAnimation';
+import hasCollision from 'components/hasCollision';
+import createState from 'utils/createState';
+import getRandomInt from 'math/getRandomInt';
+import Vector from 'math/Vector';
+
 import PhysicsBody from '../PhysicsBody';
 import store from '../../store';
-import Vector from '../../math/Vector';
 import Circle from '../../shapes/circle';
-import canEmit from 'components/events/canEmit';
-import createState from 'utils/createState';
 import config from '../../config';
-import hasAnimation from '../hasAnimation';
-import hasCollision from '../hasCollision';
-import getRandomInt from '../../math/getRandomInt';
-import playSFX from 'utils/playSFX';
 
 const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = undefined) => {
     const state = {};
     const body = new PhysicsBody();
     const flapForce = flapVector || new Vector();
     const startPos = new Vector(400, 400);
-    const maxSpeed = maxSp;
     const minTimeBetweenFlaps = 16.67; // in ms
     const groundLevel = 150;
+    let maxSpeed = maxSp;
 
     let lastFlap = 0;
     let flapDetected = false;
@@ -49,6 +50,10 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         flapForce.y = yValue;
     }
 
+    function setMaxSpeed(speed) {
+        maxSpeed = speed;
+    }
+
     function die() {
         if (!alive) return;
 
@@ -67,7 +72,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         body.applyForce(flapForce);
 
         const SFXKey = `swoosh${getRandomInt(1, 3)}`;
-        playSFX(SFXKey);
+        state.playSFX(SFXKey);
 
         if (!firstFlapDone) {
             firstFlapDone = true;
@@ -88,7 +93,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         const skyCollision = body.position.y < 0 - state.getSprite().height * 0.5;
 
         if (groundCollision || skyCollision) {
-            playSFX('crashGround');
+            state.playSFX('crashGround');
             die();
         }
     }
@@ -157,6 +162,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         isAlive,
         applyForce,
         setPosition,
+        setMaxSpeed,
     };
 
     return createState('bird', state, {
@@ -164,6 +170,7 @@ const createBird = (flapVector = new Vector(0, -0.5), maxSp = 11, birdSheet = un
         canEmit: canEmit(state),
         hasAnimation: hasAnimation(state, birdSheet, 'normal'),
         hasCollision: hasCollision(state, new Circle(body.position.x, body.position.y, 45)),
+        hasSFX: hasSFX(state),
     });
 };
 
