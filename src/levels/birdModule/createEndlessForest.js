@@ -15,7 +15,6 @@ import store from '../../store';
 import createGroundClutter from '../../components/bird/createGroundClutter';
 
 // TODO List:
-// ** Add in more foreground/background clutter.
 // ** Make autoflapper.
 const createEndlessForest = function createEndlessForestFunc(settings) {
     const state = {};
