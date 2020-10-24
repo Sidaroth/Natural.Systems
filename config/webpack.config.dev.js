@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const pkg = require('../package.json');
 
 const PATHS = {
@@ -51,8 +50,8 @@ module.exports = {
             warnings: true,
             errors: true,
         },
-        port: 3001,
-        publicPath: 'http://localhost:3001/',
+        port: 3002,
+        publicPath: 'http://localhost:3002/',
         hot: true,
     },
     module: {
@@ -121,21 +120,5 @@ module.exports = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin(),
-        new CopyWebpackPlugin({
-            patterns: [{
-                from: '../assets/images/**/*',
-                to: 'images/',
-                flatten: false,
-            },
-            {
-                from: '../assets/sounds/**/*',
-                to: 'sounds/',
-                flatten: false,
-            },
-            ],
-            options: {
-                concurrency: 100,
-            },
-        }),
     ],
 };

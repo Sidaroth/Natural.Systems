@@ -10,7 +10,6 @@ import QuadtreeMod from './Modules/QuadTreeMod';
 import config from './config';
 import store from './store';
 import Roses from './Modules/Roses';
-import BirdModule from './Modules/BirdModule';
 import FractalTreesMod from './Modules/FractalTrees';
 import ShaderMod from './Modules/ShaderMod';
 
@@ -97,7 +96,6 @@ export default class System {
         this.boids = new Boids(this.stage);
         this.quadTree = new QuadtreeMod(this.stage);
         this.roses = new Roses(this.stage);
-        this.bird = new BirdModule(this.stage);
         this.fractalTrees = new FractalTreesMod(this.stage);
         this.shaderMod = new ShaderMod(this.stage);
 
@@ -110,7 +108,6 @@ export default class System {
         this.modules.push(this.boids);
         this.modules.push(this.quadTree);
         this.modules.push(this.roses);
-        this.modules.push(this.bird);
         this.modules.push(this.fractalTrees);
         this.modules.push(this.shaderMod);
     }

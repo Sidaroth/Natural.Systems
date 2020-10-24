@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const pkg = require('../package.json');
 
 const PATHS = {
@@ -93,22 +92,6 @@ module.exports = {
                 html5: true,
             },
             mobile: true,
-        }),
-        new CopyWebpackPlugin({
-            patterns: [{
-                from: '../assets/images/**/*',
-                to: 'images/',
-                flatten: false,
-            },
-            {
-                from: '../assets/sounds/**/*',
-                to: 'sounds/',
-                flatten: false,
-            },
-            ],
-            options: {
-                concurrency: 100,
-            },
         }),
     ],
     node: {
