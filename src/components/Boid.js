@@ -128,11 +128,9 @@ const createBoid = (texture, debugGfx = undefined) => {
     }
 
     function update(delta, tree) {
-        if (gfx) {
-            if (renderVision) {
-                gfx.lineStyle(1, 0xaaaaaa);
-                gfx.drawCircle(state.position.x, state.position.y, visionRadius);
-            }
+        if (gfx && renderVision) {
+            gfx.lineStyle(1, 0xaaaaaa);
+            gfx.drawCircle(state.position.x, state.position.y, visionRadius);
         }
 
         acceleration.zero();

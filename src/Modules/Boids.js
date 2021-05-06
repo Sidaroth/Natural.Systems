@@ -34,6 +34,12 @@ export default class Boids extends Module {
         this.name = 'boids';
     }
 
+    spawn50Boids() {
+        for (let i = 0; i < 50; i += 1) {
+            this.spawnBoid();
+        }
+    }
+
     spawnBoid() {
         const textureIdx = getRandomInt(0, this.textures.length - 1);
         const boid = createBoid(this.textures[textureIdx], this.debugGfx);
@@ -111,6 +117,7 @@ export default class Boids extends Module {
         this.folder.add(this, 'enableAlignment').onChange(() => this.onVizChange());
         this.folder.add(this, 'enableCohesion').onChange(() => this.onVizChange());
         this.folder.add(this, 'spawnBoid');
+        this.folder.add(this, 'spawn50Boids');
         this.folder.add(this, 'reset');
         this.folder.open();
     }

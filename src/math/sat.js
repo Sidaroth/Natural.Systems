@@ -1,8 +1,7 @@
 import Vector from './Vector';
 
 // Projects the points onto a unit vector axis,
-// resulting in a one dimensional range of the minimum and
-// maximum value on that axis.
+// resulting in a one dimensional range of the minimum and maximum value on that axis.
 function projectMinMaxOnAxis(points, axis, offset) {
     let min = Infinity;
     let max = -Infinity;
@@ -94,6 +93,7 @@ function checkPolygonPolygon(polygon1, polygon2) {
     };
 
     // We only need to test against unique axes. We can reduce computational load by filtering out duplicates.
+    // This optimization relies on the filtering process being cheaper computationally than the seperating axis calculations.
     const uniqueAxes = [];
     [...pol1Normals, ...pol2Normals].forEach((axis) => {
         if (uniqueAxes.find(a => a.equals(axis)) === undefined) uniqueAxes.push(axis);

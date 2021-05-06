@@ -119,13 +119,13 @@ export default class NoiseVisualizer extends Module {
 
     update(delta) {
         // only recalculate if a speed is set.
-        if (this.speed > 0) {
-            this.runtime += delta * (this.speed / 1000);
-            if (this.type === 'perlin' || this.type === 'simplex') {
-                this.generateNoise();
-            } else if (this.type === 'perlin32' || this.type === 'simplex32') {
-                this.generateNoise32Bit();
-            }
+        if (this.speed <= 0) return;
+
+        this.runtime += delta * (this.speed / 1000);
+        if (this.type === 'perlin' || this.type === 'simplex') {
+            this.generateNoise();
+        } else if (this.type === 'perlin32' || this.type === 'simplex32') {
+            this.generateNoise32Bit();
         }
     }
 

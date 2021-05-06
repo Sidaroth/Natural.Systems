@@ -20,6 +20,8 @@ export default class SATModule extends Module {
     innerRegionHeight = config.WORLD.height - 2 * this.innerRegionOffset;
     innerRegion;
 
+    edgeThickness = 10;
+
     boxWidth = 25;
     boxHeight = 25;
     box;
@@ -36,67 +38,54 @@ export default class SATModule extends Module {
         this.stage.addChild(this.innerRegion.gfx);
     }
 
-    createObstacles() {
-        const leftEdge = new Polygon([
-            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y),
-            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y + this.innerRegionHeight),
-            new Vector(this.innerRegion.bounds.x - 10, this.innerRegion.bounds.y + this.innerRegionHeight),
-            new Vector(this.innerRegion.bounds.x - 10, this.innerRegion.bounds.y),
-        ]);
-        const topEdge = new Polygon([
-            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y),
-            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y - 10),
-            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y - 10),
-            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y),
-        ]);
-        const rightEdge = new Polygon([
-            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y),
-            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth + 10, this.innerRegion.bounds.y),
-            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth + 10, this.innerRegion.bounds.y + this.innerRegionHeight),
-            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y + this.innerRegionHeight),
-        ]);
-        const bottomEdge = new Polygon([
-            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y + this.innerRegionHeight),
-            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y + this.innerRegionHeight),
-            new Vector(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y + this.innerRegionHeight + 10),
-            new Vector(this.innerRegion.bounds.x, this.innerRegion.bounds.y + this.innerRegionHeight + 10),
-        ]);
+    createBoundingBox() {
+        const leftEdge = this.createRect(this.innerRegion.bounds.x - this.edgeThickness, this.innerRegion.bounds.y - this.edgeThickness, this.edgeThickness, this.innerRegionHeight + (2 * this.edgeThickness));
+        const rightEdge = this.createRect(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y - this.edgeThickness, this.edgeThickness, this.innerRegionHeight + (2 * this.edgeThickness));
+        const topEdge = this.createRect(this.innerRegion.bounds.x, this.innerRegion.bounds.y - this.edgeThickness, this.innerRegionWidth, this.edgeThickness);
+        const bottomEdge = this.createRect(this.innerRegion.bounds.x, this.innerRegion.bounds.y + this.innerRegionHeight, this.innerRegionWidth, this.edgeThickness);
 
         this.edges.push(leftEdge);
         this.edges.push(topEdge);
         this.edges.push(rightEdge);
         this.edges.push(bottomEdge);
+    }
 
-        let pos = new Vector(150, 150);
-        const obs1 = new Polygon([pos, new Vector(150, 200), new Vector(200, 150)]);
-        this.obstacles.push(obs1);
+    createRect(x, y, width, height, isObstacle = false) {
+        const rect = new Polygon([
+            new Vector(x, y),
+            new Vector(x + width, y),
+            new Vector(x + width, y + height),
+            new Vector(x, y + height),
+        ]);
 
-        pos = new Vector(800, 500);
-        const obs2 = new Polygon([pos, new Vector(900, 500), new Vector(900, 600), new Vector(800, 600)]);
-        this.obstacles.push(obs2);
+        if (isObstacle) this.obstacles.push(rect);
 
-        pos = new Vector(400, 300);
-        const obs3 = new Polygon([pos, new Vector(500, 300), new Vector(500, 400), new Vector(400, 400)]);
-        this.obstacles.push(obs3);
+        return rect;
+    }
 
-        pos = new Vector(1000, 750);
-        const obs4 = new Polygon([pos, new Vector(900, 800), new Vector(965, 725)]);
-        this.obstacles.push(obs4);
+    createObstacles() {
+        this.createBoundingBox();
+        const triangle1 = new Polygon([new Vector(150, 150), new Vector(150, 200), new Vector(200, 150)]);
+        this.obstacles.push(triangle1);
 
-        pos = new Vector(150, 600);
-        const obs5 = new Polygon([
-            pos,
+        const triangle2 = new Polygon([new Vector(1000, 750), new Vector(900, 800), new Vector(965, 725)]);
+        this.obstacles.push(triangle2);
+
+        const triangle3 = new Polygon([new Vector(900, 100), new Vector(1000, 175), new Vector(800, 175)]);
+        this.obstacles.push(triangle3);
+
+        this.createRect(800, 500, 100, 100, true);
+        this.createRect(400, 300, 100, 100, true);
+
+        const hexagon = new Polygon([
+            new Vector(150, 600),
             new Vector(150, 650),
             new Vector(250, 700),
             new Vector(350, 650),
             new Vector(350, 600),
             new Vector(250, 550),
         ]);
-        this.obstacles.push(obs5);
-
-        pos = new Vector(900, 100);
-        const obs6 = new Polygon([pos, new Vector(1000, 175), new Vector(800, 175)]);
-        this.obstacles.push(obs6);
+        this.obstacles.push(hexagon);
     }
 
     stop() {
@@ -119,7 +108,7 @@ export default class SATModule extends Module {
         this.edges = [];
         this.obstacles = [];
         this.gfx = new PIXI.Graphics();
-        this.innerRegion = new Region(this.innerRegionOffset, this.innerRegionOffset, this.innerRegionWidth, this.innerRegionHeight)
+        this.innerRegion = new Region(this.innerRegionOffset, this.innerRegionOffset, this.innerRegionWidth, this.innerRegionHeight);
 
         this.setupGUI();
         this.drawBoundary();
@@ -128,13 +117,7 @@ export default class SATModule extends Module {
 
         const boxPosX = this.innerRegion.bounds.x + this.innerRegionWidth / 2;
         const boxPosY = this.innerRegion.bounds.y + 200;
-        const boxVertices = [
-            new Vector(boxPosX, boxPosY),
-            new Vector(boxPosX + this.boxWidth, boxPosY),
-            new Vector(boxPosX + this.boxWidth, boxPosY + this.boxHeight),
-            new Vector(boxPosX, boxPosY + this.boxHeight),
-        ];
-        this.box = new Polygon(boxVertices);
+        this.box = this.createRect(boxPosX, boxPosY, this.boxWidth, this.boxHeight);
         this.directionVector = new Vector(1, 1);
     }
 
