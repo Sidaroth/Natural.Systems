@@ -9,26 +9,26 @@ import store from '../store';
 
 
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
-// https://www.wikiwand.com/en/Hyperplane_separation_theorem
 export default class SATModule extends Module {
-    edges;
-    obstacles;
-    gfx;
-
-    innerRegionOffset = 40;
-    innerRegionWidth = config.WORLD.width - 2 * this.innerRegionOffset;
-    innerRegionHeight = config.WORLD.height - 2 * this.innerRegionOffset;
-    innerRegion;
-
-    edgeThickness = 10;
-
-    boxWidth = 25;
-    boxHeight = 25;
-    box;
-    directionVector;
-
     constructor(stage) {
         super();
+
+        this.edges = [];
+        this.obstacles = [];
+        this.gfx = undefined;
+
+        this.innerRegionOffset = 40;
+        this.innerRegionWidth = config.WORLD.width - 2 * this.innerRegionOffset;
+        this.innerRegionHeight = config.WORLD.height - 2 * this.innerRegionOffset;
+        this.innerRegion = undefined;
+
+        this.edgeThickness = 10;
+
+        this.boxWidth = 25;
+        this.boxHeight = 25;
+        this.box = undefined;
+        this.directionVector = undefined;
+
         this.stage = stage;
         this.name = 'SAT';
     }
@@ -86,6 +86,16 @@ export default class SATModule extends Module {
             new Vector(250, 550),
         ]);
         this.obstacles.push(hexagon);
+
+        const concavePolygon = new Polygon([
+            new Vector(100, 400),
+            new Vector(150, 345),
+            new Vector(200, 400),
+            new Vector(175, 325),
+            new Vector(125, 325),
+        ]);
+        this.obstacles.push(concavePolygon);
+        window.concave = concavePolygon;
     }
 
     stop() {

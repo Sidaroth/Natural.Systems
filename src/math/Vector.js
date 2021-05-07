@@ -5,14 +5,11 @@ import rotatePoint from './rotatePoint';
  * Homegrown basic vector class.
  */
 export default class Vector {
-    x;
-    y;
-    z;
-
     constructor(x = 0, y = 0, z = 0) {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.length = this.calculateLength(); // cache value.
     }
 
     zero() {
@@ -21,9 +18,13 @@ export default class Vector {
         this.z = 0;
     }
 
+    calculateLength() {
+        this.length = Math.sqrt((this.x * this.x) + (this.y * this.y) + (this.z * this.z));
+    }
+
     // get length/magnitude.
     getLength() {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z); // eslint-disable-line
+        return this.length;
     }
 
     // set the magnitude/length of the vector.
@@ -33,7 +34,7 @@ export default class Vector {
 
     // Useful when comparing length of two vectors together, saves a sqrt call.
     squaredLength() {
-        return this.x * this.x + this.y * this.y + this.z * this.z; // eslint-disable-line
+        return (this.x * this.x) + (this.y * this.y) + (this.z * this.z);
     }
 
     // Limit the magnitude to the specified 'max' value.
@@ -89,6 +90,10 @@ export default class Vector {
         return Vector.multiply(other, d);
     }
 
+    normal() {
+        return this.perpendicular().getUnit();
+    }
+
     perpendicular() {
         return new Vector(-this.y, this.x); // Effectively rotates the vector 90 degrees counter-clockwise.
     }
@@ -106,6 +111,7 @@ export default class Vector {
         this.x = vector.x || 0;
         this.y = vector.y || 0;
         this.z = vector.z || 0;
+        this.calculateLength();
 
         return this;
     }
@@ -119,12 +125,15 @@ export default class Vector {
             this.x = x[0] || 0;
             this.y = x[1] || 0;
             this.z = x[2] || 0;
+            this.calculateLength();
+
             return this;
         }
 
         this.x = x || 0;
         this.y = y || 0;
         this.z = z || 0;
+        this.calculateLength();
 
         return this;
     }
@@ -141,7 +150,7 @@ export default class Vector {
             this.x += x.x || 0;
             this.y += x.y || 0;
             this.z += x.z || 0;
-
+            this.calculateLength();
             return this;
         }
 
@@ -150,13 +159,14 @@ export default class Vector {
             this.x += x[0] || 0;
             this.y += x[1] || 0;
             this.z += x[2] || 0;
+            this.calculateLength();
             return this;
         }
 
         this.x += x || 0;
         this.y += y || 0;
         this.z += z || 0;
-
+        this.calculateLength();
         return this;
     }
 
@@ -166,6 +176,7 @@ export default class Vector {
             this.x -= x.x || 0;
             this.y -= x.y || 0;
             this.z -= x.z || 0;
+            this.calculateLength();
 
             return this;
         }
@@ -175,12 +186,15 @@ export default class Vector {
             this.x -= x[0] || 0;
             this.y -= x[1] || 0;
             this.z -= x[2] || 0;
+            this.calculateLength();
+
             return this;
         }
 
         this.x -= x || 0;
         this.y -= y || 0;
         this.z -= z || 0;
+        this.calculateLength();
 
         return this;
     }
@@ -193,6 +207,7 @@ export default class Vector {
         this.x /= scalar;
         this.y /= scalar;
         this.z /= scalar;
+        this.calculateLength();
 
         return this;
     }
@@ -205,13 +220,13 @@ export default class Vector {
         this.x *= scalar;
         this.y *= scalar;
         this.z *= scalar;
+        this.calculateLength();
 
         return this;
     }
 
     angleBetween2d(vec) {
-        return Math.acos(+this.dot(vec).toFixed(5));
-        // return Math.atan2(this.cross2d(vec), this.dot(vec));
+        return Math.acos(this.dot(vec) / (this.length * vec.length));
     }
 
     // products

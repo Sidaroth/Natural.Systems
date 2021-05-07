@@ -14,13 +14,11 @@ import FractalTreesMod from './Modules/FractalTrees';
 import ShaderMod from './Modules/ShaderMod';
 
 export default class System {
-    stage = null;
-    renderer = null;
-    gui = null;
-    modules = [];
-    activeModule = null;
-
     constructor(stage, renderer) {
+        this.renderer = null;
+        this.gui = null;
+        this.modules = [];
+        this.activeModule = null;
         this.stage = stage;
         this.renderer = renderer;
     }
@@ -69,7 +67,7 @@ export default class System {
             return obj;
         }, {});
 
-        const guiController = this.gui.add(this.guiData, 'active', modules).listen();
+        const guiController = this.gui.add(this.guiData, 'active', modules);
         guiController.onChange(id => this.switchModule(id));
         this.gui.add(this.guiData, 'fps').listen();
     }
@@ -88,28 +86,16 @@ export default class System {
     }
 
     createModules() {
-        this.walker = new RandomWalker(this.stage, 200, 200);
-        this.gaussianDistrib = new GaussianDistribution(this.stage);
-        this.basicNoise = new NoiseVisualizer(this.stage);
-        this.windySnow = new WindySnow(this.stage);
-        this.sat = new SAT(this.stage);
-        this.boids = new Boids(this.stage);
-        this.quadTree = new QuadtreeMod(this.stage);
-        this.roses = new Roses(this.stage);
-        this.fractalTrees = new FractalTreesMod(this.stage);
-        this.shaderMod = new ShaderMod(this.stage);
-
-
-        this.modules.push(this.walker);
-        this.modules.push(this.gaussianDistrib);
-        this.modules.push(this.basicNoise);
-        this.modules.push(this.windySnow);
-        this.modules.push(this.sat);
-        this.modules.push(this.boids);
-        this.modules.push(this.quadTree);
-        this.modules.push(this.roses);
-        this.modules.push(this.fractalTrees);
-        this.modules.push(this.shaderMod);
+        this.modules.push(new RandomWalker(this.stage, 200, 200));
+        this.modules.push(new GaussianDistribution(this.stage));
+        this.modules.push(new NoiseVisualizer(this.stage));
+        this.modules.push(new WindySnow(this.stage));
+        this.modules.push(new SAT(this.stage));
+        this.modules.push(new Boids(this.stage));
+        this.modules.push(new QuadtreeMod(this.stage));
+        this.modules.push(new Roses(this.stage));
+        this.modules.push(new FractalTreesMod(this.stage));
+        this.modules.push(new ShaderMod(this.stage));
     }
 
     update(delta) {

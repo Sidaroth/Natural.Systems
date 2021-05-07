@@ -1,4 +1,15 @@
-import Vector from './Vector';
+import SATSeparationDataModel from './satSeparationDataModel';
+
+/**
+ * Sources for SAT:
+ * https://www.sevenson.com.au/programming/sat/
+ * https://www.metanetsoftware.com/technique/tutorialA.html
+ * https://gamedevelopment.tutsplus.com/tutorials/collision-detection-using-the-separating-axis-theorem--gamedev-169
+ * https://dyn4j.org/2010/01/sat/ (handling of concave polygons)
+ * http://programmerart.weebly.com/separating-axis-theorem.html
+ * https://badai.xyz/2019-10-07-sat-collision-detection-polygon-and-circle/
+ * https://www.wikiwand.com/en/Hyperplane_separation_theorem
+ */
 
 // Projects the points onto a unit vector axis,
 // resulting in a one dimensional range of the minimum and maximum value on that axis.
@@ -15,29 +26,8 @@ function projectMinMaxOnAxis(points, axis, offset) {
     return { min: min + offset, max: max + offset };
 }
 
-function calculateEdgeNormals(edges) {
-    const normals = [];
-    edges.forEach((edge) => {
-        const normal = new Vector()
-            .copy(edge)
-            .perpendicular()
-            .getUnit();
-
-        normals.push(normal);
-    });
-
-    return normals;
-}
-
 function isSeparatingAxis(polygon1, polygon2, axis) {
-    const separationData = {
-        isSeparating: false,
-        overlapDistance: undefined,
-        overlapAxis: new Vector(),
-        aInB: false,
-        bInA: false,
-    };
-
+    const separationData = new SATSeparationDataModel();
     const offset = polygon2.position.clone().sub(polygon1.position);
     const projectedOffset = offset.dot(axis);
     const pol1Range = projectMinMaxOnAxis(polygon1.vertices, axis, projectedOffset);
@@ -45,12 +35,12 @@ function isSeparatingAxis(polygon1, polygon2, axis) {
 
     // There's a gap on this axis.
     if (pol1Range.min > pol2Range.max || pol2Range.min > pol1Range.max) {
-        separationData.isSeparating = true;
         return separationData;
     }
 
     // There's overlap, calculate the amount along this axis.
     let overlap = 0;
+    separationData.isSeparating = false;
 
     // Polygon 1 is to the left of Polygon2 along this axis.
     if (pol1Range.min < pol2Range.min) {
@@ -83,20 +73,24 @@ function isSeparatingAxis(polygon1, polygon2, axis) {
     return separationData;
 }
 
-function checkPolygonPolygon(polygon1, polygon2) {
-    const pol1Normals = calculateEdgeNormals(polygon1.getEdges());
-    const pol2Normals = calculateEdgeNormals(polygon2.getEdges());
+function boundsOverlaps(polygon1, polygon2) {
+    return polygon1.getAABB().intersects(polygon2.getAABB());
+}
 
-    let shortestOverlap = {
-        isSeparating: false,
-        overlapDistance: Infinity,
-    };
+function checkPolygonPolygon(polygon1, polygon2) {
+    let shortestOverlap = new SATSeparationDataModel();
+
+    // We can determine that if the axis-aligned bounding box of the polygons do not overlap, there is no collision.
+    if (!boundsOverlaps(polygon1, polygon2)) {
+        return shortestOverlap;
+    }
 
     // We only need to test against unique axes. We can reduce computational load by filtering out duplicates.
     // This optimization relies on the filtering process being cheaper computationally than the seperating axis calculations.
     const uniqueAxes = [];
-    [...pol1Normals, ...pol2Normals].forEach((axis) => {
-        if (uniqueAxes.find(a => a.equals(axis)) === undefined) uniqueAxes.push(axis);
+    [...polygon1.getEdges(), ...polygon2.getEdges()].forEach((axis) => {
+        const normal = axis.normal();
+        if (uniqueAxes.find(a => a.equals(normal)) === undefined) uniqueAxes.push(normal);
     });
 
     for (let i = 0; i < uniqueAxes.length; i += 1) {
@@ -109,7 +103,7 @@ function checkPolygonPolygon(polygon1, polygon2) {
     }
 
     // Calculate overlap vector based on shortest overlap distance along the corresponding axis.
-    shortestOverlap.overlapVector = shortestOverlap.overlapAxis.clone().multiply(shortestOverlap.overlapDistance);
+    shortestOverlap.overlapVector = shortestOverlap.overlapAxis.multiply(shortestOverlap.overlapDistance);
     return shortestOverlap;
 }
 
