@@ -78,6 +78,7 @@ export default class WindySnow extends Module {
         this.snowFlakes.push(snowFlake);
     }
 
+    // TODO https://youtu.be/c1yuYXg4IeE make smarter wind regions.
     addWindRegions() {
         const topRegion = new Region(0, 100, config.WORLD.width, 200);
         const bottomRegion = new Region(0, 300, config.WORLD.width, 200);

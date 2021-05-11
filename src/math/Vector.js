@@ -9,7 +9,7 @@ export default class Vector {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.length = this.calculateLength(); // cache value.
+        this.calculateLength(); // cache value.
     }
 
     zero() {

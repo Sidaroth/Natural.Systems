@@ -24,9 +24,6 @@ const createBoid = (texture, debugGfx = undefined) => {
     const visionRadius = 90;
     const visionSquared = visionRadius * visionRadius;
     const visionShape = new Circle(position.x, position.y, visionRadius);
-    const testAngles = [];
-    const fovSlices = 120;
-    const sliceWidth = fov / fovSlices;
     const maxForce = 0.1;
     let maxSpeed = 5;
 
@@ -42,28 +39,27 @@ const createBoid = (texture, debugGfx = undefined) => {
         gfx = debugGfx;
     }
 
-    // i.e -45 degrees to +45 degrees. (In radians)
-    for (let angle = -fov / 2; angle <= fov / 2; angle += sliceWidth) {
-        if (angle !== 0) testAngles.push(angle);
-    }
-    testAngles.sort((a, b) => Math.abs(a) - Math.abs(b)); // Sort angles so they are increasingly larger in each direction.
-
     function getPosition() {
         return state.position;
     }
 
     function findHeading(tree) {
-        const nearbyBoids = tree
-            .query(visionShape)
-            .filter(b => b.id !== id && Math.abs(state.position.getUnit().angleBetween2d(b.position.getUnit())) < fov);
+        const withinRadius = tree.query(visionShape);
+        withinRadius.forEach((b) => {
+            if (b.id !== id) {
+                console.log(Math.abs(state.position.getUnit().angleBetween2d(b.position.getUnit())));
+            }
+        });
+        const withinFOV = withinRadius.filter(b => b.id !== id && Math.abs(state.position.getUnit().angleBetween2d(b.position.getUnit())) < fov);
 
-        if (!nearbyBoids.length) return; // No boids in range other than self, or they're not in FOV.
+        if (!withinFOV.length) return; // No boids in range other than self, or they're not in FOV.
+
 
         const flockPosition = new Vector();
         const flockVelocity = new Vector();
         const separation = new Vector();
 
-        nearbyBoids.forEach((boid) => {
+        withinFOV.forEach((boid) => {
             const diff = Vector.sub(state.position, boid.position);
             const distance = diff.squaredLength();
             if (distance < visionSquared) {
@@ -82,21 +78,21 @@ const createBoid = (texture, debugGfx = undefined) => {
         });
 
         if (enableCohesion) {
-            flockPosition.divide(nearbyBoids.length);
+            flockPosition.divide(withinFOV.length);
             flockPosition.sub(position);
             flockPosition.limit(maxForce);
             acceleration.add(flockPosition);
         }
 
         if (enableAlignment) {
-            flockVelocity.divide(nearbyBoids.length);
+            flockVelocity.divide(withinFOV.length);
             flockVelocity.sub(velocity);
             flockVelocity.limit(maxForce);
             acceleration.add(flockVelocity);
         }
 
         if (enableSeparation) {
-            separation.divide(nearbyBoids.length);
+            separation.divide(withinFOV.length);
             separation.setLength(maxSpeed * 3);
             separation.sub(velocity);
             separation.limit(maxForce);
@@ -134,6 +130,7 @@ const createBoid = (texture, debugGfx = undefined) => {
         }
 
         acceleration.zero();
+
         findHeading(tree);
         state.velocity.add(acceleration);
         state.velocity.setLength(maxSpeed * delta);
@@ -164,11 +161,6 @@ const createBoid = (texture, debugGfx = undefined) => {
         maxSpeed = speed;
     }
 
-    function getTestAngles() {
-        return testAngles;
-    }
-
-
     const localState = {
         // exposed vars
         id,
@@ -180,7 +172,6 @@ const createBoid = (texture, debugGfx = undefined) => {
         fov,
         // functions
         addForce,
-        getTestAngles,
         setVizualizationStatus,
         getPosition,
         setPosition,

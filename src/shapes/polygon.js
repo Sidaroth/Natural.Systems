@@ -41,6 +41,8 @@ export default class Polygon {
     * - A polygon is considered CONCAVE if at least one of its INTERNAL angles are greater than 180 degrees.
     * - A CONCAVE polygon must have at least 4 vertices.
     *
+    * https://stackoverflow.com/a/45372025
+    *
     */
     calculateIsConcave() {
         if (this.edges.length <= 3) return false;
