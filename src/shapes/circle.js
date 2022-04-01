@@ -31,8 +31,8 @@ export default class Circle {
         return new Vector(this.x, this.y);
     }
 
-    render(context) {
-        context.lineStyle(5, 0xFF0000);
+    render(context, lineStyle = { width: 5, color: 0xFF0000 }) {
+        context.lineStyle(lineStyle.width, lineStyle.color);
         context.drawCircle(this.x, this.y, this.r);
     }
 }

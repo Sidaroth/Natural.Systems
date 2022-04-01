@@ -3,7 +3,13 @@ import Rect from '../shapes/rect';
 import store from '../store';
 import createState from 'utils/createState';
 
-// https://www.wikiwand.com/en/Quadtree
+/**
+ * https://www.wikiwand.com/en/Quadtree
+ *
+ * TODO This implementation is very inefficient with many moving objects (i.e boids module)
+ * https://gamedev.stackexchange.com/questions/20607/quad-tree-with-a-lot-of-moving-objects
+ * https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det
+ */
 const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivision = 0, parentNode = undefined) => {
     const state = {};
 

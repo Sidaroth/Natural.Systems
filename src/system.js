@@ -12,6 +12,7 @@ import store from './store';
 import Roses from './Modules/Roses';
 import FractalTreesMod from './Modules/FractalTrees';
 import ShaderMod from './Modules/ShaderMod';
+import Raycast from './Modules/Raycast';
 
 export default class System {
     constructor(stage, renderer) {
@@ -79,6 +80,12 @@ export default class System {
             if (this.warningText) this.stage.removeChild(this.warningText);
             if (this.activeModule) this.activeModule.destroy();
 
+            if (mod.backgroundColor !== undefined) {
+                store.app.renderer.backgroundColor = mod.backgroundColor;
+            } else {
+                store.app.renderer.backgroundColor = 0xdddddd;
+            }
+
             mod.setup();
             this.activeModule = mod;
             document.getElementById('description').innerHTML = mod.description;
@@ -96,6 +103,7 @@ export default class System {
         this.modules.push(new Roses(this.stage));
         this.modules.push(new FractalTreesMod(this.stage));
         this.modules.push(new ShaderMod(this.stage));
+        this.modules.push(new Raycast(this.stage));
     }
 
     update(delta) {
