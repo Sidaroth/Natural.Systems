@@ -8,6 +8,7 @@ specifiers:
   eslint: ^8.57.0
   eslint-config-airbnb-base: ^15.0.0
   eslint-config-airbnb-typescript: ^18.0.0
+  eslint-import-resolver-alias: ^1.1.2
   eslint-plugin-import: ^2.29.1
   lodash: ^4.17.21
   noisejs: ^2.1.0
@@ -33,6 +34,7 @@ devDependencies:
   eslint: 8.57.0
   eslint-config-airbnb-base: 15.0.0_jrbq5spb6ym3vlo5mnlvtmgpyy
   eslint-config-airbnb-typescript: 18.0.0_nb4zfpirgdejudndkyfz55fbem
+  eslint-import-resolver-alias: 1.1.2_gblj7z6526q5ff7xdcrfk7bm7e
   eslint-plugin-import: 2.29.1_ivk5e2uq3ikeyfzuugb4now7vq
   rollup-plugin-strip-code: 0.2.7
   vite: 5.1.6
@@ -1077,6 +1079,15 @@ packages:
       eslint-config-airbnb-base: 15.0.0_jrbq5spb6ym3vlo5mnlvtmgpyy
     transitivePeerDependencies:
       - eslint-plugin-import
+    dev: true
+
+  /eslint-import-resolver-alias/1.1.2_gblj7z6526q5ff7xdcrfk7bm7e:
+    resolution: {integrity: sha512-WdviM1Eu834zsfjHtcGHtGfcu+F30Od3V7I9Fi57uhBEwPkjDcii7/yW8jAT+gOhn4P/vOxxNAXbFAKsrrc15w==}
+    engines: {node: '>= 4'}
+    peerDependencies:
+      eslint-plugin-import: '>=1.4.0'
+    dependencies:
+      eslint-plugin-import: 2.29.1_ivk5e2uq3ikeyfzuugb4now7vq
     dev: true
 
   /eslint-import-resolver-node/0.3.9:
