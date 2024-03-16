@@ -7,7 +7,6 @@ import Vector from '../math/Vector';
 import SAT from '../math/sat';
 import store from '../store';
 
-
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
 export default class SATModule extends Module {
     constructor(stage) {

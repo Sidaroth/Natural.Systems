@@ -1,15 +1,18 @@
 import * as PIXI from 'pixi.js';
+import gaussian from 'math/gaussian';
+import constrain from 'math/constrain';
 import config from '../config';
 import Module from './Module';
 
-import gaussian from 'math/gaussian';
-import constrain from 'math/constrain';
-
 export default class GaussianDistribution extends Module {
     stage = null;
+
     numberOfColumns = 60;
+
     columnWidth = 0;
+
     columns = [];
+
     growth = 2;
 
     constructor(stage) {

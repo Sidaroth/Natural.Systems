@@ -1,19 +1,24 @@
 import * as PIXI from 'pixi.js';
+import { Noise } from 'noisejs';
 import Module from './Module';
 import PhysicsBody from '../components/PhysicsBody';
 import config from '../config';
 import getRandomInt from '../math/getRandomInt';
 import Vector from '../math/Vector';
 import store from '../store';
-import { Noise } from 'noisejs';
 import Region from '../components/Region';
 
 export default class WindySnow extends Module {
     count = 300;
+
     snowFlakes = [];
+
     bgfx;
+
     gravity;
+
     snowflakeTextures = [];
+
     regions = [];
 
     constructor(stage) {
@@ -120,7 +125,6 @@ export default class WindySnow extends Module {
         gfx.drawCircle(0, 0, 1.5);
         this.snowflakeTextures.push(store.renderer.generateTexture(gfx));
         gfx.endFill();
-
 
         this.addWindRegions();
 

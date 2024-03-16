@@ -18,7 +18,7 @@ const options = {
     antialias: true, // default: false
     transparent: false, // default: false
     resolution: 1, // default: 1
-}
+};
 await app.init(options);
 
 const content = document.getElementById('content');
@@ -77,7 +77,7 @@ function getURLParams() {
 function start() {
     // const params = getURLParams();
     // system.setup(params);
-    app.ticker.add(delta => mainLoop(delta));
+    app.ticker.add((delta) => mainLoop(delta));
 }
 
 start();

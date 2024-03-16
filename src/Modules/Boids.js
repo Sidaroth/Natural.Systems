@@ -12,20 +12,32 @@ import createQuadTree from '../components/QuadTree';
 // 2D Boids - Flock behaviour, obstacle avoidance.
 export default class Boids extends Module {
     numBoids = 100;
+
     obstacles = [];
+
     textures = [];
+
     boids = [];
+
     treeSize = 1;
+
     boidTree;
 
     // Visualization
     renderBoidConnections = false;
+
     renderBoidVision = false;
+
     renderQuadTree = false;
+
     enableAlignment = true;
+
     enableCohesion = true;
+
     enableSeparation = true;
+
     boidSpeed = 5;
+
     debugGfx;
 
     constructor(stage) {
@@ -109,7 +121,7 @@ export default class Boids extends Module {
         this.folder
             .add(this, 'boidSpeed', 0, 25)
             .listen()
-            .onChange(v => this.boids.forEach(b => b.setSpeed(v)));
+            .onChange((v) => this.boids.forEach((b) => b.setSpeed(v)));
         this.folder.add(this, 'renderQuadTree');
         this.folder.add(this, 'renderBoidConnections').onChange(() => this.onVizChange());
         this.folder.add(this, 'renderBoidVision').onChange(() => this.onVizChange());
@@ -140,7 +152,7 @@ export default class Boids extends Module {
         this.debugGfx.clear();
         // Rearrange quad tree to reflect any changes in position.
         this.boidTree = createQuadTree(store.worldBoundary, this.treeSize);
-        this.boids.forEach(boid => this.boidTree.insert(boid));
+        this.boids.forEach((boid) => this.boidTree.insert(boid));
 
         this.boids.forEach((boid) => {
             boid.update(delta, this.boidTree);

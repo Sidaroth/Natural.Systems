@@ -14,12 +14,19 @@ import store from '../store';
 // petals = 7; d = 19;
 export default class Roses extends Module {
     stage = null;
+
     radius = 300;
+
     petals = 0; // petals = N if odd, 2n petals if even.
+
     d = 0;
+
     outerColor = '#ff0000';
+
     innerColor = '#0000ff';
+
     innerWidth = 0;
+
     outerWidth = 0;
 
     constructor(stage, x, y) {

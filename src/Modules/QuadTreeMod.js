@@ -10,10 +10,15 @@ import getUUID from '../math/getUUID';
 
 export default class QuadTreeMod extends Module {
     vision = 0;
+
     numPoints = 0;
+
     treeCapacity = 0;
+
     treeDepth = 8;
+
     checks = 0;
+
     points = [];
 
     constructor(stage) {
@@ -48,7 +53,7 @@ export default class QuadTreeMod extends Module {
     }
 
     addPoints() {
-        this.points.forEach(p => this.stage.removeChild(p.sprite));
+        this.points.forEach((p) => this.stage.removeChild(p.sprite));
 
         this.points = [];
         for (let i = 0; i < this.numPoints; i += 1) {
@@ -136,7 +141,7 @@ export default class QuadTreeMod extends Module {
         this.gfx.drawCircle(store.mouse.x, store.mouse.y, this.vision);
 
         this.points
-            .filter(p => !this.highlights.find(point => p === point))
+            .filter((p) => !this.highlights.find((point) => p === point))
             .forEach((p) => {
                 p.sprite.texture = this.pointTexture;
             });

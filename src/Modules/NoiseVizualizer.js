@@ -1,20 +1,30 @@
 import * as PIXI from 'pixi.js';
+import { Noise } from 'noisejs';
 import config from '../config';
 import Module from './Module';
-import { Noise } from 'noisejs';
 import store from '../store';
 
 export default class NoiseVisualizer extends Module {
     stage = null;
+
     runtime = 0;
+
     noiseGen = null;
+
     texture = null;
+
     canvas = null;
+
     ctx = null;
+
     imageData = null;
+
     sprite = null;
+
     width = 4;
+
     height = 4;
+
     type = 'perlin';
 
     constructor(stage) {

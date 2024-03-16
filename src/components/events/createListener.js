@@ -10,8 +10,7 @@ const createListener = function createListenerFunc(event, fn, once, emitState) {
         state.dropped = true;
     }
 
-    const localState =
-    {
+    const localState = {
         // props
         id: getUUID(),
         dropped: false,

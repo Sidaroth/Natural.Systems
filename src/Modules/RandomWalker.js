@@ -1,14 +1,16 @@
 import * as PIXI from 'pixi.js';
+import getRandomInt from 'math/getRandomInt';
+import constrain from 'math/constrain';
 import config from '../config';
 import Module from './Module';
 
-import getRandomInt from 'math/getRandomInt';
-import constrain from 'math/constrain';
 import Worker from '../components/test.worker';
 
 export default class RandomWalker extends Module {
     stage = null;
+
     position = null;
+
     radius = 2;
 
     DIRECTION = {

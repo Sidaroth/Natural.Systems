@@ -5,11 +5,17 @@ import Vector from 'math/Vector';
 // TODO Convert to hasPhysicsBody.
 export default class PhysicsBody {
     mass = 1; // in kg.
+
     position;
+
     velocity;
+
     acceleration;
+
     sprite;
+
     texture;
+
     dragCoeff = 0.1;
 
     constructor() {

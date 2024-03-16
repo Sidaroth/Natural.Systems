@@ -3,6 +3,7 @@ import Vector from '../math/Vector';
 // A line from p1 to p2.
 export default class Line {
     origin;
+
     end;
 
     constructor(p1, p2) {

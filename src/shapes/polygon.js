@@ -138,7 +138,7 @@ export default class Polygon {
         0xFF00FF, // magenta
         0x00FFFF, // cyan
         0xFFFF00, // yellow
-    ]
+    ];
 
     render(gfx, lineColor = 0x000000, fillColor = 0xCCCCCC) {
         gfx.beginFill(fillColor);

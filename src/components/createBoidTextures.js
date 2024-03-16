@@ -1,6 +1,6 @@
+import * as PIXI from 'pixi.js';
 import Vector from '../math/Vector';
 import store from '../store';
-import * as PIXI from 'pixi.js';
 
 export default function createBoidTextures(size = 8.5) {
     const boidWidth = size;

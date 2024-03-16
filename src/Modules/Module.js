@@ -2,8 +2,11 @@ import getUUID from 'math/getUUID';
 
 export default class Module {
     id = '';
+
     name = '';
+
     description = '';
+
     stage = null;
 
     constructor() {

@@ -28,7 +28,7 @@ const canListen = function canListenFunc(state) {
     }
 
     function dropListener(listener) {
-        listeners.splice(listeners.findIndex(l => l === listener), 1);
+        listeners.splice(listeners.findIndex((l) => l === listener), 1);
         listener.drop();
     }
 

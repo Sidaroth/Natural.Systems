@@ -1,7 +1,7 @@
+import createState from 'utils/createState';
 import Vector from '../math/Vector';
 import Rect from '../shapes/rect';
 import store from '../store';
-import createState from 'utils/createState';
 
 /**
  * https://www.wikiwand.com/en/Quadtree
@@ -77,10 +77,10 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
     function remove(entity) {
         if (!bounds.contains(entity.position)) return;
         if (state.isDivided) {
-            subTrees.forEach(tree => tree.remove(entity));
+            subTrees.forEach((tree) => tree.remove(entity));
         } else {
             // We're in a leaf node.
-            const idx = entities.findIndex(e => e.id === entity.id);
+            const idx = entities.findIndex((e) => e.id === entity.id);
             if (idx !== -1) {
                 entities.splice(idx, 1);
                 cleanup();
