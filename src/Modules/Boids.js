@@ -61,8 +61,8 @@ export default class Boids extends Module {
         let yDir = 0;
 
         do {
-            xDir = getRandomInt(0, 200) / 100 - 1;
-            yDir = getRandomInt(0, 200) / 100 - 1;
+            xDir = (getRandomInt(0, 200) / 100) - 1;
+            yDir = (getRandomInt(0, 200) / 100) - 1;
         } while (xDir === 0 && yDir === 0);
 
         boid.velocity.set(xDir, yDir);

@@ -1,18 +1,11 @@
-import * as PIXI from 'pixi.js';
+import { Application, isWebGLSupported } from 'pixi.js';
 import System from './system';
 import config from './config';
 import store from './store';
 import Rect from './shapes/rect';
 import createMessageBus from './components/events/createMessageBus';
 
-let type = 'WebGL';
-if (!PIXI.utils.isWebGLSupported) {
-    type = 'canvas';
-}
-
-PIXI.utils.sayHello(type);
-const app = new PIXI.Application();
-
+const app = new Application();
 const options = {
     width: config.WORLD.width,
     height: config.WORLD.height,
@@ -22,22 +15,16 @@ const options = {
 };
 await app.init(options);
 
-const content = document.getElementById('content');
-content.appendChild(app.canvas);
+if (!isWebGLSupported()) {
+    throw new Error('WebGL is not supported');
+}
 
-app.renderer.backgroundColor = 0xdddddd;
-app.renderer.view.style.position = 'absolute';
-app.renderer.view.style.display = 'block';
-app.renderer.view.style.margin = 'auto';
-app.renderer.view.style.padding = 0;
-app.renderer.view.style.top = 0;
-app.renderer.view.style.bottom = 0;
-app.renderer.view.style.left = 0;
-app.renderer.view.style.right = 0;
+const content = document.getElementById('app');
+content.appendChild(app.canvas);
 
 store.app = app;
 store.renderer = app.renderer;
-store.mouse = app.renderer.plugins.interaction.mouse.global;
+// store.mouse = app.renderer.plugins.interaction.mouse.global;
 store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
 store.messageBus = createMessageBus();
 

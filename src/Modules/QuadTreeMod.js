@@ -109,6 +109,7 @@ export default class QuadTreeMod extends Module {
         this.gfx.drawCircle(0, 0, 2);
         this.gfx.endFill();
         this.highlightTexture = store.renderer.generateTexture(this.gfx);
+
         store.renderer.plugins.interaction.on('mousedown', this.onMouseDown, this);
 
         this.reset();

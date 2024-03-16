@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import { Text } from 'pixi.js';
 import RandomWalker from './modules/RandomWalker';
 import GaussianDistribution from './modules/GaussianDistribution';
 import NoiseVisualizer from './modules/NoiseVizualizer';
@@ -25,18 +25,17 @@ export default class System {
 
     setup(params) {
         this.createModules();
-        this.setupGui();
         this.fps = 0;
         this.lastTick = 0;
         this.lastFPSUpdate = 0;
 
-        this.startText = new PIXI.Text('Use the selector to select a module');
+        this.startText = new Text({ text: 'Use the selector to select a module' });
         this.startText.anchor.set(0.5, 0.5);
         this.startText.x = config.WORLD.width / 2;
-        this.startText.y = config.WORLD.height / 2 - this.startText.height * 2;
+        this.startText.y = (config.WORLD.height / 2) - (this.startText.height * 2);
         this.stage.addChild(this.startText);
 
-        this.warningText = new PIXI.Text('Some of the modules use new/experimental browser features.\nThey may not work in your browser version.');
+        this.warningText = new Text({ text: 'Some of the modules use new/experimental browser features.\nThey may not work in your browser version.' });
 
         this.warningText.anchor.set(0.5, 0.5);
         this.warningText.x = config.WORLD.width / 2;
@@ -49,27 +48,6 @@ export default class System {
                 this.switchModule(startingModule.id);
             }
         }
-    }
-
-    setupGui() {
-        this.gui = new dat.GUI();
-        this.gui.addFolder('Module Select');
-        this.guiData = {
-            active: '',
-            fps: 0,
-        };
-
-        store.gui = this.gui;
-
-        // Generate an object for dat.gui that contains name -> id references for each module.
-        const modules = this.modules.reduce((obj, mod) => {
-            obj[mod.name] = mod.id;
-            return obj;
-        }, {});
-
-        const guiController = this.gui.add(this.guiData, 'active', modules);
-        guiController.onChange((id) => this.switchModule(id));
-        this.gui.add(this.guiData, 'fps').listen();
     }
 
     switchModule(id) {
@@ -108,7 +86,6 @@ export default class System {
     update(delta) {
         const now = Date.now();
         if (now - this.lastFPSUpdate > 200) {
-            this.guiData.fps = Math.floor(1000 / (now - this.lastTick));
             this.lastFPSUpdate = now;
         }
         this.lastTick = now;
@@ -129,7 +106,6 @@ export default class System {
 
         this.startText.destroy();
         this.warningText.destroy();
-        this.gui.destroy();
         this.stage.destroy();
         this.renderer.destroy();
     }

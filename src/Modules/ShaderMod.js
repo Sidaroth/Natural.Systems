@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-import testFragment from 'shaders/test.frag';
 import Module from './Module';
 import config from '../config';
 
@@ -27,7 +26,6 @@ export default class ShaderMod extends Module {
 
     update(delta) {
         this.uniforms.u_time += delta / 1000;
-        this.sprite.filters = [new PIXI.Filter(undefined, testFragment, this.uniforms)];
     }
 
     destroy() {
