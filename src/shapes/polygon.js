@@ -76,7 +76,7 @@ export default class Polygon {
         this.vertices.forEach((vertex, i) => {
             const nextVertex = this.vertices[(i + 1) % this.vertices.length];
 
-            const a = vertex.x * nextVertex.y - nextVertex.x * vertex.y;
+            const a = (vertex.x * nextVertex.y) - (nextVertex.x * vertex.y);
             centerX += (vertex.x + nextVertex.x) * a;
             centerY += (vertex.y + nextVertex.y) * a;
             area += a;

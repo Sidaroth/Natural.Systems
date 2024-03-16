@@ -12,6 +12,7 @@ const options = {
     antialias: true, // default: false
     transparent: false, // default: false
     resolution: 1, // default: 1
+    backgroundColor: 0xbbbbbb,
 };
 await app.init(options);
 
@@ -24,9 +25,15 @@ content.appendChild(app.canvas);
 
 store.app = app;
 store.renderer = app.renderer;
-// store.mouse = app.renderer.plugins.interaction.mouse.global;
 store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
 store.messageBus = createMessageBus();
+
+// Replaces renderer.plugins.interaction.mouse.global in Pixi v7+
+app.stage.eventMode = 'static';
+app.stage.hitArea = app.screen;
+app.stage.addEventListener('pointermove', (e) => {
+    store.mousePosition = e.global;
+});
 
 // Source code link.
 const div = document.createElement('div');
@@ -43,13 +50,6 @@ p.id = 'description';
 descriptionDiv.appendChild(p);
 content.appendChild(descriptionDiv);
 
-const system = new System(app.stage, app.renderer);
-
-function mainLoop(delta) {
-    system.update(delta);
-    system.render();
-}
-
 function getURLParams() {
     const params = {};
     const query = decodeURIComponent(window.location.href.slice(window.location.href.indexOf('?') + 1));
@@ -63,10 +63,21 @@ function getURLParams() {
     return params;
 }
 
+const system = new System(app.stage, app.renderer);
+
+function mainLoop(ticker) {
+    const delta = ticker.deltaTime;
+    // elapsedTime += delta;
+
+    system.update(delta);
+    system.render();
+}
+
 function start() {
     const params = getURLParams();
     system.setup(params);
-    app.ticker.add((delta) => mainLoop(delta));
+
+    app.ticker.add(mainLoop);
 }
 
 start();

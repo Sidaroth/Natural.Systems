@@ -54,7 +54,6 @@ export default class NoiseVisualizer extends Module {
 
     setup() {
         this.reset();
-        this.setupGUI();
         this.height = config.WORLD.height;
         this.width = config.WORLD.width;
         this.canvas = new OffscreenCanvas(this.width, this.height);
@@ -66,26 +65,26 @@ export default class NoiseVisualizer extends Module {
         this.stage.addChild(this.sprite);
     }
 
-    setupGUI() {
-        this.folder = store.gui.addFolder('Noise settings');
-        this.folder.add(this, 'type', ['perlin', 'simplex', 'perlin32', 'simplex32']).listen();
-        this.folder.add(this, 'speed', this.speedMin, this.speedMax).listen();
-        this.folder.add(this, 'zoom', this.zoomMin, this.zoomMax).listen();
-        this.folder.add(this, 'redThreshold', -50, 50).listen();
-        this.folder.add(this, 'greenThreshold', -50, 50).listen();
-        this.folder.add(this, 'blueThreshold', -50, 50).listen();
-        this.folder.add(this, 'red', 0, 64).listen();
-        this.folder.add(this, 'green', 0, 64).listen();
-        this.folder.add(this, 'blue', 0, 64).listen();
-        this.folder.add(this, 'alpha', 0, 255).listen();
-        this.folder.add(this, 'reset');
-    }
+    // setupGUI() {
+    //     this.folder = store.gui.addFolder('Noise settings');
+    //     this.folder.add(this, 'type', ['perlin', 'simplex', 'perlin32', 'simplex32']).listen();
+    //     this.folder.add(this, 'speed', this.speedMin, this.speedMax).listen();
+    //     this.folder.add(this, 'zoom', this.zoomMin, this.zoomMax).listen();
+    //     this.folder.add(this, 'redThreshold', -50, 50).listen();
+    //     this.folder.add(this, 'greenThreshold', -50, 50).listen();
+    //     this.folder.add(this, 'blueThreshold', -50, 50).listen();
+    //     this.folder.add(this, 'red', 0, 64).listen();
+    //     this.folder.add(this, 'green', 0, 64).listen();
+    //     this.folder.add(this, 'blue', 0, 64).listen();
+    //     this.folder.add(this, 'alpha', 0, 255).listen();
+    //     this.folder.add(this, 'reset');
+    // }
 
     // TODO: Fix. RGB Values don't make any sense right now, but it does produce some nice and trippy effects
     generateNoise32Bit() {
         for (let y = 0; y < this.height; y += 1) {
             for (let x = 0; x < this.width; x += 1) {
-                const bufferIndex = (y * this.width + x);
+                const bufferIndex = ((y * this.width) + x);
 
                 let val;
                 if (this.type === 'simplex32') {
@@ -110,7 +109,7 @@ export default class NoiseVisualizer extends Module {
     generateNoise() {
         for (let y = 0; y < this.height; y += 1) {
             for (let x = 0; x < this.width; x += 1) {
-                const bufferIndex = (y * this.width + x) * 4; // we move 4 by 4 over in X because the array is set up as [R, G, B, A, R, G, B, A...]
+                const bufferIndex = ((y * this.width) + x) * 4; // we move 4 by 4 over in X because the array is set up as [R, G, B, A, R, G, B, A...]
 
                 let val;
                 if (this.type === 'simplex') {

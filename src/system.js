@@ -35,7 +35,8 @@ export default class System {
         this.startText.y = (config.WORLD.height / 2) - (this.startText.height * 2);
         this.stage.addChild(this.startText);
 
-        this.warningText = new Text({ text: 'Some of the modules use new/experimental browser features.\nThey may not work in your browser version.' });
+        const textString = 'Requires WebGL and an up to date browser';
+        this.warningText = new Text({ text: textString });
 
         this.warningText.anchor.set(0.5, 0.5);
         this.warningText.x = config.WORLD.width / 2;
@@ -85,18 +86,15 @@ export default class System {
 
     update(delta) {
         const now = Date.now();
-        if (now - this.lastFPSUpdate > 200) {
-            this.lastFPSUpdate = now;
-        }
         this.lastTick = now;
 
-        if (this.activeModule) {
+        if (this.activeModule && this.activeModule.update) {
             this.activeModule.update(delta);
         }
     }
 
     render() {
-        if (this.activeModule) {
+        if (this.activeModule && this.activeModule.render) {
             this.activeModule.render();
         }
     }

@@ -22,6 +22,10 @@ const config = {
             },
         },
     },
+    rules: {
+        'no-console': 'off',
+        'max-len': ['error', { code: 120, ignoreComments: true }],
+    },
 };
 
 module.exports = config;

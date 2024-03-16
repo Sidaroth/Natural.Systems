@@ -6,7 +6,7 @@ import Circle from '../shapes/circle';
 import Line from '../shapes/line';
 
 export default class Raycast extends Module {
-    constructor(stage, x, y) {
+    constructor(stage) {
         super();
         this.stage = stage;
         this.name = 'raycast';
@@ -26,15 +26,8 @@ export default class Raycast extends Module {
         this.movingRight = true;
     }
 
-    setupGUI() {
-        this.folder = store.gui.addFolder('Raycast Settings');
-        this.folder.add(this, 'reset');
-        this.folder.open();
-    }
-
     setup() {
         this.reset();
-        this.setupGUI();
         this.gfx = new PIXI.Graphics();
         this.stage.addChild(this.gfx);
     }
@@ -83,10 +76,6 @@ export default class Raycast extends Module {
         if (this.gfx) {
             this.stage.removeChild(this.gfx);
             this.gfx.destroy();
-        }
-
-        if (this.folder && store.gui) {
-            store.gui.removeFolder(this.folder);
         }
     }
 }

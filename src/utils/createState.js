@@ -1,7 +1,7 @@
 import getFunctionUsage from './getFunctionUsage';
 import pipe from './pipe';
 
-const createState = function createStateFunc(className = 'MyClass', mainState = {}, states = {}, overrides = {}) {
+function createState(stateName = 'Unnamed', mainState = {}, states = {}, overrides = {}) {
     const stateList = [];
     const pipes = {};
 
@@ -34,23 +34,23 @@ const createState = function createStateFunc(className = 'MyClass', mainState = 
         }
     });
 
-    getFunctionUsage(stateList, className);
+    getFunctionUsage(stateList, stateName);
 
-    // Creates a piped init/constructor that runs each __constructor() function in the different states.
+    // Creates a piped init/constructor that runs each internalConstructor() function in the different states.
     // This allows a created class/state to have a constructor that is ran at create time.
-    const init = pipe(...stateList.map((s) => s.state.__constructor).filter((c) => c));
+    const init = pipe(...stateList.map((s) => s.state.internalConstructor).filter((c) => c));
 
     Object.assign(mainState, ...stateList.map((s) => s.state), pipes, overrides);
 
     // Cleans up any constructor still on the mainstate.
-    if (mainState.__constructor) {
-        delete mainState.__constructor;
+    if (mainState.internalConstructor) {
+        delete mainState.internalConstructor;
     }
 
     // actually calls the piped init constructor from above.
     init();
 
     return mainState;
-};
+}
 
 export default createState;

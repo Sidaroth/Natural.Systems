@@ -1,6 +1,6 @@
 import store from 'root/store';
 
-const canListen = function canListenFunc(state) {
+const canListen = function canListenFunc() {
     const listeners = [];
 
     function listenOn(emitState, event, fn, context) {

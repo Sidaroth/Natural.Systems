@@ -29,7 +29,7 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
         const width = bounds.w / 2;
         const height = bounds.h / 2;
 
-        const midPoint = new Vector(bounds.x + bounds.w / 2, bounds.y + bounds.h / 2);
+        const midPoint = new Vector(bounds.x + (bounds.w / 2), bounds.y + (bounds.h / 2));
         const ne = new Rect(midPoint.x, midPoint.y - height, width, height);
         const nw = new Rect(bounds.x, midPoint.y - height, width, height);
         const se = new Rect(midPoint.x, midPoint.y, width, height);
@@ -43,10 +43,7 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
         // Redistribute current entities.
         for (let i = entities.length; i > 0; i -= 1) {
             const entity = entities.pop();
-            subTrees.every((tree) => {
-                if (tree.insert(entity)) return false;
-                return true;
-            });
+            subTrees.every((tree) => !(tree.insert(entity)));
         }
     }
 
@@ -90,13 +87,10 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
 
     function insert(entity) {
         if (!bounds.contains(entity.position)) return false;
-        if (!state.isDivided && !(division + 1 > maxDivisions) && entities.length + 1 > capacity) subdivide();
+        if (!state.isDivided && division + 1 <= maxDivisions && entities.length + 1 > capacity) subdivide();
 
         if (state.isDivided) {
-            subTrees.every((tree) => {
-                if (tree.insert(entity)) return false;
-                return true;
-            });
+            subTrees.every((tree) => !(tree.insert(entity)));
         } else {
             entities.push(entity);
         }
@@ -144,8 +138,7 @@ const createQuadTree = (boundary, cap = Infinity, divisions = Infinity, subDivis
     }
 
     function render(context) {
-        context.lineStyle(1, 0x000000);
-        context.drawRect(bounds.x, bounds.y, bounds.w, bounds.h);
+        context.rect(bounds.x, bounds.y, bounds.w, bounds.h).stroke({ width: 1, color: 0x000000 });
 
         subTrees.forEach((tree) => {
             tree.render(context);

@@ -14,10 +14,4 @@ export default class Module {
         this.name = `ModuleId: ${this.id}`;
         this.description = `${this.name} placeholder description.`;
     }
-
-    setup() { }
-
-    update() { }
-
-    render() { }
 }

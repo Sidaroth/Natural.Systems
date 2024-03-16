@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 
 // Abstraction around PIXI.Containers, intended to be used as a component in levels.
-const hasContainer = function hasContainerFunc(state) {
+const hasContainer = function hasContainerFunc() {
     const container = new PIXI.Container();
 
     function addChild(child) {

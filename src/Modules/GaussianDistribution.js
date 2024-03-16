@@ -13,7 +13,7 @@ export default class GaussianDistribution extends Module {
 
     columns = [];
 
-    growth = 2;
+    growth = 5;
 
     constructor(stage) {
         super();
@@ -39,7 +39,9 @@ export default class GaussianDistribution extends Module {
     }
 
     update() {
-        const index = constrain(parseInt(this.gen()), 0, this.numberOfColumns - 1);
+        const random = parseInt(this.gen(), 10);
+        const index = constrain(random, 0, this.numberOfColumns - 1);
+
         this.columns[index].y -= this.growth;
         this.columns[index].height += this.growth;
 
@@ -49,13 +51,13 @@ export default class GaussianDistribution extends Module {
 
     render() {
         this.gfx.clear();
-        this.gfx.beginFill(0xaaaaaa);
-        this.gfx.lineStyle(1, 0x000000, 1);
 
         this.columns.forEach((column) => {
-            this.gfx.drawRect(column.x, column.y, this.columnWidth, column.height);
+            this.gfx
+                .rect(column.x, column.y, this.columnWidth, column.height)
+                .stroke({ width: 1, color: 0x000000 })
+                .fill({ color: 0x888888 });
         });
-        this.gfx.endFill();
     }
 
     destroy() {

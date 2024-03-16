@@ -5,7 +5,6 @@ import Region from '../components/Region';
 import Polygon from '../shapes/polygon';
 import Vector from '../math/Vector';
 import SAT from '../math/sat';
-import store from '../store';
 
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
 export default class SATModule extends Module {
@@ -17,8 +16,8 @@ export default class SATModule extends Module {
         this.gfx = undefined;
 
         this.innerRegionOffset = 40;
-        this.innerRegionWidth = config.WORLD.width - 2 * this.innerRegionOffset;
-        this.innerRegionHeight = config.WORLD.height - 2 * this.innerRegionOffset;
+        this.innerRegionWidth = config.WORLD.width - (2 * this.innerRegionOffset);
+        this.innerRegionHeight = config.WORLD.height - (2 * this.innerRegionOffset);
         this.innerRegion = undefined;
 
         this.edgeThickness = 10;
@@ -38,10 +37,31 @@ export default class SATModule extends Module {
     }
 
     createBoundingBox() {
-        const leftEdge = this.createRect(this.innerRegion.bounds.x - this.edgeThickness, this.innerRegion.bounds.y - this.edgeThickness, this.edgeThickness, this.innerRegionHeight + (2 * this.edgeThickness));
-        const rightEdge = this.createRect(this.innerRegion.bounds.x + this.innerRegionWidth, this.innerRegion.bounds.y - this.edgeThickness, this.edgeThickness, this.innerRegionHeight + (2 * this.edgeThickness));
-        const topEdge = this.createRect(this.innerRegion.bounds.x, this.innerRegion.bounds.y - this.edgeThickness, this.innerRegionWidth, this.edgeThickness);
-        const bottomEdge = this.createRect(this.innerRegion.bounds.x, this.innerRegion.bounds.y + this.innerRegionHeight, this.innerRegionWidth, this.edgeThickness);
+        const leftEdge = this.createRect(
+            this.innerRegion.bounds.x - this.edgeThickness,
+            this.innerRegion.bounds.y - this.edgeThickness,
+            this.edgeThickness,
+            this.innerRegionHeight + (2 * this.edgeThickness),
+        );
+
+        const rightEdge = this.createRect(
+            this.innerRegion.bounds.x + this.innerRegionWidth,
+            this.innerRegion.bounds.y - this.edgeThickness,
+            this.edgeThickness,
+            this.innerRegionHeight + (2 * this.edgeThickness),
+        );
+        const topEdge = this.createRect(
+            this.innerRegion.bounds.x,
+            this.innerRegion.bounds.y - this.edgeThickness,
+            this.innerRegionWidth,
+            this.edgeThickness,
+        );
+        const bottomEdge = this.createRect(
+            this.innerRegion.bounds.x,
+            this.innerRegion.bounds.y + this.innerRegionHeight,
+            this.innerRegionWidth,
+            this.edgeThickness,
+        );
 
         this.edges.push(leftEdge);
         this.edges.push(topEdge);
@@ -103,28 +123,22 @@ export default class SATModule extends Module {
         this.obstacleRotation = 0;
     }
 
-    setupGUI() {
-        this.stop();
-        this.folder = store.gui.addFolder('SAT Settings');
-        this.folder.add(this, 'boxSpeed', 0, 10).listen();
-        this.folder.add(this, 'boxRotation', -20, 20).listen();
-        this.folder.add(this, 'obstacleRotation', -20, 20).listen();
-        this.folder.add(this, 'stop');
-        this.folder.open();
-    }
-
     setup() {
         this.edges = [];
         this.obstacles = [];
         this.gfx = new PIXI.Graphics();
-        this.innerRegion = new Region(this.innerRegionOffset, this.innerRegionOffset, this.innerRegionWidth, this.innerRegionHeight);
+        this.innerRegion = new Region(
+            this.innerRegionOffset,
+            this.innerRegionOffset,
+            this.innerRegionWidth,
+            this.innerRegionHeight,
+        );
 
-        this.setupGUI();
         this.drawBoundary();
         this.createObstacles();
         this.stage.addChild(this.gfx);
 
-        const boxPosX = this.innerRegion.bounds.x + this.innerRegionWidth / 2;
+        const boxPosX = this.innerRegion.bounds.x + (this.innerRegionWidth / 2);
         const boxPosY = this.innerRegion.bounds.y + 200;
         this.box = this.createRect(boxPosX, boxPosY, this.boxWidth, this.boxHeight);
         this.directionVector = new Vector(1, 1);
@@ -138,7 +152,9 @@ export default class SATModule extends Module {
                 ? new Vector(this.directionVector.x * -1, this.directionVector.y)
                 : new Vector(this.directionVector.x, this.directionVector.y * -1);
 
-            this.box.setPosition(this.box.position.x + SATResponse.overlapVector.x, this.box.position.y + SATResponse.overlapVector.y);
+            const x = this.box.position.x + SATResponse.overlapVector.x;
+            const y = this.box.position.y + SATResponse.overlapVector.y;
+            this.box.setPosition(x, y);
         }
     }
 
@@ -169,16 +185,10 @@ export default class SATModule extends Module {
         });
 
         const centroid = this.box.getCentroid();
-        this.gfx.beginFill(0x000000);
-        this.gfx.drawCircle(centroid.x, centroid.y, 1);
-        this.gfx.endFill();
+        this.gfx.circle(centroid.x, centroid.y, 1).fill(0x000000);
     }
 
     destroy() {
-        if (store.gui) {
-            store.gui.removeFolder(this.folder);
-        }
-
         this.stage.removeChild(this.innerRegion.gfx);
         this.stage.removeChild(this.gfx);
         this.gfx.destroy();
