@@ -45,7 +45,12 @@ const createBoid = (texture, debugGfx = undefined) => {
 
     function findHeading(tree) {
         const withinRadius = tree.query(visionShape);
-        const withinFOV = withinRadius.filter((b) => b.id !== id && Math.abs(state.position.getUnit().angleBetween2d(b.position.getUnit())) < fov);
+        const withinFOV = withinRadius.filter((b) => {
+            const notSelf = b.id !== id;
+            const angle = state.position.getUnit().angleBetween2d(b.position.getUnit());
+            const inFOV = Math.abs(angle) < fov;
+            return notSelf && inFOV;
+        });
 
         if (!withinFOV.length) return; // No boids in range other than self, or they're not in FOV.
 

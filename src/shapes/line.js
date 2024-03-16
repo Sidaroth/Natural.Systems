@@ -16,10 +16,10 @@ export default class Line {
     }
 
     render(gfx, lineStyle = { width: 3, color: 0x000000 }) {
-        gfx.beginFill(lineStyle.color);
-        gfx.lineStyle(lineStyle.width, lineStyle.color);
-        gfx.moveTo(this.origin.x, this.origin.y);
-        gfx.lineTo(this.end.x, this.end.y);
-        gfx.endFill();
+        gfx
+            .moveTo(this.origin.x, this.origin.y)
+            .lineTo(this.end.x, this.end.y)
+            .stroke({ width: lineStyle.width, color: lineStyle.color })
+            .fill(lineStyle.color);
     }
 }

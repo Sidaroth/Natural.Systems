@@ -97,10 +97,20 @@ export default class Boids extends Module {
 
     createEdges() {
         this.edges = [];
-        this.edges.push(new Line(new Vector(), new Vector(config.WORLD.width, 0))); // TOP
-        this.edges.push(new Line(new Vector(), new Vector(0, config.WORLD.height))); // LEFT
-        this.edges.push(new Line(new Vector(config.WORLD.width, 0), new Vector(config.WORLD.width, config.WORLD.height))); // RIGHT
-        this.edges.push(new Line(new Vector(0, config.WORLD.height), new Vector(config.WORLD.width, config.WORLD.height))); // BOTTOM
+        const bottomRight = new Vector(config.WORLD.width, config.WORLD.height);
+        const topRight = new Vector(config.WORLD.width, 0);
+        const topLeft = new Vector(0, 0);
+        const bottomLeft = new Vector(0, config.WORLD.height);
+
+        const left = new Line(topLeft, bottomLeft);
+        const right = new Line(topRight, bottomRight);
+        const top = new Line(topLeft, topRight);
+        const bottom = new Line(bottomLeft, bottomRight);
+
+        this.edges.push(top);
+        this.edges.push(left);
+        this.edges.push(right);
+        this.edges.push(bottom);
     }
 
     onVizChange() {
@@ -136,7 +146,6 @@ export default class Boids extends Module {
 
     setup() {
         this.gfx = new PIXI.Graphics();
-        this.setupGUI();
         this.textures = createBoidTextures();
         this.createEdges();
         this.stage.addChild(this.gfx);
@@ -180,7 +189,5 @@ export default class Boids extends Module {
             this.stage.removeChild(this.gfx);
             this.gfx.destroy();
         }
-
-        store.gui.removeFolder(this.folder);
     }
 }

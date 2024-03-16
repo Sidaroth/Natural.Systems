@@ -18,11 +18,10 @@ export default function createBoidTextures(size = 8.5) {
         scalar += 0.1;
 
         gfx.clear();
-        gfx.beginFill(colors[i]);
         gfx.moveTo(p1.x / scalar, p1.x / scalar);
         gfx.lineTo(p2.x / scalar, p2.y / scalar);
         gfx.lineTo(p3.x / scalar, p3.y / scalar);
-        gfx.endFill();
+        gfx.fill(colors[i]);
 
         textures.push(store.renderer.generateTexture(gfx));
     }
