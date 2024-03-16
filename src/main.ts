@@ -3,6 +3,7 @@ import System from './system';
 import config from './config';
 import store from './store';
 import Rect from './shapes/rect';
+import createMessageBus from './components/events/createMessageBus';
 
 let type = 'WebGL';
 if (!PIXI.utils.isWebGLSupported) {
@@ -38,6 +39,7 @@ store.app = app;
 store.renderer = app.renderer;
 store.mouse = app.renderer.plugins.interaction.mouse.global;
 store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
+store.messageBus = createMessageBus();
 
 // Source code link.
 const div = document.createElement('div');
@@ -54,7 +56,7 @@ p.id = 'description';
 descriptionDiv.appendChild(p);
 content.appendChild(descriptionDiv);
 
-// const system = new System(app.stage, app.renderer);
+const system = new System(app.stage, app.renderer);
 
 function mainLoop(delta) {
     system.update(delta);
@@ -64,7 +66,7 @@ function mainLoop(delta) {
 function getURLParams() {
     const params = {};
     const query = decodeURIComponent(window.location.href.slice(window.location.href.indexOf('?') + 1));
-    query.split('&').forEach((param, k) => {
+    query.split('&').forEach((param) => {
         const parts = param.split('=', 2);
         const key = parts[0];
         const value = parts[1];
@@ -75,8 +77,8 @@ function getURLParams() {
 }
 
 function start() {
-    // const params = getURLParams();
-    // system.setup(params);
+    const params = getURLParams();
+    system.setup(params);
     app.ticker.add((delta) => mainLoop(delta));
 }
 

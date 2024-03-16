@@ -16,6 +16,7 @@ const config = {
                     ['modules', './src/modules'],
                     ['shapes', './src/shapes'],
                     ['styles', './src/styles'],
+                    ['shaders', './src/shaders'],
                 ],
                 extensions: ['.js', '.ts', '.cjs', '.mjs'],
             },

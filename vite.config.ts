@@ -21,6 +21,7 @@ function getConfig(environment: ConfigEnv): UserConfig {
                 modules: resolve(__dirname, './src/modules'),
                 shapes: resolve(__dirname, './src/shapes'),
                 styles: resolve(__dirname, './src/styles'),
+                shaders: resolve(__dirname, './src/shaders'),
             },
         },
 
