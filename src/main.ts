@@ -3,7 +3,6 @@ import System from './system';
 import config from './config';
 import store from './store';
 import Rect from './shapes/rect';
-import Sound from 'pixi-sound';
 
 let type = 'WebGL';
 if (!PIXI.utils.isWebGLSupported) {
@@ -11,16 +10,20 @@ if (!PIXI.utils.isWebGLSupported) {
 }
 
 PIXI.utils.sayHello(type);
-const app = new PIXI.Application({
+const app = new PIXI.Application();
+
+const options = {
     width: config.WORLD.width,
     height: config.WORLD.height,
     antialias: true, // default: false
     transparent: false, // default: false
     resolution: 1, // default: 1
-});
+}
+await app.init(options);
 
 const content = document.getElementById('content');
-content.appendChild(app.view);
+content.appendChild(app.canvas);
+
 app.renderer.backgroundColor = 0xdddddd;
 app.renderer.view.style.position = 'absolute';
 app.renderer.view.style.display = 'block';
@@ -51,7 +54,7 @@ p.id = 'description';
 descriptionDiv.appendChild(p);
 content.appendChild(descriptionDiv);
 
-const system = new System(app.stage, app.renderer);
+// const system = new System(app.stage, app.renderer);
 
 function mainLoop(delta) {
     system.update(delta);
@@ -72,10 +75,8 @@ function getURLParams() {
 }
 
 function start() {
-    const params = getURLParams();
-    system.setup(params);
-
-    // app.ticker.maxFPS = 60;
+    // const params = getURLParams();
+    // system.setup(params);
     app.ticker.add(delta => mainLoop(delta));
 }
 

@@ -1,18 +1,17 @@
-import * as dat from 'dat.gui';
 import * as PIXI from 'pixi.js';
-import RandomWalker from './Modules/RandomWalker';
-import GaussianDistribution from './Modules/GaussianDistribution';
-import NoiseVisualizer from './Modules/NoiseVizualizer';
-import WindySnow from './Modules/WindySnow';
-import SAT from './Modules/SATModule';
-import Boids from './Modules/Boids';
-import QuadtreeMod from './Modules/QuadTreeMod';
+import RandomWalker from './modules/RandomWalker';
+import GaussianDistribution from './modules/GaussianDistribution';
+import NoiseVisualizer from './modules/NoiseVizualizer';
+import WindySnow from './modules/WindySnow';
+import SAT from './modules/SATModule';
+import Boids from './modules/Boids';
+import QuadtreeMod from './modules/QuadTreeMod';
 import config from './config';
 import store from './store';
-import Roses from './Modules/Roses';
-import FractalTreesMod from './Modules/FractalTrees';
-import ShaderMod from './Modules/ShaderMod';
-import Raycast from './Modules/Raycast';
+import Roses from './modules/Roses';
+import FractalTreesMod from './modules/FractalTrees';
+import ShaderMod from './modules/ShaderMod';
+import Raycast from './modules/Raycast';
 
 export default class System {
     constructor(stage, renderer) {
@@ -45,7 +44,7 @@ export default class System {
         this.stage.addChild(this.warningText);
 
         if (params.module) {
-            const startingModule = this.modules.find(m => m.name === params.module);
+            const startingModule = this.modules.find((m) => m.name === params.module);
             if (startingModule) {
                 this.switchModule(startingModule.id);
             }
@@ -69,12 +68,12 @@ export default class System {
         }, {});
 
         const guiController = this.gui.add(this.guiData, 'active', modules);
-        guiController.onChange(id => this.switchModule(id));
+        guiController.onChange((id) => this.switchModule(id));
         this.gui.add(this.guiData, 'fps').listen();
     }
 
     switchModule(id) {
-        const mod = this.modules.find(m => m.id === id);
+        const mod = this.modules.find((m) => m.id === id);
         if (mod) {
             if (this.startText) this.stage.removeChild(this.startText);
             if (this.warningText) this.stage.removeChild(this.warningText);
@@ -126,7 +125,7 @@ export default class System {
     }
 
     destroy() {
-        this.modules.forEach(mod => mod.destroy());
+        this.modules.forEach((mod) => mod.destroy());
 
         this.startText.destroy();
         this.warningText.destroy();
