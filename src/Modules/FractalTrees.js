@@ -74,7 +74,6 @@ export default class FractalTreesMod extends Module {
     }
 
     setup() {
-        this.setupGUI();
         this.gfx = new PIXI.Graphics();
         this.stage.addChild(this.gfx);
 
@@ -125,13 +124,13 @@ export default class FractalTreesMod extends Module {
         this.drawRandomBranches = false;
     }
 
-    // TODO draw leaf polygon instead of cirlces?
+    // TODO draw leaf polygon instead of circles?
     drawLeaf(origin) {
         if (!this.drawLeaves) return;
 
-        this.gfx.beginFill(this.leafColor, this.leafOpacity);
-        this.gfx.drawEllipse(origin.x, origin.y, this.leafRadius, this.leafRadius);
-        this.gfx.endFill();
+        this.gfx
+            .ellipse(origin.x, origin.y, this.leafRadius, this.leafRadius)
+            .fill({ color: this.leafColor, alpha: this.leafOpacity });
     }
 
     drawBranch(depth, origin, length, rot, branchThickness) {
@@ -145,22 +144,24 @@ export default class FractalTreesMod extends Module {
         const p = new PIXI.Point(origin.x, origin.y - length);
         const endPoint = rotatePoint(p, degreesToRadians(rotation), origin);
 
-        this.gfx.lineStyle(branchThickness, this.lineColor, this.lineOpacity);
-        this.gfx.moveTo(origin.x, origin.y);
-        this.gfx.lineTo(endPoint.x, endPoint.y);
+        this.gfx
+            .moveTo(origin.x, origin.y)
+            .lineTo(endPoint.x, endPoint.y)
+            .stroke({ width: branchThickness, color: this.lineColor, alpha: this.lineOpacity });
 
         let newThickness = branchThickness * 0.67;
         if (newThickness < 1) newThickness = 1;
 
-        if (this.drawRandomBranches) {
-            this.drawBranch(depth + 1, endPoint, length * this.branchRatio, rotation - getRandomInt(5, this.degrees), newThickness);
-            this.drawBranch(depth + 1, endPoint, length * this.branchRatio, rotation + getRandomInt(5, this.degrees), newThickness);
-        } else {
-            this.drawBranch(depth + 1, endPoint, length * this.branchRatio, rotation - this.degrees, newThickness);
-            this.drawBranch(depth + 1, endPoint, length * this.branchRatio, rotation + this.degrees, newThickness);
-        }
+        const branchLength = length * this.branchRatio;
+        const nextDepth = depth + 1;
+        const leftRotationChange = this.drawRandomBranches ? getRandomInt(5, this.degrees) : this.degrees;
+        const rightRotationChange = this.drawRandomBranches ? getRandomInt(5, this.degrees) : this.degrees;
+        this.drawBranch(nextDepth, endPoint, branchLength, rotation - leftRotationChange, newThickness);
+        this.drawBranch(nextDepth, endPoint, branchLength, rotation + rightRotationChange, newThickness);
 
-        if (this.addStraightBranch) this.drawBranch(depth + 1, endPoint, length * this.branchRatio, rotation, newThickness);
+        if (this.addStraightBranch) {
+            this.drawBranch(nextDepth, endPoint, branchLength, rotation, newThickness);
+        }
     }
 
     update(delta) {
@@ -177,7 +178,6 @@ export default class FractalTreesMod extends Module {
     drawBranches() {
         this.gfx.clear();
         this.gfx.moveTo(config.WORLD.width / 2, config.WORLD.height);
-        this.gfx.lineStyle(this.lineThickness, this.lineColor, this.lineOpacity);
 
         if (this.drawBase) {
             this.drawBranch(0, this.origin, this.startLength, 0, this.lineThickness);
@@ -190,20 +190,11 @@ export default class FractalTreesMod extends Module {
             this.drawBranch(0, center, this.startLength, -this.degrees, this.lineThickness);
             if (this.addStraightBranch) this.drawBranch(0, center, this.startLength, 0, this.lineThickness);
         }
-
-        // Because we're only using one graphics object and not splitting it up into several for drawing
-        // or collecting it into a texture, for large amounts of leafnodes/branches, Uint16 arrays will overflow and die.
-        this.gfx.geometry.updateBatches();
-        this.gfx.geometry._indexBuffer.update(new Uint32Array(this.gfx.geometry.indices));
     }
 
     destroy() {
         if (this.gfx) {
             this.gfx.destroy();
-        }
-
-        if (this.folder && store.gui) {
-            store.gui.removeFolder(this.folder);
         }
     }
 }

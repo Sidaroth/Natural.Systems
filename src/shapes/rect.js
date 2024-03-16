@@ -1,11 +1,14 @@
 import Vector from '../math/Vector';
 import constrain from '../math/constrain';
-import Circle from '../shapes/circle';
+import Circle from './circle';
 
 export default class Rect {
     x;
+
     y;
+
     w;
+
     h;
 
     constructor(x, y, w, h) {
@@ -35,12 +38,21 @@ export default class Rect {
 
     intersects(shape) {
         if (shape instanceof Rect) {
-            return !(shape.x > this.x + this.w || shape.x + shape.w < this.x || shape.y > this.y + this.h || shape.y + shape.h < this.y);
-        } else if (shape instanceof Circle) {
+            const shapeRight = shape.x + shape.w;
+            const shapeBottom = shape.y + shape.h;
+            const thisRight = this.x + this.w;
+            const thisBottom = this.y + this.h;
+
+            const insideRight = shapeRight >= this.x && shape.x <= thisRight;
+            const insideBottom = shapeBottom >= this.y && shape.y <= thisBottom;
+
+            return insideRight && insideBottom;
+        }
+
+        if (shape instanceof Circle) {
             const closestX = constrain(shape.x, this.x, this.x + this.w);
             const closestY = constrain(shape.y, this.y, this.y + this.h);
             const dist = new Vector(shape.x - closestX, shape.y - closestY);
-            // console.log('circle', this.x, this.y, this.w, this.y, closestX, closestY, dist, dist.squaredLength(), shape.r2);
 
             return dist.squaredLength() < shape.r2;
         }

@@ -1,12 +1,13 @@
-import createMessageBus from 'components/events/createMessageBus';
-
 const store = {
     app: undefined,
     renderer: undefined,
-    mouse: undefined,
+    mousePosition: {
+        x: 0,
+        y: 0,
+    },
     worldBoundary: undefined,
     count: 0,
-    messageBus: createMessageBus(),
+    messageBus: undefined,
 };
 
 export default store;

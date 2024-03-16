@@ -1,18 +1,17 @@
-import * as dat from 'dat.gui';
-import * as PIXI from 'pixi.js';
-import RandomWalker from './Modules/RandomWalker';
-import GaussianDistribution from './Modules/GaussianDistribution';
-import NoiseVisualizer from './Modules/NoiseVizualizer';
-import WindySnow from './Modules/WindySnow';
-import SAT from './Modules/SATModule';
-import Boids from './Modules/Boids';
-import QuadtreeMod from './Modules/QuadTreeMod';
+import { Text } from 'pixi.js';
+import RandomWalker from './modules/RandomWalker';
+import GaussianDistribution from './modules/GaussianDistribution';
+import NoiseVisualizer from './modules/NoiseVizualizer';
+import WindySnow from './modules/WindySnow';
+import SAT from './modules/SATModule';
+import Boids from './modules/Boids';
+import QuadtreeMod from './modules/QuadTreeMod';
 import config from './config';
 import store from './store';
-import Roses from './Modules/Roses';
-import FractalTreesMod from './Modules/FractalTrees';
-import ShaderMod from './Modules/ShaderMod';
-import Raycast from './Modules/Raycast';
+import Roses from './modules/Roses';
+import FractalTreesMod from './modules/FractalTrees';
+import ShaderMod from './modules/ShaderMod';
+import Raycast from './modules/Raycast';
 
 export default class System {
     constructor(stage, renderer) {
@@ -26,18 +25,18 @@ export default class System {
 
     setup(params) {
         this.createModules();
-        this.setupGui();
         this.fps = 0;
         this.lastTick = 0;
         this.lastFPSUpdate = 0;
 
-        this.startText = new PIXI.Text('Use the selector to select a module');
+        this.startText = new Text({ text: 'Use the selector to select a module' });
         this.startText.anchor.set(0.5, 0.5);
         this.startText.x = config.WORLD.width / 2;
-        this.startText.y = config.WORLD.height / 2 - this.startText.height * 2;
+        this.startText.y = (config.WORLD.height / 2) - (this.startText.height * 2);
         this.stage.addChild(this.startText);
 
-        this.warningText = new PIXI.Text('Some of the modules use new/experimental browser features.\nThey may not work in your browser version.');
+        const textString = 'Requires WebGL and an up to date browser';
+        this.warningText = new Text({ text: textString });
 
         this.warningText.anchor.set(0.5, 0.5);
         this.warningText.x = config.WORLD.width / 2;
@@ -45,36 +44,15 @@ export default class System {
         this.stage.addChild(this.warningText);
 
         if (params.module) {
-            const startingModule = this.modules.find(m => m.name === params.module);
+            const startingModule = this.modules.find((m) => m.name === params.module);
             if (startingModule) {
                 this.switchModule(startingModule.id);
             }
         }
     }
 
-    setupGui() {
-        this.gui = new dat.GUI();
-        this.gui.addFolder('Module Select');
-        this.guiData = {
-            active: '',
-            fps: 0,
-        };
-
-        store.gui = this.gui;
-
-        // Generate an object for dat.gui that contains name -> id references for each module.
-        const modules = this.modules.reduce((obj, mod) => {
-            obj[mod.name] = mod.id;
-            return obj;
-        }, {});
-
-        const guiController = this.gui.add(this.guiData, 'active', modules);
-        guiController.onChange(id => this.switchModule(id));
-        this.gui.add(this.guiData, 'fps').listen();
-    }
-
     switchModule(id) {
-        const mod = this.modules.find(m => m.id === id);
+        const mod = this.modules.find((m) => m.id === id);
         if (mod) {
             if (this.startText) this.stage.removeChild(this.startText);
             if (this.warningText) this.stage.removeChild(this.warningText);
@@ -108,29 +86,24 @@ export default class System {
 
     update(delta) {
         const now = Date.now();
-        if (now - this.lastFPSUpdate > 200) {
-            this.guiData.fps = Math.floor(1000 / (now - this.lastTick));
-            this.lastFPSUpdate = now;
-        }
         this.lastTick = now;
 
-        if (this.activeModule) {
+        if (this.activeModule && this.activeModule.update) {
             this.activeModule.update(delta);
         }
     }
 
     render() {
-        if (this.activeModule) {
+        if (this.activeModule && this.activeModule.render) {
             this.activeModule.render();
         }
     }
 
     destroy() {
-        this.modules.forEach(mod => mod.destroy());
+        this.modules.forEach((mod) => mod.destroy());
 
         this.startText.destroy();
         this.warningText.destroy();
-        this.gui.destroy();
         this.stage.destroy();
         this.renderer.destroy();
     }

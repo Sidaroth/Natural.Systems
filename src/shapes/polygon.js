@@ -76,7 +76,7 @@ export default class Polygon {
         this.vertices.forEach((vertex, i) => {
             const nextVertex = this.vertices[(i + 1) % this.vertices.length];
 
-            const a = vertex.x * nextVertex.y - nextVertex.x * vertex.y;
+            const a = (vertex.x * nextVertex.y) - (nextVertex.x * vertex.y);
             centerX += (vertex.x + nextVertex.x) * a;
             centerY += (vertex.y + nextVertex.y) * a;
             area += a;
@@ -138,7 +138,7 @@ export default class Polygon {
         0xFF00FF, // magenta
         0x00FFFF, // cyan
         0xFFFF00, // yellow
-    ]
+    ];
 
     render(gfx, lineColor = 0x000000, fillColor = 0xCCCCCC) {
         gfx.beginFill(fillColor);

@@ -2,8 +2,11 @@ import Vector from '../math/Vector';
 
 export default class Circle {
     x;
+
     y;
+
     r;
+
     r2;
 
     constructor(x, y, r) {

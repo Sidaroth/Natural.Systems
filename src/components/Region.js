@@ -1,12 +1,14 @@
-import Vector from '../math/Vector';
 import * as PIXI from 'pixi.js';
+import Vector from '../math/Vector';
 import Rect from '../shapes/rect';
 
 export default class Region {
     bounds;
+
     density = 1; // air density, fluid density
 
     force = new Vector(); // any force that should be applied to objects within the region. I.e wind, water flow, etc.
+
     gfx = new PIXI.Graphics();
 
     constructor(x, y, w, h) {

@@ -15,11 +15,11 @@ export default function edgeIntersectPoint(ray, edge) {
     if (denominator === 0) {
         // parallel or coincident, they will never intersect.
         return null;
-    } else {
-        const step = numerator / denominator;
-        intersectionPoint.x = ray.origin.x + (step * rayV.x);
-        intersectionPoint.y = ray.origin.y + (step * rayV.y);
     }
+    const step = numerator / denominator;
+    intersectionPoint.x = ray.origin.x + (step * rayV.x);
+    intersectionPoint.y = ray.origin.y + (step * rayV.y);
+
     /* eslint-enable no-mixed-operators */
 
     return intersectionPoint;

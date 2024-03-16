@@ -1,9 +1,9 @@
 import store from 'root/store';
+import { EventEmitter } from 'pixi.js';
 import createListener from './createListener';
-import * as PIXI from 'pixi.js';
 
 const canEmit = function canEmitFunc(state) {
-    const localEmitter = new PIXI.utils.EventEmitter();
+    const localEmitter = new EventEmitter();
     const listeners = [];
 
     function emitGlobal(event, data) {

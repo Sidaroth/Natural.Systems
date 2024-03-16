@@ -1,7 +1,7 @@
 const config = {
     WORLD: {
         width: 1280,
-        height: 900,
+        height: 720,
     },
     EVENTS: {
         ENTITY: {

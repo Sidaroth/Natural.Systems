@@ -90,14 +90,14 @@ function checkPolygonPolygon(polygon1, polygon2) {
     const uniqueAxes = [];
     [...polygon1.getEdges(), ...polygon2.getEdges()].forEach((axis) => {
         const normal = axis.normal();
-        if (uniqueAxes.find(a => a.equals(normal)) === undefined) uniqueAxes.push(normal);
+        if (uniqueAxes.find((a) => a.equals(normal)) === undefined) uniqueAxes.push(normal);
     });
 
     for (let i = 0; i < uniqueAxes.length; i += 1) {
         const separationData = isSeparatingAxis(polygon1, polygon2, uniqueAxes[i]);
         if (separationData.isSeparating) {
             return separationData; // We've found a separating line, no collision.
-        } else if (separationData.overlapDistance < shortestOverlap.overlapDistance) {
+        } if (separationData.overlapDistance < shortestOverlap.overlapDistance) {
             shortestOverlap = separationData;
         }
     }

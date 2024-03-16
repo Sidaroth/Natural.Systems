@@ -1,19 +1,24 @@
 import * as PIXI from 'pixi.js';
+import { Noise } from 'noisejs';
 import Module from './Module';
 import PhysicsBody from '../components/PhysicsBody';
 import config from '../config';
 import getRandomInt from '../math/getRandomInt';
 import Vector from '../math/Vector';
 import store from '../store';
-import { Noise } from 'noisejs';
 import Region from '../components/Region';
 
 export default class WindySnow extends Module {
     count = 300;
+
     snowFlakes = [];
+
     bgfx;
+
     gravity;
+
     snowflakeTextures = [];
+
     regions = [];
 
     constructor(stage) {
@@ -44,27 +49,27 @@ export default class WindySnow extends Module {
 
     drawBackground() {
         // sky
-        this.bgfx.beginFill(0x222222);
-        this.bgfx.drawRect(0, 0, config.WORLD.width, config.WORLD.height * 0.85);
-        this.bgfx.endFill();
+        this.bgfx
+            .rect(0, 0, config.WORLD.width, config.WORLD.height * 0.85)
+            .fill(0x222222);
 
         // moon
-        this.bgfx.beginFill(0xffffff);
-        this.bgfx.drawCircle(config.WORLD.width * 0.8, config.WORLD.height * 0.18, 45);
-        this.bgfx.endFill();
+        this.bgfx
+            .circle(config.WORLD.width * 0.8, config.WORLD.height * 0.18, 45)
+            .fill(0xffffff);
 
         // moon dots
-        this.bgfx.beginFill(0xccccccdd);
-        this.bgfx.drawCircle(config.WORLD.width * 0.805, config.WORLD.height * 0.19, 4);
-        this.bgfx.drawCircle(config.WORLD.width * 0.825, config.WORLD.height * 0.18 + 2, 4);
-        this.bgfx.drawCircle(config.WORLD.width * 0.81, config.WORLD.height * 0.18 - 10, 7);
-        this.bgfx.drawCircle(config.WORLD.width * 0.78, config.WORLD.height * 0.18 + 7, 10);
-        this.bgfx.endFill();
+        this.bgfx
+            .circle(config.WORLD.width * 0.805, config.WORLD.height * 0.19, 4)
+            .circle(config.WORLD.width * 0.825, (config.WORLD.height * 0.18) + 2, 4)
+            .circle(config.WORLD.width * 0.81, (config.WORLD.height * 0.18) - 10, 7)
+            .circle(config.WORLD.width * 0.78, (config.WORLD.height * 0.18) + 7, 10)
+            .fill({ color: 0xcccccc, alpha: 0.75 });
 
         // ground
-        this.bgfx.beginFill(0xdddddd);
-        this.bgfx.drawRect(0, config.WORLD.height - config.WORLD.height * 0.15, config.WORLD.width, config.WORLD.height * 0.33);
-        this.bgfx.endFill();
+        this.bgfx
+            .rect(0, config.WORLD.height - (config.WORLD.height * 0.15), config.WORLD.width, config.WORLD.height * 0.33)
+            .fill(0xdddddd);
     }
 
     addSnowflake() {
@@ -88,11 +93,6 @@ export default class WindySnow extends Module {
 
         this.regions.push(topRegion);
         this.regions.push(bottomRegion);
-
-        // topRegion.render(0xffffff);
-        // bottomRegion.render(0xaaaaaa);
-        // this.stage.addChild(topRegion.gfx);
-        // this.stage.addChild(bottomRegion.gfx);
     }
 
     // TODO fix module options for wind speeds, gravity and number of snowflake modifiers.
@@ -104,23 +104,16 @@ export default class WindySnow extends Module {
 
         // Create 3 sizes of snowflakes for some parallax effects.
         const gfx = new PIXI.Graphics();
-        gfx.beginFill(0xFFFFFF);
-        gfx.drawCircle(0, 0, 2.5);
+        gfx.circle(0, 0, 2.5).fill(0xFFFFFF);
         this.snowflakeTextures.push(store.renderer.generateTexture(gfx));
-        gfx.endFill();
         gfx.clear();
 
-        gfx.beginFill(0xFFFFFF);
-        gfx.drawCircle(0, 0, 2);
+        gfx.circle(0, 0, 2).fill(0xFFFFFF);
         this.snowflakeTextures.push(store.renderer.generateTexture(gfx));
-        gfx.endFill();
         gfx.clear();
 
-        gfx.beginFill(0xFFFFFF);
-        gfx.drawCircle(0, 0, 1.5);
+        gfx.circle(0, 0, 1.5).fill(0xFFFFFF);
         this.snowflakeTextures.push(store.renderer.generateTexture(gfx));
-        gfx.endFill();
-
 
         this.addWindRegions();
 
@@ -147,8 +140,6 @@ export default class WindySnow extends Module {
             this.checkEdges(snowFlake);
         }
     }
-
-    render() {}
 
     destroy() {
         this.snowFlakes.forEach((flake) => {

@@ -12,20 +12,32 @@ import createQuadTree from '../components/QuadTree';
 // 2D Boids - Flock behaviour, obstacle avoidance.
 export default class Boids extends Module {
     numBoids = 100;
+
     obstacles = [];
+
     textures = [];
+
     boids = [];
+
     treeSize = 1;
+
     boidTree;
 
     // Visualization
     renderBoidConnections = false;
+
     renderBoidVision = false;
+
     renderQuadTree = false;
+
     enableAlignment = true;
+
     enableCohesion = true;
+
     enableSeparation = true;
+
     boidSpeed = 5;
+
     debugGfx;
 
     constructor(stage) {
@@ -49,8 +61,8 @@ export default class Boids extends Module {
         let yDir = 0;
 
         do {
-            xDir = getRandomInt(0, 200) / 100 - 1;
-            yDir = getRandomInt(0, 200) / 100 - 1;
+            xDir = (getRandomInt(0, 200) / 100) - 1;
+            yDir = (getRandomInt(0, 200) / 100) - 1;
         } while (xDir === 0 && yDir === 0);
 
         boid.velocity.set(xDir, yDir);
@@ -85,10 +97,20 @@ export default class Boids extends Module {
 
     createEdges() {
         this.edges = [];
-        this.edges.push(new Line(new Vector(), new Vector(config.WORLD.width, 0))); // TOP
-        this.edges.push(new Line(new Vector(), new Vector(0, config.WORLD.height))); // LEFT
-        this.edges.push(new Line(new Vector(config.WORLD.width, 0), new Vector(config.WORLD.width, config.WORLD.height))); // RIGHT
-        this.edges.push(new Line(new Vector(0, config.WORLD.height), new Vector(config.WORLD.width, config.WORLD.height))); // BOTTOM
+        const bottomRight = new Vector(config.WORLD.width, config.WORLD.height);
+        const topRight = new Vector(config.WORLD.width, 0);
+        const topLeft = new Vector(0, 0);
+        const bottomLeft = new Vector(0, config.WORLD.height);
+
+        const left = new Line(topLeft, bottomLeft);
+        const right = new Line(topRight, bottomRight);
+        const top = new Line(topLeft, topRight);
+        const bottom = new Line(bottomLeft, bottomRight);
+
+        this.edges.push(top);
+        this.edges.push(left);
+        this.edges.push(right);
+        this.edges.push(bottom);
     }
 
     onVizChange() {
@@ -109,7 +131,7 @@ export default class Boids extends Module {
         this.folder
             .add(this, 'boidSpeed', 0, 25)
             .listen()
-            .onChange(v => this.boids.forEach(b => b.setSpeed(v)));
+            .onChange((v) => this.boids.forEach((b) => b.setSpeed(v)));
         this.folder.add(this, 'renderQuadTree');
         this.folder.add(this, 'renderBoidConnections').onChange(() => this.onVizChange());
         this.folder.add(this, 'renderBoidVision').onChange(() => this.onVizChange());
@@ -124,7 +146,6 @@ export default class Boids extends Module {
 
     setup() {
         this.gfx = new PIXI.Graphics();
-        this.setupGUI();
         this.textures = createBoidTextures();
         this.createEdges();
         this.stage.addChild(this.gfx);
@@ -140,7 +161,7 @@ export default class Boids extends Module {
         this.debugGfx.clear();
         // Rearrange quad tree to reflect any changes in position.
         this.boidTree = createQuadTree(store.worldBoundary, this.treeSize);
-        this.boids.forEach(boid => this.boidTree.insert(boid));
+        this.boids.forEach((boid) => this.boidTree.insert(boid));
 
         this.boids.forEach((boid) => {
             boid.update(delta, this.boidTree);
@@ -168,7 +189,5 @@ export default class Boids extends Module {
             this.stage.removeChild(this.gfx);
             this.gfx.destroy();
         }
-
-        store.gui.removeFolder(this.folder);
     }
 }

@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import { Point } from 'pixi.js';
 import rotatePoint from './rotatePoint';
 
 /**
@@ -75,9 +75,8 @@ export default class Vector {
         return new Vector(+unit.x.toFixed(places), +unit.y.toFixed(places), +unit.z.toFixed(places));
     }
 
-    /** Currently only supports 2D rotation. TODO... */
     rotateBy(radians, pivot) {
-        const res = rotatePoint(new PIXI.Point(this.x, this.y), radians, pivot);
+        const res = rotatePoint(new Point(this.x, this.y), radians, pivot);
         this.x = res.x;
         this.y = res.y;
 
@@ -108,9 +107,11 @@ export default class Vector {
 
     // Copy the values of another vector into this.
     copy(vector) {
-        this.x = vector.x || 0;
-        this.y = vector.y || 0;
-        this.z = vector.z || 0;
+        if (!vector) return this;
+
+        this.x = vector.x ?? 0;
+        this.y = vector.y ?? 0;
+        this.z = vector.z ?? 0;
         this.calculateLength();
 
         return this;
@@ -122,17 +123,17 @@ export default class Vector {
         }
 
         if (x instanceof Array) {
-            this.x = x[0] || 0;
-            this.y = x[1] || 0;
-            this.z = x[2] || 0;
+            this.x = x[0] ?? 0;
+            this.y = x[1] ?? 0;
+            this.z = x[2] ?? 0;
             this.calculateLength();
 
             return this;
         }
 
-        this.x = x || 0;
-        this.y = y || 0;
-        this.z = z || 0;
+        this.x = x ?? 0;
+        this.y = y ?? 0;
+        this.z = z ?? 0;
         this.calculateLength();
 
         return this;
@@ -147,25 +148,25 @@ export default class Vector {
     // Support addition of vector+vector, vector+array, and vector+scalars.
     add(x, y = undefined, z = undefined) {
         if (x instanceof Vector) {
-            this.x += x.x || 0;
-            this.y += x.y || 0;
-            this.z += x.z || 0;
+            this.x += x.x ?? 0;
+            this.y += x.y ?? 0;
+            this.z += x.z ?? 0;
             this.calculateLength();
             return this;
         }
 
         // Unsure how useful this one is.
         if (x instanceof Array) {
-            this.x += x[0] || 0;
-            this.y += x[1] || 0;
-            this.z += x[2] || 0;
+            this.x += x[0] ?? 0;
+            this.y += x[1] ?? 0;
+            this.z += x[2] ?? 0;
             this.calculateLength();
             return this;
         }
 
-        this.x += x || 0;
-        this.y += y || 0;
-        this.z += z || 0;
+        this.x += x ?? 0;
+        this.y += y ?? 0;
+        this.z += z ?? 0;
         this.calculateLength();
         return this;
     }
@@ -173,9 +174,9 @@ export default class Vector {
     // Support substraction of vector-vector, vector-array, and vector-scalars.
     sub(x, y = undefined, z = undefined) {
         if (x instanceof Vector) {
-            this.x -= x.x || 0;
-            this.y -= x.y || 0;
-            this.z -= x.z || 0;
+            this.x -= x.x ?? 0;
+            this.y -= x.y ?? 0;
+            this.z -= x.z ?? 0;
             this.calculateLength();
 
             return this;
@@ -183,17 +184,17 @@ export default class Vector {
 
         // Unsure how useful this one is.
         if (x instanceof Array) {
-            this.x -= x[0] || 0;
-            this.y -= x[1] || 0;
-            this.z -= x[2] || 0;
+            this.x -= x[0] ?? 0;
+            this.y -= x[1] ?? 0;
+            this.z -= x[2] ?? 0;
             this.calculateLength();
 
             return this;
         }
 
-        this.x -= x || 0;
-        this.y -= y || 0;
-        this.z -= z || 0;
+        this.x -= x ?? 0;
+        this.y -= y ?? 0;
+        this.z -= z ?? 0;
         this.calculateLength();
 
         return this;
@@ -226,6 +227,8 @@ export default class Vector {
     }
 
     angleBetween2d(vec) {
+        if (this.length === 0 || vec.length === 0) return 0; // Prevent division by zero.
+
         return Math.acos(this.dot(vec) / (this.length * vec.length));
     }
 
@@ -235,15 +238,15 @@ export default class Vector {
     }
 
     cross(vector) {
-        const x = this.y * vector.z - this.z * vector.y;
-        const y = this.z * vector.x - this.x * vector.z;
-        const z = this.x * vector.y - this.y * vector.x;
+        const x = (this.y * vector.z) - (this.z * vector.y);
+        const y = (this.z * vector.x) - (this.x * vector.z);
+        const z = (this.x * vector.y) - (this.y * vector.x);
 
         return new Vector(x, y, z);
     }
 
     cross2d(vec) {
-        return this.x * vec.y - this.y * vec.x; // Z component of 3d cross.
+        return (this.x * vec.y) - (this.y * vec.x); // Z component of 3d cross.
     }
 
     // Static functions
@@ -273,13 +276,13 @@ export default class Vector {
     }
 
     static dot(vec1, vec2) {
-        return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+        return (vec1.x * vec2.x) + (vec1.y * vec2.y) + (vec1.z * vec2.z);
     }
 
     static cross(vec1, vec2) {
-        const x = vec1.y * vec2.z - vec1.z * vec2.y;
-        const y = vec1.z * vec2.x - vec1.x * vec2.z;
-        const z = vec1.x * vec2.y - vec1.y * vec2.x;
+        const x = (vec1.y * vec2.z) - (vec1.z * vec2.y);
+        const y = (vec1.z * vec2.x) - (vec1.x * vec2.z);
+        const z = (vec1.x * vec2.y) - (vec1.y * vec2.x);
 
         return new Vector(x, y, z);
     }

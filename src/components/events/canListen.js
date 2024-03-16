@@ -1,6 +1,6 @@
 import store from 'root/store';
 
-const canListen = function canListenFunc(state) {
+const canListen = function canListenFunc() {
     const listeners = [];
 
     function listenOn(emitState, event, fn, context) {
@@ -28,7 +28,7 @@ const canListen = function canListenFunc(state) {
     }
 
     function dropListener(listener) {
-        listeners.splice(listeners.findIndex(l => l === listener), 1);
+        listeners.splice(listeners.findIndex((l) => l === listener), 1);
         listener.drop();
     }
 
