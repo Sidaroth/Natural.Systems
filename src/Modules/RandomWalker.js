@@ -6,9 +6,9 @@ import config from '../config';
 import Module from './Module';
 
 export default class RandomWalker extends Module {
-    stage = null;
+    stage;
 
-    position = null;
+    position;
 
     radius = 2;
 
@@ -31,7 +31,7 @@ export default class RandomWalker extends Module {
         this.stage.addChild(this.gfx);
     }
 
-    update() {
+    update(delta) {
         const direction = getRandomInt(0, 3);
         this.move(direction);
     }

@@ -1,10 +1,9 @@
 import { Application, Ticker, isWebGLSupported } from 'pixi.js';
+import Rect from 'shapes/rect';
+import UrlParam from 'interfaces/urlParam';
 import System from './system';
 import config from './config';
 import store from './store';
-import Rect from 'shapes/rect';
-import createMessageBus from 'components/events/createMessageBus';
-import UrlParam from 'interfaces/urlParam';
 
 const app = new Application();
 const options = {
@@ -29,7 +28,6 @@ content.appendChild(app.canvas);
 store.app = app;
 store.renderer = app.renderer;
 store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
-store.messageBus = createMessageBus();
 
 // Replaces renderer.plugins.interaction.mouse.global in Pixi v7+
 app.stage.eventMode = 'static';

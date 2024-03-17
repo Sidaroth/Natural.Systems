@@ -1,29 +1,33 @@
 import { Graphics } from 'pixi.js';
-import Vector from 'math/Vector.ts';
+import Vector from 'math/Vector';
 import Rect from 'shapes/rect';
+import PhysicsBody from 'components/PhysicsBody';
 
 export default class Region {
-    bounds;
+    bounds: Rect;
 
-    density = 1; // air density, fluid density
+    density: number; // air density, fluid density
 
-    force = new Vector(); // any force that should be applied to objects within the region. I.e wind, water flow, etc.
+    force: Vector = new Vector(); // any force that should be applied to objects within the region. I.e wind, water flow, etc.
 
-    gfx = new Graphics();
+    gfx: Graphics = new Graphics();
 
-    constructor(x, y, w, h) {
+    constructor(x: number, y: number, w: number, h: number) {
+        this.density = 1;
+        this.gfx = new Graphics();
+        this.force = new Vector();
         this.bounds = new Rect(x, y, w, h);
     }
 
-    setPosition(x, y) {
-        this.bounds.setPosition({ x, y });
+    setPosition(x: number, y: number) {
+        this.bounds.setPosition(x, y);
     }
 
-    setSize(w, h) {
+    setSize(w: number, h: number) {
         this.bounds.setSize(w, h);
     }
 
-    setForce(force) {
+    setForce(force: Vector) {
         this.force = force;
     }
 
@@ -33,7 +37,7 @@ export default class Region {
     }
 
     // For now only supports square regions. Circular and polygonal shapes will have to wait until I implement SAT or similar checks.
-    contains(object) {
+    contains(object: PhysicsBody) {
         const insideX = object.position.x >= this.bounds.x && object.position.x <= this.bounds.x + this.bounds.w;
         const insideY = object.position.y >= this.bounds.y && object.position.y <= this.bounds.y + this.bounds.h;
         return insideX && insideY;

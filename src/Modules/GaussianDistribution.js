@@ -5,7 +5,7 @@ import config from '../config';
 import Module from './Module';
 
 export default class GaussianDistribution extends Module {
-    stage = null;
+    stage;
 
     numberOfColumns = 60;
 

@@ -1,20 +1,22 @@
-import { Sprite } from 'pixi.js';
+import { Graphics, Sprite, Texture } from 'pixi.js';
 import createState from 'utils/createState';
-import getUUID from 'math/getUUID.ts';
-import Vector from 'math/Vector.ts';
-import degreesToRadians from 'math/degreesToRadians.ts';
+import getUUID from 'math/getUUID';
+import Vector from 'math/Vector';
+import degreesToRadians from 'math/degreesToRadians';
 import Circle from 'shapes/circle';
-import store from '../store';
+import store from 'root/store';
+import { Boid, QuadTree } from 'interfaces/boid';
+import Point from 'math/point';
 
 // Boid logic:
 // 1. Avoid obstacles/each other (Separation)
 // 2. Fly together in a unified direction. (Alignment)
 // 3. Move towards center of flock. (Cohesion)
-const createBoid = (texture, debugGfx = undefined) => {
-    const state = {};
+function createBoid(texture: Texture, debugGfx?: Graphics) {
+    const state = {} as Boid;
 
     const id = getUUID();
-    const position = new Vector();
+    const position = new Point();
     const velocity = new Vector();
     const acceleration = new Vector();
     const sprite = new Sprite(texture);
@@ -33,7 +35,7 @@ const createBoid = (texture, debugGfx = undefined) => {
     let enableCohesion = true;
     let enableAlignment = true;
     let enableSeparation = true;
-    let gfx;
+    let gfx: Graphics;
 
     if (debugGfx) {
         gfx = debugGfx;
@@ -43,11 +45,11 @@ const createBoid = (texture, debugGfx = undefined) => {
         return state.position;
     }
 
-    function findHeading(tree) {
+    function findHeading(tree: QuadTree) {
         const withinRadius = tree.query(visionShape);
-        const withinFOV = withinRadius.filter((b) => {
-            const notSelf = b.id !== id;
-            const angle = state.position.getUnit().angleBetween2d(b.position.getUnit());
+        const withinFOV = withinRadius.filter((boid: Boid) => {
+            const notSelf = boid.id !== id;
+            const angle = Vector.angleBetweenPoints(state.position, boid.position);
             const inFOV = Math.abs(angle) < fov;
             return notSelf && inFOV;
         });
@@ -58,7 +60,7 @@ const createBoid = (texture, debugGfx = undefined) => {
         const flockVelocity = new Vector();
         const separation = new Vector();
 
-        withinFOV.forEach((boid) => {
+        withinFOV.forEach((boid: Boid) => {
             const diff = Vector.sub(state.position, boid.position);
             const distance = diff.squaredLength();
             if (distance < visionSquared) {
@@ -70,9 +72,8 @@ const createBoid = (texture, debugGfx = undefined) => {
             flockVelocity.add(boid.velocity);
 
             if (renderConnections && gfx) {
-                gfx.lineStyle(1, 0x000000);
                 gfx.moveTo(state.position.x, state.position.y);
-                gfx.lineTo(boid.position.x, boid.position.y);
+                gfx.lineTo(boid.position.x, boid.position.y).stroke({ width: 1, color: 0x000000 });
             }
         });
 
@@ -106,12 +107,13 @@ const createBoid = (texture, debugGfx = undefined) => {
         state.sprite.position.y = state.position.y;
     }
 
-    function setPosition(x, y) {
+    function setPosition(x: number, y: number) {
         state.position.set(x, y);
         updateSpritePos();
     }
 
-    function setRotation(angle) {
+    // In radians
+    function setRotation(angle: number) {
         if (state.sprite) sprite.rotation = angle;
     }
 
@@ -122,10 +124,9 @@ const createBoid = (texture, debugGfx = undefined) => {
         if (state.position.y > store.worldBoundary.h) state.setPosition(state.position.x, store.worldBoundary.y);
     }
 
-    function update(delta, tree) {
+    function update(delta: number, tree: QuadTree) {
         if (gfx && renderVision) {
-            gfx.lineStyle(1, 0xaaaaaa);
-            gfx.drawCircle(state.position.x, state.position.y, visionRadius);
+            gfx.circle(state.position.x, state.position.y, visionRadius).stroke({ width: 1, color: 0xaaaaaa });
         }
 
         acceleration.zero();
@@ -134,13 +135,19 @@ const createBoid = (texture, debugGfx = undefined) => {
         state.velocity.add(acceleration);
         state.velocity.setLength(maxSpeed * delta);
 
-        state.position.add(velocity);
+        state.position.add(velocity.asPoint());
         updateSpritePos();
         state.setRotation(state.velocity.getUnit().angle());
         checkBounds();
     }
 
-    function setVizualizationStatus(connections, vision, separation, alignment, cohesion) {
+    function setVizualizationStatus(
+        connections: boolean,
+        vision: boolean,
+        separation: boolean,
+        alignment: boolean,
+        cohesion: boolean,
+    ) {
         renderConnections = connections;
         renderVision = vision;
         enableSeparation = separation;
@@ -148,15 +155,15 @@ const createBoid = (texture, debugGfx = undefined) => {
         enableCohesion = cohesion;
     }
 
-    function setVelocity(vel) {
+    function setVelocity(vel: Vector) {
         velocity.copyFrom(vel);
     }
 
-    function addForce(x, y = undefined) {
+    function addForce(x: number, y?: number) {
         acceleration.add(x, y);
     }
 
-    function setSpeed(speed) {
+    function setSpeed(speed: number) {
         maxSpeed = speed;
     }
 
@@ -180,9 +187,13 @@ const createBoid = (texture, debugGfx = undefined) => {
         update,
     };
 
-    return createState('Boid', state, {
-        localState,
+    return createState({
+        stateName: 'Boid',
+        mainState: state,
+        states: {
+            localState,
+        },
     });
-};
+}
 
 export default createBoid;

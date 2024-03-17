@@ -1,4 +1,5 @@
 // Point class represents a point in 2D space - supports most common operations.
+
 // Self-operating methods return self to allow chaining.
 export default class Point {
     x: number = 0;

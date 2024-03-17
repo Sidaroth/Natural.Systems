@@ -5,7 +5,7 @@ import Module from './Module';
 import store from '../store';
 
 export default class NoiseVisualizer extends Module {
-    stage = null;
+    stage;
 
     runtime = 0;
 

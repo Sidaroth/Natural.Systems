@@ -12,7 +12,7 @@ import degreesToRadians from '../math/degreesToRadians';
 // petals = 6; d = 71;
 // petals = 7; d = 19;
 export default class Roses extends Module {
-    stage = null;
+    stage;
 
     radius = 300;
 

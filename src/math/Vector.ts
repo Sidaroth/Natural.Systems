@@ -1,18 +1,20 @@
 import Point from 'math/point';
+import { Graphics, StrokeStyle } from 'pixi.js';
 
 type VectorPolymorph = number | Vector | number[] | Point;
 
 // A 2D/3D vector class.
 export default class Vector {
-    x: number = 0;
+    x: number;
 
-    y: number = 0;
+    y: number;
 
-    z: number = 0;
+    z: number;
 
-    private length: number = 0;
+    private length: number;
 
     constructor(x = 0, y = 0, z = 0) {
+        this.length = 0;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -27,6 +29,11 @@ export default class Vector {
         this.x = 0;
         this.y = 0;
         this.z = 0;
+        this.length = 0;
+    }
+
+    asPoint() {
+        return new Point(this.x, this.y);
     }
 
     // Calculates and caches the length of the vector. Called after any operation that changes the vector.
@@ -283,6 +290,15 @@ export default class Vector {
         return new Vector(x, y, z);
     }
 
+    render(
+        gfxContext: Graphics,
+        strokeStyle: StrokeStyle = { color: 0xff0000, width: 3 },
+        from: Point = new Point(0, 0),
+    ) {
+        gfxContext.moveTo(from.x, from.y);
+        gfxContext.lineTo(this.x, this.y).stroke(strokeStyle);
+    }
+
     // 2D cross product - returns the Z component of the 3D cross product. Equivalent to the determinant of the 2x2 matrix
     // formed by the two vectors.
     cross2d(vector: Vector): number {
@@ -354,5 +370,32 @@ export default class Vector {
         const z = (vec1.x * vec2.y) - (vec1.y * vec2.x);
 
         return new Vector(x, y, z);
+    }
+
+    static asPoint(vector: Vector): Point {
+        return new Point(vector.x, vector.y);
+    }
+
+    static unit(vec: Vector | Point): Vector {
+        const vector = vec instanceof Point ? Vector.fromPoint(vec) : vec;
+
+        return vector.getUnit();
+    }
+
+    static angleBetweenPoints(point1: Point, point2: Point) {
+        const vector1 = Vector.fromPoint(point1);
+        const vector2 = Vector.fromPoint(point2);
+
+        const unit1 = vector1.getUnit();
+        const unit2 = vector2.getUnit();
+
+        return unit1.angleBetween2d(unit2);
+    }
+
+    static angleBetween(vec1: Vector | Point, vec2: Vector | Point) {
+        const vector1 = vec1 instanceof Point ? Vector.fromPoint(vec1) : vec1;
+        const vector2 = vec2 instanceof Point ? Vector.fromPoint(vec2) : vec2;
+
+        return vector1.angleBetween2d(vector2);
     }
 }

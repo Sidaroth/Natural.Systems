@@ -1,8 +1,8 @@
 import { Graphics } from 'pixi.js';
-import Vector from 'math/Vector.ts';
-import store from '../store';
+import Vector from 'math/Vector';
+import store from 'root/store';
 
-export default function createBoidTextures(size = 8.5) {
+export default function createBoidTextures(size: number = 8.5) {
     const boidWidth = size;
     const boidHeight = boidWidth * 2.5;
 
@@ -23,7 +23,8 @@ export default function createBoidTextures(size = 8.5) {
         gfx.lineTo(p3.x / scalar, p3.y / scalar);
         gfx.fill(colors[i]);
 
-        textures.push(store.renderer.generateTexture(gfx));
+        const texture = store.renderer?.generateTexture(gfx);
+        if (texture) textures.push(texture);
     }
 
     return textures;
