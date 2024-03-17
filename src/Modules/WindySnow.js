@@ -1,10 +1,10 @@
-import * as PIXI from 'pixi.js';
+import { Graphics } from 'pixi.js';
 import { Noise } from 'noisejs';
+import getRandomInt from 'math/getRandomInt.ts';
+import Vector from 'math/Vector.ts';
 import Module from './Module';
 import PhysicsBody from '../components/PhysicsBody';
 import config from '../config';
-import getRandomInt from '../math/getRandomInt';
-import Vector from '../math/Vector';
 import store from '../store';
 import Region from '../components/Region';
 
@@ -29,7 +29,7 @@ export default class WindySnow extends Module {
         this.gravity = new Vector(0, 1);
     }
 
-    /* eslint-disable class-methods-use-this */
+    // eslint-disable-next-line class-methods-use-this
     checkEdges(snowFlake) {
         if (snowFlake.position.x > config.WORLD.width) {
             snowFlake.position.x = 0;
@@ -45,7 +45,6 @@ export default class WindySnow extends Module {
             snowFlake.velocity.zero();
         }
     }
-    /* eslint-enable class-methods-use-this */
 
     drawBackground() {
         // sky
@@ -98,12 +97,12 @@ export default class WindySnow extends Module {
     // TODO fix module options for wind speeds, gravity and number of snowflake modifiers.
     setup() {
         this.time = 0;
-        this.bgfx = new PIXI.Graphics();
+        this.bgfx = new Graphics();
         this.stage.addChild(this.bgfx);
         this.drawBackground();
 
         // Create 3 sizes of snowflakes for some parallax effects.
-        const gfx = new PIXI.Graphics();
+        const gfx = new Graphics();
         gfx.circle(0, 0, 2.5).fill(0xFFFFFF);
         this.snowflakeTextures.push(store.renderer.generateTexture(gfx));
         gfx.clear();

@@ -1,12 +1,12 @@
-import * as PIXI from 'pixi.js';
+import { Graphics, Sprite } from 'pixi.js';
+import getRandomInt from 'math/getRandomInt';
+import getUUID from 'math/getUUID';
 import config from '../config';
 import Module from './Module';
-import getRandomInt from '../math/getRandomInt';
 import createQuadTree from '../components/QuadTree';
 import Rect from '../shapes/rect';
 import Circle from '../shapes/circle';
 import store from '../store';
-import getUUID from '../math/getUUID';
 
 export default class QuadTreeMod extends Module {
     vision = 0;
@@ -63,7 +63,7 @@ export default class QuadTreeMod extends Module {
                     x: getRandomInt(0, config.WORLD.width),
                     y: getRandomInt(0, config.WORLD.height),
                 },
-                sprite: new PIXI.Sprite(this.pointTexture),
+                sprite: new Sprite(this.pointTexture),
             };
 
             entity.sprite.position.x = entity.position.x;
@@ -92,7 +92,7 @@ export default class QuadTreeMod extends Module {
     }
 
     setup() {
-        this.gfx = new PIXI.Graphics();
+        this.gfx = new Graphics();
         this.stage.addChild(this.gfx);
 
         // Black texture

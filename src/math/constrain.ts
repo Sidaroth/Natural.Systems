@@ -1,4 +1,4 @@
-export default function constrain(value, min, max) {
+export default function constrain(value: number, min: number, max: number): number {
     if (value < min) return min;
     if (value > max) return max;
 

@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import { Graphics } from 'pixi.js';
 import gaussian from 'math/gaussian';
 import constrain from 'math/constrain';
 import config from '../config';
@@ -34,7 +34,7 @@ export default class GaussianDistribution extends Module {
 
         this.gen = gaussian(this.numberOfColumns / 2, this.numberOfColumns / 10);
 
-        this.gfx = new PIXI.Graphics();
+        this.gfx = new Graphics();
         this.stage.addChild(this.gfx);
     }
 

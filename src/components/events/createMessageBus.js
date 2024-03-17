@@ -1,7 +1,7 @@
 import canEmit from 'components/events/canEmit';
 import createState from 'utils/createState';
 
-const createMessageBus = function createMessageBusFunc() {
+function createMessageBus() {
     const state = {};
 
     const localState = {

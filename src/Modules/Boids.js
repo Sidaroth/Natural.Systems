@@ -1,10 +1,10 @@
-import * as PIXI from 'pixi.js';
+import { Graphics } from 'pixi.js';
 import Module from './Module';
 import config from '../config';
 import store from '../store';
-import Vector from '../math/Vector';
-import getRandomInt from '../math/getRandomInt';
-import Line from '../shapes/line';
+import Vector from '../math/Vector.ts';
+import getRandomInt from '../math/getRandomInt.ts';
+import Line from '../shapes/line.ts';
 import createBoid from '../components/Boid';
 import createBoidTextures from '../components/createBoidTextures';
 import createQuadTree from '../components/QuadTree';
@@ -145,11 +145,11 @@ export default class Boids extends Module {
     }
 
     setup() {
-        this.gfx = new PIXI.Graphics();
+        this.gfx = new Graphics();
         this.textures = createBoidTextures();
         this.createEdges();
         this.stage.addChild(this.gfx);
-        this.debugGfx = new PIXI.Graphics();
+        this.debugGfx = new Graphics();
         this.stage.addChild(this.debugGfx);
 
         this.obstacles = [];

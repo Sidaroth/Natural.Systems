@@ -1,6 +1,6 @@
 import createState from 'utils/createState';
-import Vector from '../math/Vector';
-import Rect from '../shapes/rect';
+import Vector from 'math/Vector.ts';
+import Rect from 'shapes/rect';
 import store from '../store';
 
 /**

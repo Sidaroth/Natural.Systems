@@ -1,9 +1,10 @@
-import { Application, isWebGLSupported } from 'pixi.js';
+import { Application, Ticker, isWebGLSupported } from 'pixi.js';
 import System from './system';
 import config from './config';
 import store from './store';
-import Rect from './shapes/rect';
-import createMessageBus from './components/events/createMessageBus';
+import Rect from 'shapes/rect';
+import createMessageBus from 'components/events/createMessageBus';
+import UrlParam from 'interfaces/urlParam';
 
 const app = new Application();
 const options = {
@@ -21,6 +22,8 @@ if (!isWebGLSupported()) {
 }
 
 const content = document.getElementById('app');
+if (!content) throw new Error('No div "app" found. Cannot append PIXI Canvas to DOM');
+
 content.appendChild(app.canvas);
 
 store.app = app;
@@ -32,7 +35,8 @@ store.messageBus = createMessageBus();
 app.stage.eventMode = 'static';
 app.stage.hitArea = app.screen;
 app.stage.addEventListener('pointermove', (e) => {
-    store.mousePosition = e.global;
+    store.mousePosition.x = e.global.x;
+    store.mousePosition.y = e.global.y;
 });
 
 // Source code link.
@@ -50,14 +54,17 @@ p.id = 'description';
 descriptionDiv.appendChild(p);
 content.appendChild(descriptionDiv);
 
-function getURLParams() {
-    const params = {};
+function getURLParams(): UrlParam {
+    const params: UrlParam = {};
     const query = decodeURIComponent(window.location.href.slice(window.location.href.indexOf('?') + 1));
     query.split('&').forEach((param) => {
         const parts = param.split('=', 2);
         const key = parts[0];
         const value = parts[1];
-        params[key] = value;
+
+        if (key !== undefined && value !== undefined) {
+            params[key] = value;
+        }
     });
 
     return params;
@@ -65,9 +72,8 @@ function getURLParams() {
 
 const system = new System(app.stage, app.renderer);
 
-function mainLoop(ticker) {
+function mainLoop(ticker: Ticker) {
     const delta = ticker.deltaTime;
-    // elapsedTime += delta;
 
     system.update(delta);
     system.render();

@@ -1,10 +1,10 @@
-import * as PIXI from 'pixi.js';
+import { Graphics } from 'pixi.js';
+import Vector from 'math/Vector.ts';
+import SAT from 'math/sat.ts';
+import Region from 'components/Region';
+import Polygon from 'shapes/polygon.ts';
 import Module from './Module';
 import config from '../config';
-import Region from '../components/Region';
-import Polygon from '../shapes/polygon';
-import Vector from '../math/Vector';
-import SAT from '../math/sat';
 
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
 export default class SATModule extends Module {
@@ -126,7 +126,7 @@ export default class SATModule extends Module {
     setup() {
         this.edges = [];
         this.obstacles = [];
-        this.gfx = new PIXI.Graphics();
+        this.gfx = new Graphics();
         this.innerRegion = new Region(
             this.innerRegionOffset,
             this.innerRegionOffset,
@@ -152,8 +152,8 @@ export default class SATModule extends Module {
                 ? new Vector(this.directionVector.x * -1, this.directionVector.y)
                 : new Vector(this.directionVector.x, this.directionVector.y * -1);
 
-            const x = this.box.position.x + SATResponse.overlapVector.x;
-            const y = this.box.position.y + SATResponse.overlapVector.y;
+            const x = this.box.position.x + SATResponse.overlapAxis.x;
+            const y = this.box.position.y + SATResponse.overlapAxis.y;
             this.box.setPosition(x, y);
         }
     }

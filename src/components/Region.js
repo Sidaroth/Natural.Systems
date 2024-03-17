@@ -1,6 +1,6 @@
-import * as PIXI from 'pixi.js';
-import Vector from '../math/Vector';
-import Rect from '../shapes/rect';
+import { Graphics } from 'pixi.js';
+import Vector from 'math/Vector.ts';
+import Rect from 'shapes/rect';
 
 export default class Region {
     bounds;
@@ -9,7 +9,7 @@ export default class Region {
 
     force = new Vector(); // any force that should be applied to objects within the region. I.e wind, water flow, etc.
 
-    gfx = new PIXI.Graphics();
+    gfx = new Graphics();
 
     constructor(x, y, w, h) {
         this.bounds = new Rect(x, y, w, h);
@@ -29,9 +29,7 @@ export default class Region {
 
     render(color = 0xff00ff) {
         this.gfx.clear();
-        this.gfx.beginFill(color);
-        this.gfx.drawRect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
-        this.gfx.endFill();
+        this.gfx.rect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h).fill(color);
     }
 
     // For now only supports square regions. Circular and polygonal shapes will have to wait until I implement SAT or similar checks.

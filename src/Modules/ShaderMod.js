@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import { Sprite, Texture } from 'pixi.js';
 import Module from './Module';
 import config from '../config';
 
@@ -19,8 +19,8 @@ export default class ShaderMod extends Module {
         };
 
         this.canvas = new OffscreenCanvas(config.WORLD.width, config.WORLD.height);
-        this.texture = PIXI.Texture.from(this.canvas);
-        this.sprite = new PIXI.Sprite(this.texture);
+        this.texture = Texture.from(this.canvas);
+        this.sprite = new Sprite(this.texture);
         this.stage.addChild(this.sprite);
     }
 

@@ -1,10 +1,10 @@
-import * as PIXI from 'pixi.js';
+import { Sprite } from 'pixi.js';
 import createState from 'utils/createState';
-import Vector from '../math/Vector';
-import degreesToRadians from '../math/degreesToRadians';
-import Circle from '../shapes/circle';
+import getUUID from 'math/getUUID.ts';
+import Vector from 'math/Vector.ts';
+import degreesToRadians from 'math/degreesToRadians.ts';
+import Circle from 'shapes/circle';
 import store from '../store';
-import getUUID from '../math/getUUID';
 
 // Boid logic:
 // 1. Avoid obstacles/each other (Separation)
@@ -17,7 +17,7 @@ const createBoid = (texture, debugGfx = undefined) => {
     const position = new Vector();
     const velocity = new Vector();
     const acceleration = new Vector();
-    const sprite = new PIXI.Sprite(texture);
+    const sprite = new Sprite(texture);
     sprite.anchor.set(0.5);
 
     const fov = degreesToRadians(90);
@@ -149,7 +149,7 @@ const createBoid = (texture, debugGfx = undefined) => {
     }
 
     function setVelocity(vel) {
-        velocity.copy(vel);
+        velocity.copyFrom(vel);
     }
 
     function addForce(x, y = undefined) {

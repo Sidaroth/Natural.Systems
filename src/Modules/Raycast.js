@@ -1,9 +1,9 @@
-import * as PIXI from 'pixi.js';
-import Module from './Module';
+import { Graphics } from 'pixi.js';
+import Vector from 'math/Vector';
+import Circle from 'shapes/circle';
+import Line from 'shapes/line.ts';
 import store from '../store';
-import Vector from '../math/Vector';
-import Circle from '../shapes/circle';
-import Line from '../shapes/line';
+import Module from './Module';
 
 export default class Raycast extends Module {
     constructor(stage) {
@@ -28,7 +28,7 @@ export default class Raycast extends Module {
 
     setup() {
         this.reset();
-        this.gfx = new PIXI.Graphics();
+        this.gfx = new Graphics();
         this.stage.addChild(this.gfx);
     }
 

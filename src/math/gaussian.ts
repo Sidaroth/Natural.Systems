@@ -3,40 +3,42 @@
  * https://www.wikiwand.com/en/Marsaglia_polar_method
  * Consider implement ziggurat algorithm instead as it's faster.
  */
-const gaussianGen = function gaussianGen(mean, stdev) {
+function gaussianGen(mean: number, stdev: number) {
     // It generates two numbers at a time, so we store the second one for the next call.
     let hasSpare = false;
-    let spare;
+    let spare: number = 0;
 
-    return () => {
+    const generator = () => {
         // If we have a spare, use it.
         if (hasSpare) {
             hasSpare = false;
             return mean + (stdev * spare);
         }
 
-        let num1;
-        let num2;
-        let mag;
+        let firstNum;
+        let secondNum;
+        let magnitude;
 
         // Generate two numbers num1 and num2 within the unit circle.
         do {
-            num1 = (2.0 * Math.random()) - 1.0;
-            num2 = (2.0 * Math.random()) - 1.0;
-            mag = (num1 * num1) + (num2 * num2);
-        } while (mag >= 1.0 || mag === 0);
+            firstNum = (2.0 * Math.random()) - 1.0;
+            secondNum = (2.0 * Math.random()) - 1.0;
+            magnitude = (firstNum * firstNum) + (secondNum * secondNum);
+        } while (magnitude >= 1.0 || magnitude === 0);
 
         // This forms a radius (mag) from a uniform (0, 1] to a random (0, 1] with a gaussian distribution.
-        mag = Math.sqrt((-2.0 * Math.log(mag)) / mag);
+        magnitude = Math.sqrt((-2.0 * Math.log(magnitude)) / magnitude);
 
         // Store one of the numbers for the next call (spare).
-        spare = num2 * mag;
+        spare = secondNum * magnitude;
         hasSpare = true;
 
         // Return a gaussian random number.
-        const generated = num1 * mag;
+        const generated = firstNum * magnitude;
         return mean + (stdev * generated);
     };
-};
+
+    return generator;
+}
 
 export default gaussianGen;

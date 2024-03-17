@@ -1,6 +1,7 @@
-import * as PIXI from 'pixi.js';
-import getRandomInt from 'math/getRandomInt';
-import constrain from 'math/constrain';
+import { Graphics } from 'pixi.js';
+import getRandomInt from 'math/getRandomInt.ts';
+import constrain from 'math/constrain.ts';
+import Point from 'math/point.ts';
 import config from '../config';
 import Module from './Module';
 
@@ -21,12 +22,12 @@ export default class RandomWalker extends Module {
     constructor(stage, x, y) {
         super();
         this.stage = stage;
-        this.position = new PIXI.Point(x, y);
+        this.position = new Point(x, y);
         this.name = 'randomWalker';
     }
 
     setup() {
-        this.gfx = new PIXI.Graphics();
+        this.gfx = new Graphics();
         this.stage.addChild(this.gfx);
     }
 

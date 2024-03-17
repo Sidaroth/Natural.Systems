@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import { Texture, Sprite } from 'pixi.js';
 import { Noise } from 'noisejs';
 import config from '../config';
 import Module from './Module';
@@ -58,8 +58,8 @@ export default class NoiseVisualizer extends Module {
         this.width = config.WORLD.width;
         this.canvas = new OffscreenCanvas(this.width, this.height);
         this.ctx = this.canvas.getContext('2d');
-        this.texture = PIXI.Texture.from(this.canvas);
-        this.sprite = new PIXI.Sprite(this.texture);
+        this.texture = Texture.from(this.canvas);
+        this.sprite = new Sprite(this.texture);
         this.imageData = this.ctx.createImageData(this.width, this.height);
         this.pixels = new Int32Array(this.imageData.data.buffer);
         this.stage.addChild(this.sprite);
@@ -105,7 +105,6 @@ export default class NoiseVisualizer extends Module {
     }
 
     // TODO: This gets laggy at large height * width sizes. Optimize by doing 32bit manip or something...https://jsperf.com/canvas-pixel-manipulation/8
-    // PIXI.Texture manipulation?
     generateNoise() {
         for (let y = 0; y < this.height; y += 1) {
             for (let x = 0; x < this.width; x += 1) {

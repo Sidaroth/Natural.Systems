@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import { Sprite } from 'pixi.js';
 import Vector from 'math/Vector';
 
 // TODO Seperate sprite from a physicsbody to hasSprite.
@@ -69,7 +69,7 @@ export default class PhysicsBody {
 
     setTexture(texture) {
         this.texture = texture;
-        if (!this.sprite) this.sprite = new PIXI.Sprite();
+        if (!this.sprite) this.sprite = new Sprite();
         this.sprite.texture = texture;
     }
 
@@ -80,7 +80,6 @@ export default class PhysicsBody {
     }
 
     destroy() {
-        // if (this.texture) this.texture.destroy();
         if (this.sprite) this.sprite.destroy();
     }
 }

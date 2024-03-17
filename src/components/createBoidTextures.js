@@ -1,5 +1,5 @@
-import * as PIXI from 'pixi.js';
-import Vector from '../math/Vector';
+import { Graphics } from 'pixi.js';
+import Vector from 'math/Vector.ts';
 import store from '../store';
 
 export default function createBoidTextures(size = 8.5) {
@@ -10,7 +10,7 @@ export default function createBoidTextures(size = 8.5) {
     const p1 = new Vector(0, 0);
     const p2 = new Vector(-boidWidth, boidHeight);
     const p3 = new Vector(boidWidth, boidHeight);
-    const gfx = new PIXI.Graphics();
+    const gfx = new Graphics();
 
     let scalar = 1;
     const colors = [0x03a9f4, 0x009688, 0x607d8b, 0x00bcd4];

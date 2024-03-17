@@ -1,10 +1,10 @@
-import * as PIXI from 'pixi.js';
+import degreesToRadians from 'math/degreesToRadians.ts';
+import getRandomInt from 'math/getRandomInt.ts';
+import Point from 'math/point.ts';
+import { Graphics } from 'pixi.js';
 import Module from './Module';
 import store from '../store';
 import config from '../config';
-import rotatePoint from '../math/rotatePoint';
-import degreesToRadians from '../math/degreesToRadians';
-import getRandomInt from '../math/getRandomInt';
 
 export default class FractalTreesMod extends Module {
     constructor(stage) {
@@ -74,7 +74,7 @@ export default class FractalTreesMod extends Module {
     }
 
     setup() {
-        this.gfx = new PIXI.Graphics();
+        this.gfx = new Graphics();
         this.stage.addChild(this.gfx);
 
         this.drawBranches();
@@ -141,8 +141,8 @@ export default class FractalTreesMod extends Module {
 
         const rotation = depth > 2 ? rot + this.swayCurrent : rot;
 
-        const p = new PIXI.Point(origin.x, origin.y - length);
-        const endPoint = rotatePoint(p, degreesToRadians(rotation), origin);
+        const endPoint = new Point(origin.x, origin.y - length);
+        endPoint.rotate(degreesToRadians(rotation), origin);
 
         this.gfx
             .moveTo(origin.x, origin.y)
