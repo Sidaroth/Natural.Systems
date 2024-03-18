@@ -1,10 +1,11 @@
 import Point from 'math/point';
 import { Graphics, StrokeStyle } from 'pixi.js';
+import Position from 'interfaces/position';
 
 type VectorPolymorph = number | Vector | number[] | Point;
 
 // A 2D/3D vector class.
-export default class Vector {
+export default class Vector implements Position {
     x: number;
 
     y: number;
@@ -95,6 +96,8 @@ export default class Vector {
         this.x = point.x;
         this.y = point.y;
 
+        this.calculateLength();
+
         return this;
     }
 
@@ -135,6 +138,7 @@ export default class Vector {
     fromPoint(point: Point) {
         this.x = point.x;
         this.y = point.y;
+        this.calculateLength();
 
         return this;
     }

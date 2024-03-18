@@ -1,10 +1,12 @@
 // Point class represents a point in 2D space - supports most common operations.
 
-// Self-operating methods return self to allow chaining.
-export default class Point {
-    x: number = 0;
+import Position from 'interfaces/position';
 
-    y: number = 0;
+// Self-operating methods return self to allow chaining.
+export default class Point implements Position {
+    x: number;
+
+    y: number;
 
     constructor(x: number = 0, y: number = 0) {
         this.x = x;
