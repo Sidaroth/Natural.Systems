@@ -1,7 +1,7 @@
-import { Color, Graphics } from 'pixi.js';
-import config from '../config';
-import Module from './Module';
-import degreesToRadians from '../math/degreesToRadians';
+import { Color, Container, Graphics } from 'pixi.js';
+import degreesToRadians from 'math/degreesToRadians';
+import config from 'root/config';
+import Module from 'modules/Module';
 
 // See https://www.wikiwand.com/en/Maurer_rose for formula.
 // Interesting petal & d combinations:
@@ -12,23 +12,27 @@ import degreesToRadians from '../math/degreesToRadians';
 // petals = 6; d = 71;
 // petals = 7; d = 19;
 export default class Roses extends Module {
-    stage;
+    backgroundColor?: number;
 
-    radius = 300;
+    stage: Container;
 
-    petals = 0; // petals = N if odd, 2n petals if even.
+    radius: number = 300;
 
-    d = 0;
+    petals: number = 0; // petals = N if odd, 2n petals if even.
 
-    outerColor = '#ff0000';
+    angleMultiplier: number = 0; // d
 
-    innerColor = '#0000ff';
+    outerColor: Color = new Color('#ff0000');
 
-    innerWidth = 0;
+    innerColor: Color = new Color('#0000ff');
 
-    outerWidth = 0;
+    innerWidth: number = 0;
 
-    constructor(stage) {
+    outerWidth: number = 0;
+
+    gfx: Graphics = new Graphics();
+
+    constructor(stage: Container) {
         super();
         this.stage = stage;
         this.name = 'roses';
@@ -45,23 +49,6 @@ export default class Roses extends Module {
         Make use of the panel on the right to play around with some settings.`;
     }
 
-    // setupGUI() {
-    //     this.folder = store.gui.addFolder('Rose Settings');
-    //     this.folder.add(this, 'radius', 5, 600).listen();
-    //     this.folder.add(this, 'petals', 1, 15).listen().onChange((v) => {
-    //         this.petals = parseInt(v, 10);
-    //     });
-    //     this.folder.add(this, 'd', 1, 150).listen().onChange((v) => {
-    //         this.d = parseInt(v, 10);
-    //     });
-    //     this.folder.addColor(this, 'outerColor').listen();
-    //     this.folder.add(this, 'outerWidth', 0.1, 10).listen();
-    //     this.folder.addColor(this, 'innerColor').listen();
-    //     this.folder.add(this, 'innerWidth', 0.1, 10).listen();
-    //     this.folder.add(this, 'reset');
-    //     this.folder.open();
-    // }
-
     setup() {
         this.reset();
         this.gfx = new Graphics();
@@ -71,12 +58,16 @@ export default class Roses extends Module {
     reset() {
         this.radius = 300;
         this.petals = 5;
-        this.d = 97;
+        this.angleMultiplier = 97;
         this.outerColor = new Color('#ff0000');
         this.innerColor = new Color('#0000ff');
         this.innerWidth = 1;
         this.outerWidth = 3;
     }
+
+    /* eslint-disable */
+    update(delta: number): void { }
+    /* eslint-enable */
 
     render() {
         this.gfx.clear();
@@ -88,11 +79,13 @@ export default class Roses extends Module {
         }
 
         this.gfx.moveTo(centerX, centerY);
-        for (let a = 0; a <= 360; a += 1) {
-            const k = a * this.d;
-            const r = this.radius * Math.sin(degreesToRadians(this.petals * k));
-            const x = centerX + (r * Math.sin(degreesToRadians(k)));
-            const y = centerY + (r * Math.cos(degreesToRadians(k)));
+        for (let angle = 0; angle <= 360; angle += 1) {
+            const rotation = angle * this.angleMultiplier;
+
+            // Radial coordinate in a polar coordinate system.
+            const radial = this.radius * Math.sin(degreesToRadians(this.petals * rotation));
+            const x = centerX + (radial * Math.sin(degreesToRadians(rotation)));
+            const y = centerY + (radial * Math.cos(degreesToRadians(rotation)));
 
             this.gfx.lineTo(x, y);
         }
@@ -100,11 +93,11 @@ export default class Roses extends Module {
 
         // Draws the outer bounds of the rose in a red color. Visually a much more neat look.
         this.gfx.moveTo(centerX, centerY);
-        for (let a = 0; a <= 360; a += 1) {
-            const k = a;
-            const r = this.radius * Math.sin(degreesToRadians(this.petals * k));
-            const x = centerX + (r * Math.sin(degreesToRadians(k)));
-            const y = centerY + (r * Math.cos(degreesToRadians(k)));
+        for (let angle = 0; angle <= 360; angle += 1) {
+            // Radial coordinate in a polar coordinate system.
+            const radial = this.radius * Math.sin(degreesToRadians(this.petals * angle));
+            const x = centerX + (radial * Math.sin(degreesToRadians(angle)));
+            const y = centerY + (radial * Math.cos(degreesToRadians(angle)));
 
             this.gfx.lineTo(x, y);
         }

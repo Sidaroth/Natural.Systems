@@ -8,9 +8,9 @@ export default class Line {
 
     end: Point;
 
-    constructor(p1: Point, p2: Point) {
-        this.origin = p1;
-        this.end = p2;
+    constructor(p1: Point | Vector, p2: Point | Vector) {
+        this.origin = p1 instanceof Vector ? p1.asPoint() : p1;
+        this.end = p2 instanceof Vector ? p2.asPoint() : p2;
     }
 
     // Returns a vector representation from the origin to the end of the line.

@@ -3,7 +3,7 @@ import Vector from 'math/Vector';
 import Rect from 'shapes/rect';
 import store from 'root/store';
 import Circle from 'shapes/circle';
-import { Boid, QuadTree } from 'interfaces/boid';
+import { Boid, Entity, QuadTree } from 'root/interfaces/entities';
 import { Graphics } from 'pixi.js';
 
 /**
@@ -13,7 +13,6 @@ import { Graphics } from 'pixi.js';
  * https://gamedev.stackexchange.com/questions/20607/quad-tree-with-a-lot-of-moving-objects
  * https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det
  *
- * Generalize the QuadTree to be able to handle any type of object with a position / size, not just boids.
  */
 function createQuadTree(boundary: Rect, cap = Infinity, divisions = Infinity, subDivision = 0, parentNode?: QuadTree) {
     const state = {} as QuadTree;
@@ -24,7 +23,7 @@ function createQuadTree(boundary: Rect, cap = Infinity, divisions = Infinity, su
     const division = subDivision;
     const parent = parentNode;
 
-    let entities: Boid[] = [];
+    let entities: Entity[] = [];
     let subTrees: QuadTree[] = [];
     const isDivided = false;
 
@@ -84,7 +83,7 @@ function createQuadTree(boundary: Rect, cap = Infinity, divisions = Infinity, su
         }
     }
 
-    function remove(entity: Boid) {
+    function remove(entity: Entity) {
         if (!bounds.contains(entity.position)) return;
         if (state.isDivided) {
             subTrees.forEach((tree) => tree.remove(entity));
@@ -98,7 +97,7 @@ function createQuadTree(boundary: Rect, cap = Infinity, divisions = Infinity, su
         }
     }
 
-    function insert(entity: Boid): boolean {
+    function insert(entity: Entity): boolean {
         if (!bounds.contains(entity.position)) return false;
         if (!state.isDivided && division + 1 <= maxDivisions && entities.length + 1 > capacity) subdivide();
 
@@ -113,7 +112,7 @@ function createQuadTree(boundary: Rect, cap = Infinity, divisions = Infinity, su
 
     function getAllEntities() {
         if (state.isDivided) {
-            let subTreeEntities: Boid[] = [];
+            let subTreeEntities: Entity[] = [];
             subTrees.forEach((tree) => {
                 subTreeEntities = [...subTreeEntities, ...tree.getAllEntities()];
             });
@@ -130,18 +129,18 @@ function createQuadTree(boundary: Rect, cap = Infinity, divisions = Infinity, su
 
     // Returns any point within given range/shape.
     function query(shape: Rect | Circle) {
-        let found: Boid[] = [];
+        let found: Entity[] = [];
 
         if (!bounds.intersects(shape)) return found;
 
         if (state.isDivided) {
             // See what has been found in the subtrees.
-            found = subTrees.reduce((subTreeBoids: Boid[], subTree: QuadTree) => {
+            found = subTrees.reduce((subTreeBoids: Entity[], subTree: QuadTree) => {
                 const foundInSubTree = subTree.query(shape);
                 return subTreeBoids.concat(foundInSubTree);
             }, []);
         } else {
-            entities.forEach((entity: Boid) => {
+            entities.forEach((entity: Entity) => {
                 store.count += 1;
                 if (shape.contains(entity.position)) {
                     found.push(entity);

@@ -1,22 +1,64 @@
-import degreesToRadians from 'math/degreesToRadians.ts';
-import getRandomInt from 'math/getRandomInt.ts';
-import Point from 'math/point.ts';
-import { Graphics } from 'pixi.js';
-import Module from './Module';
-import store from '../store';
-import config from '../config';
+import degreesToRadians from 'math/degreesToRadians';
+import getRandomInt from 'math/getRandomInt';
+import Point from 'math/point';
+import { Container, Graphics } from 'pixi.js';
+import config from 'root/config';
+import Module from 'modules/Module';
 
 export default class FractalTreesMod extends Module {
-    constructor(stage) {
+    backgroundColor?: number;
+
+    stage: Container;
+
+    leafRadius: number;
+
+    origin: Point;
+
+    degrees: number;
+
+    maxDepth: number;
+
+    startLength: number;
+
+    branchRatio: number;
+
+    lineThickness: number;
+
+    lineColor: number;
+
+    lineOpacity: number;
+
+    drawRandomBranches: boolean;
+
+    drawBase: boolean;
+
+    addStraightBranch: boolean;
+
+    swayCurrent: number;
+
+    swaySpeed: number;
+
+    swayMax: number;
+
+    sway: boolean;
+
+    drawLeaves: boolean;
+
+    leafOpacity: number;
+
+    leafColor: number;
+
+    folder: any;
+
+    gfx: Graphics;
+
+    constructor(stage: Container) {
         super();
         this.stage = stage;
         this.name = 'fractalTree';
         this.description = 'Fractal based tree "generator" with various options.';
 
-        this.origin = {
-            x: config.WORLD.width / 2,
-            y: config.WORLD.height,
-        };
+        this.origin = new Point(config.WORLD.width / 2, config.WORLD.height);
 
         this.degrees = 120;
         this.maxDepth = 8;
@@ -40,37 +82,7 @@ export default class FractalTreesMod extends Module {
         this.leafOpacity = 0.75;
         this.leafRadius = 2.5;
         this.leafColor = 0x4a204;
-    }
-
-    setupGUI() {
-        this.folder = store.gui.addFolder('Fractal Tree settings');
-        this.folder.add(this, 'degrees', 0, 180).listen().onChange(() => this.drawBranches());
-        this.folder.add(this, 'maxDepth', 1, 15).listen().onChange((val) => {
-            this.maxDepth = Math.round(val);
-            this.drawBranches();
-        });
-        this.folder.add(this, 'startLength', 0, 600).listen().onChange(() => this.drawBranches());
-        this.folder.add(this, 'branchRatio', 0, 2).listen().onChange(() => this.drawBranches());
-        this.folder.add(this, 'lineThickness', 1, 30).listen().onChange(() => this.drawBranches());
-        this.folder.add(this, 'lineOpacity', 0, 1).listen().onChange(() => this.drawBranches());
-        this.folder.add(this, 'sway').listen().onChange(() => {
-            this.swayCurrent = 0;
-            this.drawRandomBranches = false;
-            this.drawBranches();
-        });
-        this.folder.add(this, 'drawLeaves').listen().onChange(() => this.drawBranches());
-        this.folder.add(this, 'drawBase').listen().onChange(() => this.drawBranches());
-        this.folder.add(this, 'addStraightBranch').listen().onChange(() => this.drawBranches());
-        this.folder.add(this, 'leafRadius', 0.15, 10).listen().onChange(() => this.drawBranches());
-        this.folder.add(this, 'leafOpacity', 0, 1).listen().onChange(() => this.drawBranches());
-        this.folder.addColor(this, 'lineColor').listen().onChange(() => this.drawBranches());
-        this.folder.addColor(this, 'leafColor').listen().onChange(() => this.drawBranches());
-        // Shortcut functions
-        this.folder.add(this, 'makeSierpinski');
-        this.folder.add(this, 'makeAntenna');
-        this.folder.add(this, 'randomBranches');
-        this.folder.add(this, 'randomTree');
-        this.folder.open();
+        this.gfx = new Graphics();
     }
 
     setup() {
@@ -110,8 +122,8 @@ export default class FractalTreesMod extends Module {
         this.startLength = getRandomInt(150, 375);
         this.branchRatio = getRandomInt(25, 75) / 100;
         this.lineThickness = getRandomInt(1, 20);
-        this.addStraightBranch = getRandomInt(0, 1);
-        this.drawRandomBranches = getRandomInt(0, 1);
+        this.addStraightBranch = !!getRandomInt(0, 1);
+        this.drawRandomBranches = !!getRandomInt(0, 1);
 
         this.drawBase = true;
         this.drawLeaves = false;
@@ -125,7 +137,7 @@ export default class FractalTreesMod extends Module {
     }
 
     // TODO draw leaf polygon instead of circles?
-    drawLeaf(origin) {
+    drawLeaf(origin: Point) {
         if (!this.drawLeaves) return;
 
         this.gfx
@@ -133,7 +145,7 @@ export default class FractalTreesMod extends Module {
             .fill({ color: this.leafColor, alpha: this.leafOpacity });
     }
 
-    drawBranch(depth, origin, length, rot, branchThickness) {
+    drawBranch(depth: number, origin: Point, length: number, rot: number, branchThickness: number) {
         if (depth > this.maxDepth || length < 0.05) {
             this.drawLeaf(origin);
             return;
@@ -164,7 +176,7 @@ export default class FractalTreesMod extends Module {
         }
     }
 
-    update(delta) {
+    update(delta: number) {
         if (this.sway) {
             if (Math.abs(this.swayCurrent) > this.swayMax) {
                 this.swaySpeed *= -1;
@@ -182,15 +194,16 @@ export default class FractalTreesMod extends Module {
         if (this.drawBase) {
             this.drawBranch(0, this.origin, this.startLength, 0, this.lineThickness);
         } else {
-            const center = {
-                x: config.WORLD.width / 2,
-                y: config.WORLD.height / 2,
-            };
+            const center = new Point(config.WORLD.width / 2, config.WORLD.height / 2);
+
             this.drawBranch(0, center, this.startLength, this.degrees, this.lineThickness);
             this.drawBranch(0, center, this.startLength, -this.degrees, this.lineThickness);
             if (this.addStraightBranch) this.drawBranch(0, center, this.startLength, 0, this.lineThickness);
         }
     }
+
+    // eslint-disable-next-line class-methods-use-this
+    render(): void { }
 
     destroy() {
         if (this.gfx) {

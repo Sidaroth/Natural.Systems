@@ -1,48 +1,59 @@
-import { Graphics } from 'pixi.js';
+import { Container, Graphics, Texture } from 'pixi.js';
 import { Noise } from 'noisejs';
-import getRandomInt from 'math/getRandomInt.ts';
-import Vector from 'math/Vector.ts';
-import Module from './Module';
-import PhysicsBody from '../components/PhysicsBody';
-import config from '../config';
-import store from '../store';
-import Region from '../components/Region';
+import getRandomInt from 'math/getRandomInt';
+import Vector from 'math/Vector';
+import Module from 'modules/Module';
+import PhysicsBody from 'components/PhysicsBody';
+import config from 'root/config';
+import store from 'root/store';
+import Region from 'components/Region';
 
 export default class WindySnow extends Module {
-    count = 300;
+    stage: Container;
 
-    snowFlakes = [];
+    backgroundColor?: number;
 
-    bgfx;
+    count = 2500;
+
+    snowFlakes: PhysicsBody[] = [];
+
+    bgfx: Graphics;
 
     gravity;
 
-    snowflakeTextures = [];
+    snowflakeTextures: Texture[] = [];
 
-    regions = [];
+    regions: Region[] = [];
 
-    constructor(stage) {
+    noiseGen: Noise;
+
+    time: number;
+
+    constructor(stage: Container) {
         super();
+
         this.stage = stage;
         this.name = 'windySnow';
         this.noiseGen = new Noise(Math.random());
         this.gravity = new Vector(0, 1);
+        this.time = 0;
+        this.bgfx = new Graphics();
     }
 
     // eslint-disable-next-line class-methods-use-this
-    checkEdges(snowFlake) {
-        if (snowFlake.position.x > config.WORLD.width) {
-            snowFlake.position.x = 0;
+    checkEdges(flake: PhysicsBody) {
+        if (flake.position.x > config.WORLD.width) {
+            flake.position.x = 0;
         }
 
-        if (snowFlake.position.x < 0) {
-            snowFlake.position.x = config.WORLD.width;
+        if (flake.position.x < 0) {
+            flake.position.x = config.WORLD.width;
         }
 
         // Randomize end position on the ground.
-        if (snowFlake.position.y > getRandomInt(config.WORLD.height * 0.85, config.WORLD.height)) {
-            snowFlake.position.y = getRandomInt(-config.WORLD.height / 2, 0);
-            snowFlake.velocity.zero();
+        if (flake.position.y > getRandomInt(config.WORLD.height * 0.85, config.WORLD.height)) {
+            flake.position.y = getRandomInt(-config.WORLD.height / 2, 0);
+            flake.velocity.zero();
         }
     }
 
@@ -72,10 +83,15 @@ export default class WindySnow extends Module {
     }
 
     addSnowflake() {
-        const snowFlake = new PhysicsBody();
+        // Generate a random size snowflake.
         const size = getRandomInt(1, 3);
+        const texture = this.snowflakeTextures[size - 1];
+
+        if (!texture) return;
+
+        const snowFlake = new PhysicsBody();
         snowFlake.setMass(size / 100000); // The weight of a snowflake is about 0.02 grams, generate flakes in weightrange 0.01 - 0.03 grams.
-        snowFlake.setTexture(this.snowflakeTextures[size - 1]);
+        snowFlake.setTexture(texture);
 
         snowFlake.position.set(getRandomInt(0, config.WORLD.width), getRandomInt(0, config.WORLD.height));
         this.stage.addChild(snowFlake.sprite);
@@ -94,8 +110,11 @@ export default class WindySnow extends Module {
         this.regions.push(bottomRegion);
     }
 
-    // TODO fix module options for wind speeds, gravity and number of snowflake modifiers.
     setup() {
+        if (!store.renderer) {
+            throw new Error('Renderer not accessible. Cant create snow without a renderer.');
+        }
+
         this.time = 0;
         this.bgfx = new Graphics();
         this.stage.addChild(this.bgfx);
@@ -121,24 +140,26 @@ export default class WindySnow extends Module {
         }
     }
 
-    update(delta) {
-        this.time += delta / 1000;
+    update(delta: number) {
+        this.time += delta;
 
-        for (let i = 0; i < this.snowFlakes.length; i += 1) {
-            const snowFlake = this.snowFlakes[i];
+        this.snowFlakes.forEach((snowFlake) => {
             snowFlake.applyForce(Vector.multiply(this.gravity, snowFlake.mass));
             snowFlake.calculateDrag(1);
 
-            for (let j = 0; j < this.regions.length; j += 1) {
-                if (this.regions[j].contains(snowFlake)) {
-                    snowFlake.applyForce(this.regions[j].force);
+            this.regions.forEach((region) => {
+                if (region.contains(snowFlake)) {
+                    snowFlake.applyForce(region.force);
                 }
-            }
+            });
 
-            snowFlake.update();
+            snowFlake.update(delta);
             this.checkEdges(snowFlake);
-        }
+        });
     }
+
+    // eslint-disable-next-line class-methods-use-this
+    render(): void { }
 
     destroy() {
         this.snowFlakes.forEach((flake) => {

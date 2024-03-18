@@ -1,4 +1,6 @@
-import { Application, Ticker, isWebGLSupported } from 'pixi.js';
+import {
+    Application, Text, Ticker, isWebGLSupported,
+} from 'pixi.js';
 import Rect from 'shapes/rect';
 import UrlParam from 'interfaces/urlParam';
 import System from './system';
@@ -25,7 +27,6 @@ if (!content) throw new Error('No div "app" found. Cannot append PIXI Canvas to 
 
 content.appendChild(app.canvas);
 
-store.app = app;
 store.renderer = app.renderer;
 store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
 
@@ -36,6 +37,16 @@ app.stage.addEventListener('pointermove', (e) => {
     store.mousePosition.x = e.global.x;
     store.mousePosition.y = e.global.y;
 });
+
+app.stage.isRenderGroup = true;
+
+const FPSCounter = new Text({ text: 'FPS: 0' });
+FPSCounter.scale = 0.75;
+FPSCounter.zIndex = 99999;
+FPSCounter.x = 5;
+FPSCounter.y = 5;
+
+app.stage.addChild(FPSCounter);
 
 // Source code link.
 const div = document.createElement('div');
@@ -72,6 +83,7 @@ const system = new System(app.stage, app.renderer);
 
 function mainLoop(ticker: Ticker) {
     const delta = ticker.deltaTime;
+    FPSCounter.text = `FPS: ${Math.round(ticker.FPS)}`;
 
     system.update(delta);
     system.render();

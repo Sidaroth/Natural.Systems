@@ -5,7 +5,7 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "target": "esnext",
-        "allowJs": true, // TODO remove this
+        "allowJs": false,
         "resolveJsonModule": true, /* allows us to import .json files */
         /* Strictness */
         "strict": true,

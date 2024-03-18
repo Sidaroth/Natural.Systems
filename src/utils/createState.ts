@@ -2,6 +2,17 @@ import { PipeFunction, State, StateCreationOptions } from 'interfaces/state';
 import getFunctionUsage from './getFunctionUsage';
 import pipe from './pipe';
 
+function verifyPipeChain(pipeChain: Array<PipeFunction<any>>) {
+    pipeChain.forEach((func) => {
+        if (func.length > 1) {
+            console.warn(`
+                Pipe chain function ${func.name} has more than one argument.
+                It will only receive the first argument.
+            `);
+        }
+    });
+}
+
 function createState<T>(stateOptions: StateCreationOptions<T>): T {
     const {
         states, mainState, stateName, overrides,
@@ -42,11 +53,11 @@ function createState<T>(stateOptions: StateCreationOptions<T>): T {
     // Loop over all functions stored in pipes, check for multiple usages of the same name.
     // Automatically set up a pipe() structure for these.
     Object.keys(pipes).forEach((pipeKey: string) => {
-        const currentPipe = pipes[pipeKey];
-        if (currentPipe?.length) {
-            finishedPipes[pipeKey] = pipe(...currentPipe);
-        } else {
-            delete pipes[pipeKey];
+        const pipeChain = pipes[pipeKey];
+
+        if (pipeChain && pipeChain.length > 1) {
+            verifyPipeChain(pipeChain);
+            finishedPipes[pipeKey] = pipe(...pipeChain);
         }
     });
 
@@ -61,7 +72,7 @@ function createState<T>(stateOptions: StateCreationOptions<T>): T {
 
     const init = pipe(...constructors);
 
-    Object.assign(mainState, ...stateList.map((s) => s.state), pipes, overrides);
+    Object.assign(mainState, ...stateList.map((s) => s.state), finishedPipes, overrides);
 
     // Cleans up any constructor still on the mainstate.
     if (mainState.internalConstructor) {

@@ -5,7 +5,7 @@ import Vector from 'math/Vector';
 import degreesToRadians from 'math/degreesToRadians';
 import Circle from 'shapes/circle';
 import store from 'root/store';
-import { Boid, QuadTree } from 'interfaces/boid';
+import { Boid, QuadTree } from 'root/interfaces/entities';
 import Point from 'math/point';
 
 // Boid logic:
@@ -29,6 +29,8 @@ function createBoid(texture: Texture, debugGfx?: Graphics) {
     const maxForce = 0.1;
     let maxSpeed = 5;
 
+    let tree: QuadTree;
+
     // Visualization vars
     let renderConnections = false;
     let renderVision = false;
@@ -45,8 +47,12 @@ function createBoid(texture: Texture, debugGfx?: Graphics) {
         return state.position;
     }
 
-    function findHeading(tree: QuadTree) {
-        const withinRadius = tree.query(visionShape);
+    function setTree(newTree: QuadTree) {
+        tree = newTree;
+    }
+
+    function findHeading() {
+        const withinRadius = tree.query(visionShape) as Array<Boid>;
         const withinFOV = withinRadius.filter((boid: Boid) => {
             const notSelf = boid.id !== id;
             const angle = Vector.angleBetweenPoints(state.position, boid.position);
@@ -124,14 +130,14 @@ function createBoid(texture: Texture, debugGfx?: Graphics) {
         if (state.position.y > store.worldBoundary.h) state.setPosition(state.position.x, store.worldBoundary.y);
     }
 
-    function update(delta: number, tree: QuadTree) {
+    function update(delta: number) {
         if (gfx && renderVision) {
             gfx.circle(state.position.x, state.position.y, visionRadius).stroke({ width: 1, color: 0xaaaaaa });
         }
 
         acceleration.zero();
 
-        findHeading(tree);
+        findHeading();
         state.velocity.add(acceleration);
         state.velocity.setLength(maxSpeed * delta);
 
@@ -177,6 +183,7 @@ function createBoid(texture: Texture, debugGfx?: Graphics) {
         visionRadius,
         fov,
         // functions
+        setTree,
         addForce,
         setVizualizationStatus,
         getPosition,

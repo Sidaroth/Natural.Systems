@@ -1,12 +1,44 @@
-import { Graphics } from 'pixi.js';
+import { Container, Graphics, StrokeStyle } from 'pixi.js';
 import Vector from 'math/Vector';
 import Circle from 'shapes/circle';
-import Line from 'shapes/line.ts';
-import store from '../store';
-import Module from './Module';
+import Line from 'shapes/line';
+import store from 'root/store';
+import Module from 'modules/Module';
+import Point from 'math/point';
+
+interface CircleData {
+    x: number;
+    y: number;
+    r: number;
+}
 
 export default class Raycast extends Module {
-    constructor(stage) {
+    stage: Container;
+
+    backgroundColor?: number;
+
+    rayOrigin: Vector;
+
+    obstacles: Circle[];
+
+    // Could probably just use Circle and remove the interface.
+    circleData: CircleData[];
+
+    circleLinestyle: StrokeStyle;
+
+    lineStyle: StrokeStyle;
+
+    currentX: number;
+
+    currentY: number;
+
+    movingRight: boolean;
+
+    gfx: Graphics;
+
+    ray: Line;
+
+    constructor(stage: Container) {
         super();
         this.stage = stage;
         this.name = 'raycast';
@@ -24,6 +56,8 @@ export default class Raycast extends Module {
         this.currentX = 0;
         this.currentY = store.worldBoundary.h;
         this.movingRight = true;
+        this.ray = new Line(new Point(0, 0), new Point(0, 0));
+        this.gfx = new Graphics();
     }
 
     setup() {
@@ -34,17 +68,18 @@ export default class Raycast extends Module {
 
     reset() {
         this.obstacles = [];
-        for (let i = 0; i < this.circleData.length; i += 1) {
-            const { x, y, r } = this.circleData[i];
+        this.circleData.forEach((circle) => {
+            const { x, y, r } = circle;
             this.obstacles.push(new Circle(x, y, r));
-        }
+        });
 
         this.currentX = 0;
         this.currentY = store.worldBoundary.h;
     }
 
     update() {
-        this.ray = new Line(this.rayOrigin, { x: this.currentX, y: this.currentY });
+        const target = new Point(this.currentX, this.currentY);
+        this.ray = new Line(this.rayOrigin, target);
 
         if (this.movingRight === true) {
             this.currentX += 1;

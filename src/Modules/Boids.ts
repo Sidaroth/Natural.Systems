@@ -1,27 +1,36 @@
-import { Graphics } from 'pixi.js';
+import { Container, Graphics, Texture } from 'pixi.js';
+import { QuadTree, Boid } from 'root/interfaces/entities';
 import Module from './Module';
 import config from '../config';
 import store from '../store';
-import Vector from '../math/Vector.ts';
-import getRandomInt from '../math/getRandomInt.ts';
-import Line from '../shapes/line.ts';
+import Vector from '../math/Vector';
+import getRandomInt from '../math/getRandomInt';
+import Line from '../shapes/line';
 import createBoid from '../components/Boid';
 import createBoidTextures from '../components/createBoidTextures';
 import createQuadTree from '../components/QuadTree';
 
 // 2D Boids - Flock behaviour, obstacle avoidance.
 export default class Boids extends Module {
-    numBoids = 100;
+    stage: Container;
 
-    obstacles = [];
+    backgroundColor?: number;
 
-    textures = [];
+    numBoids = 50;
 
-    boids = [];
+    boidSpeed = 5;
 
     treeSize = 1;
 
-    boidTree;
+    obstacles = [];
+
+    textures: Texture[];
+
+    boids: Boid[];
+
+    boidTree: QuadTree;
+
+    edges: Line[];
 
     // Visualization
     renderBoidConnections = false;
@@ -36,14 +45,20 @@ export default class Boids extends Module {
 
     enableSeparation = true;
 
-    boidSpeed = 5;
+    gfx: Graphics;
 
-    debugGfx;
+    debugGfx: Graphics;
 
-    constructor(stage) {
+    constructor(stage: Container) {
         super();
         this.stage = stage;
         this.name = 'boids';
+        this.boids = [];
+        this.textures = [];
+        this.edges = [];
+        this.boidTree = createQuadTree(store.worldBoundary, this.treeSize);
+        this.gfx = new Graphics();
+        this.debugGfx = new Graphics();
     }
 
     spawn50Boids() {
@@ -54,7 +69,13 @@ export default class Boids extends Module {
 
     spawnBoid() {
         const textureIdx = getRandomInt(0, this.textures.length - 1);
-        const boid = createBoid(this.textures[textureIdx], this.debugGfx);
+        const texture = this.textures[textureIdx];
+        if (!texture) {
+            console.error('No texture found for index:', textureIdx);
+            return;
+        }
+
+        const boid = createBoid(texture, this.debugGfx);
         boid.setPosition(getRandomInt(25, config.WORLD.width - 25), getRandomInt(25, config.WORLD.height - 25));
 
         let xDir = 0;
@@ -69,7 +90,7 @@ export default class Boids extends Module {
         boid.setSpeed(this.boidSpeed);
         this.boidTree.insert(boid);
         this.boids.push(boid);
-        this.stage.addChild(boid.sprite);
+        this.stage?.addChild(boid.sprite);
 
         boid.setVizualizationStatus(
             this.renderBoidConnections,
@@ -125,25 +146,6 @@ export default class Boids extends Module {
         });
     }
 
-    setupGUI() {
-        this.folder = store.gui.addFolder('Boids Settings');
-        this.folder.add(this, 'treeSize', 1, 200).listen();
-        this.folder
-            .add(this, 'boidSpeed', 0, 25)
-            .listen()
-            .onChange((v) => this.boids.forEach((b) => b.setSpeed(v)));
-        this.folder.add(this, 'renderQuadTree');
-        this.folder.add(this, 'renderBoidConnections').onChange(() => this.onVizChange());
-        this.folder.add(this, 'renderBoidVision').onChange(() => this.onVizChange());
-        this.folder.add(this, 'enableSeparation').onChange(() => this.onVizChange());
-        this.folder.add(this, 'enableAlignment').onChange(() => this.onVizChange());
-        this.folder.add(this, 'enableCohesion').onChange(() => this.onVizChange());
-        this.folder.add(this, 'spawnBoid');
-        this.folder.add(this, 'spawn50Boids');
-        this.folder.add(this, 'reset');
-        this.folder.open();
-    }
-
     setup() {
         this.gfx = new Graphics();
         this.textures = createBoidTextures();
@@ -156,15 +158,17 @@ export default class Boids extends Module {
         this.reset();
     }
 
-    update(delta) {
+    update(delta: number) {
         this.gfx.clear();
         this.debugGfx.clear();
+
         // Rearrange quad tree to reflect any changes in position.
         this.boidTree = createQuadTree(store.worldBoundary, this.treeSize);
         this.boids.forEach((boid) => this.boidTree.insert(boid));
 
         this.boids.forEach((boid) => {
-            boid.update(delta, this.boidTree);
+            boid.setTree(this.boidTree);
+            boid.update(delta);
         });
     }
 

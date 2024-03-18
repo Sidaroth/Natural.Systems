@@ -1,31 +1,76 @@
-import { Graphics } from 'pixi.js';
-import Vector from 'math/Vector.ts';
-import SAT from 'math/sat.ts';
+import { Container, Graphics } from 'pixi.js';
+import Vector from 'math/Vector';
+import SAT from 'math/sat';
 import Region from 'components/Region';
-import Polygon from 'shapes/polygon.ts';
-import Module from './Module';
-import config from '../config';
+import Polygon from 'shapes/polygon';
+import Module from 'modules/Module';
+import config from 'root/config';
+import Point from 'root/math/point';
 
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
 export default class SATModule extends Module {
-    constructor(stage) {
+    stage: Container;
+
+    backgroundColor?: number;
+
+    edges: Polygon[];
+
+    obstacles: Polygon[];
+
+    gfx: Graphics;
+
+    innerRegionOffset: number;
+
+    innerRegionWidth: number;
+
+    innerRegionHeight: number;
+
+    innerRegion: Region;
+
+    edgeThickness: number;
+
+    boxWidth: number;
+
+    boxHeight: number;
+
+    box: Polygon;
+
+    directionVector: Vector;
+
+    boxSpeed: number;
+
+    boxRotation: number;
+
+    obstacleRotation: number;
+
+    constructor(stage: Container) {
         super();
 
         this.edges = [];
         this.obstacles = [];
-        this.gfx = undefined;
+        this.gfx = new Graphics();
 
         this.innerRegionOffset = 40;
         this.innerRegionWidth = config.WORLD.width - (2 * this.innerRegionOffset);
         this.innerRegionHeight = config.WORLD.height - (2 * this.innerRegionOffset);
-        this.innerRegion = undefined;
+        this.innerRegion = new Region(
+            this.innerRegionOffset,
+            this.innerRegionOffset,
+            this.innerRegionWidth,
+            this.innerRegionHeight,
+        );
+
+        this.box = new Polygon([new Point(0, 0), new Point(0, 1), new Point(1, 1), new Point(1, 0)]);
 
         this.edgeThickness = 10;
 
         this.boxWidth = 25;
         this.boxHeight = 25;
-        this.box = undefined;
-        this.directionVector = undefined;
+        this.directionVector = new Vector();
+
+        this.boxSpeed = 5;
+        this.boxRotation = 3;
+        this.obstacleRotation = 3;
 
         this.stage = stage;
         this.name = 'SAT';
@@ -69,12 +114,12 @@ export default class SATModule extends Module {
         this.edges.push(bottomEdge);
     }
 
-    createRect(x, y, width, height, isObstacle = false) {
+    createRect(x: number, y: number, width: number, height: number, isObstacle = false) {
         const rect = new Polygon([
-            new Vector(x, y),
-            new Vector(x + width, y),
-            new Vector(x + width, y + height),
-            new Vector(x, y + height),
+            new Point(x, y),
+            new Point(x + width, y),
+            new Point(x + width, y + height),
+            new Point(x, y + height),
         ]);
 
         if (isObstacle) this.obstacles.push(rect);
@@ -84,37 +129,49 @@ export default class SATModule extends Module {
 
     createObstacles() {
         this.createBoundingBox();
-        const triangle1 = new Polygon([new Vector(150, 150), new Vector(150, 200), new Vector(200, 150)]);
+        const triangle1 = new Polygon([
+            new Point(150, 150),
+            new Point(150, 200),
+            new Point(200, 150),
+        ]);
+
+        const triangle2 = new Polygon([
+            new Point(1000, 750),
+            new Point(900, 800),
+            new Point(965, 725),
+        ]);
+
+        const triangle3 = new Polygon([
+            new Point(900, 100),
+            new Point(1000, 175),
+            new Point(800, 175),
+        ]);
+
         this.obstacles.push(triangle1);
-
-        const triangle2 = new Polygon([new Vector(1000, 750), new Vector(900, 800), new Vector(965, 725)]);
         this.obstacles.push(triangle2);
-
-        const triangle3 = new Polygon([new Vector(900, 100), new Vector(1000, 175), new Vector(800, 175)]);
         this.obstacles.push(triangle3);
 
         this.createRect(800, 500, 100, 100, true);
         this.createRect(400, 300, 100, 100, true);
 
         const hexagon = new Polygon([
-            new Vector(150, 600),
-            new Vector(150, 650),
-            new Vector(250, 700),
-            new Vector(350, 650),
-            new Vector(350, 600),
-            new Vector(250, 550),
+            new Point(150, 600),
+            new Point(150, 650),
+            new Point(250, 700),
+            new Point(350, 650),
+            new Point(350, 600),
+            new Point(250, 550),
         ]);
         this.obstacles.push(hexagon);
 
         const concavePolygon = new Polygon([
-            new Vector(100, 400),
-            new Vector(150, 345),
-            new Vector(200, 400),
-            new Vector(175, 325),
-            new Vector(125, 325),
+            new Point(100, 400),
+            new Point(150, 345),
+            new Point(200, 400),
+            new Point(175, 325),
+            new Point(125, 325),
         ]);
         this.obstacles.push(concavePolygon);
-        window.concave = concavePolygon;
     }
 
     stop() {
@@ -144,7 +201,7 @@ export default class SATModule extends Module {
         this.directionVector = new Vector(1, 1);
     }
 
-    checkCollision(obj) {
+    checkCollision(obj: Polygon) {
         const SATResponse = SAT.checkPolygonPolygon(this.box, obj);
         if (!SATResponse.isSeparating) {
             // Flip direction of movement to bounce off the object along path of movement (mostly).
@@ -158,7 +215,7 @@ export default class SATModule extends Module {
         }
     }
 
-    update(delta) {
+    update(delta: number) {
         const velocityVec = Vector.multiply(this.directionVector, delta * this.boxSpeed);
         this.box.setPosition(this.box.position.x + velocityVec.x, this.box.position.y + velocityVec.y);
         this.box.rotateBy((this.boxRotation / 100) * delta, this.box.getCentroid());

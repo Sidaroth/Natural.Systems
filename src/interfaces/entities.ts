@@ -5,26 +5,29 @@ import Point from 'math/point';
 import Circle from 'shapes/circle';
 import Rect from 'shapes/rect';
 
+export interface Entity {
+    id: string; // UUID
+    position: Point;
+    sprite: Sprite;
+}
+
 export interface QuadTree {
-    insert(entity: Boid): boolean;
-    remove(entity: Boid): void;
+    insert(entity: Entity): boolean;
+    remove(entity: Entity): void;
     subdivide(): void;
-    getAllEntities(): Boid[];
+    getAllEntities(): Entity[];
     getSubtrees(): QuadTree[];
     cleanup(): void;
-    query(shape: Rect | Circle): Boid[];
+    query(shape: Rect | Circle): Entity[];
     clear(): void;
     render(context: Graphics): void;
     isDivided: boolean;
-    entities: Boid[];
+    entities: Entity[];
     subTrees: QuadTree[];
 }
 
-export interface Boid {
-    id: string; // UUID
-    position: Point;
+export interface Boid extends Entity {
     velocity: Vector;
-    sprite: Sprite;
     texture: Texture;
     visionRadius: number;
     fov: number;
@@ -39,5 +42,6 @@ export interface Boid {
     setRotation(angle: number): void;
     setVelocity(vel: Vector): void;
     setSpeed(speed: number): void;
-    update(delta: number, tree: QuadTree): void;
+    setTree(tree: QuadTree): void;
+    update(delta: number): void;
 }

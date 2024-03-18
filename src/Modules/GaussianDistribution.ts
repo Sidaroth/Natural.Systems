@@ -1,24 +1,39 @@
-import { Graphics } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import gaussian from 'math/gaussian';
 import constrain from 'math/constrain';
 import config from '../config';
 import Module from './Module';
 
+interface Column {
+    x: number;
+    y: number;
+    height: number;
+}
+
 export default class GaussianDistribution extends Module {
-    stage;
+    backgroundColor?: number;
+
+    stage: Container;
 
     numberOfColumns = 60;
 
     columnWidth = 0;
 
-    columns = [];
+    columns: Column[];
 
     growth = 5;
 
-    constructor(stage) {
+    randomGaussian: () => number;
+
+    gfx: Graphics;
+
+    constructor(stage: Container) {
         super();
         this.stage = stage;
         this.name = 'gaussianDistribution';
+        this.columns = [];
+        this.randomGaussian = gaussian(this.numberOfColumns / 2, this.numberOfColumns / 10);
+        this.gfx = new Graphics();
     }
 
     setup() {
@@ -32,21 +47,24 @@ export default class GaussianDistribution extends Module {
             });
         }
 
-        this.gen = gaussian(this.numberOfColumns / 2, this.numberOfColumns / 10);
+        this.randomGaussian = gaussian(this.numberOfColumns / 2, this.numberOfColumns / 10);
 
         this.gfx = new Graphics();
         this.stage.addChild(this.gfx);
     }
 
     update() {
-        const random = parseInt(this.gen(), 10);
+        const random = Math.floor(this.randomGaussian());
         const index = constrain(random, 0, this.numberOfColumns - 1);
+        const column = this.columns[index];
 
-        this.columns[index].y -= this.growth;
-        this.columns[index].height += this.growth;
+        if (!column) return;
 
-        this.columns.y = constrain(this.columns[index].y, 0, config.WORLD.height);
-        this.columns.height = constrain(this.columns[index].height, 0, config.WORLD.height);
+        column.y -= this.growth;
+        column.height += this.growth;
+
+        column.y = constrain(column.y, 0, config.WORLD.height);
+        column.height = constrain(column.height, 0, config.WORLD.height);
     }
 
     render() {

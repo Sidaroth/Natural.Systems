@@ -1,25 +1,26 @@
-import { Texture, Sprite } from 'pixi.js';
+import { Texture, Sprite, Container } from 'pixi.js';
 import { Noise } from 'noisejs';
 import config from '../config';
 import Module from './Module';
-import store from '../store';
 
 export default class NoiseVisualizer extends Module {
-    stage;
+    backgroundColor?: number;
+
+    stage: Container;
 
     runtime = 0;
 
-    noiseGen = null;
+    noiseGen: Noise;
 
-    texture = null;
+    texture: Texture;
 
-    canvas = null;
+    imageData: ImageData;
 
-    ctx = null;
+    ctx: OffscreenCanvasRenderingContext2D | null;
 
-    imageData = null;
+    sprite: Sprite;
 
-    sprite = null;
+    canvas: OffscreenCanvas;
 
     width = 4;
 
@@ -27,11 +28,67 @@ export default class NoiseVisualizer extends Module {
 
     type = 'perlin';
 
-    constructor(stage) {
+    zoom: number;
+
+    speedMax: number;
+
+    speedMin: number;
+
+    zoomMax: number;
+
+    zoomMin: number;
+
+    speed: number;
+
+    redThreshold: number;
+
+    greenThreshold: number;
+
+    blueThreshold: number;
+
+    red: number;
+
+    green: number;
+
+    blue: number;
+
+    alpha: number;
+
+    pixels: Int32Array;
+
+    constructor(stage: Container) {
         super();
         this.stage = stage;
         this.noiseGen = new Noise(Math.random());
         this.name = 'noiseViz';
+        this.zoom = 50;
+        this.speedMax = 250;
+        this.speedMin = 0;
+        this.zoomMax = 150;
+        this.zoomMin = 1;
+        this.speed = 10;
+
+        this.redThreshold = 0;
+        this.greenThreshold = 0;
+        this.blueThreshold = 0;
+        this.pixels = new Int32Array(0);
+
+        this.red = 16;
+        this.green = 0;
+        this.blue = 0;
+        this.alpha = 255;
+        this.canvas = new OffscreenCanvas(this.width, this.height);
+        this.ctx = this.canvas.getContext('2d');
+
+        this.texture = Texture.from(this.canvas);
+        this.sprite = new Sprite(this.texture);
+
+        this.imageData = new ImageData(this.width, this.height);
+        const imageData = this.ctx?.createImageData(this.width, this.height);
+        if (!imageData) return;
+
+        this.pixels = new Int32Array(imageData.data.buffer);
+        this.imageData = imageData;
     }
 
     reset() {
@@ -60,25 +117,14 @@ export default class NoiseVisualizer extends Module {
         this.ctx = this.canvas.getContext('2d');
         this.texture = Texture.from(this.canvas);
         this.sprite = new Sprite(this.texture);
-        this.imageData = this.ctx.createImageData(this.width, this.height);
-        this.pixels = new Int32Array(this.imageData.data.buffer);
+        const imageData = this.ctx?.createImageData(this.width, this.height);
+        if (imageData) {
+            this.imageData = imageData;
+            this.pixels = new Int32Array(imageData.data.buffer);
+        }
+
         this.stage.addChild(this.sprite);
     }
-
-    // setupGUI() {
-    //     this.folder = store.gui.addFolder('Noise settings');
-    //     this.folder.add(this, 'type', ['perlin', 'simplex', 'perlin32', 'simplex32']).listen();
-    //     this.folder.add(this, 'speed', this.speedMin, this.speedMax).listen();
-    //     this.folder.add(this, 'zoom', this.zoomMin, this.zoomMax).listen();
-    //     this.folder.add(this, 'redThreshold', -50, 50).listen();
-    //     this.folder.add(this, 'greenThreshold', -50, 50).listen();
-    //     this.folder.add(this, 'blueThreshold', -50, 50).listen();
-    //     this.folder.add(this, 'red', 0, 64).listen();
-    //     this.folder.add(this, 'green', 0, 64).listen();
-    //     this.folder.add(this, 'blue', 0, 64).listen();
-    //     this.folder.add(this, 'alpha', 0, 255).listen();
-    //     this.folder.add(this, 'reset');
-    // }
 
     // TODO: Fix. RGB Values don't make any sense right now, but it does produce some nice and trippy effects
     generateNoise32Bit() {
@@ -91,6 +137,10 @@ export default class NoiseVisualizer extends Module {
                     val = this.noiseGen.simplex3(x / this.zoom, y / this.zoom, this.runtime) * 256;
                 } else if (this.type === 'perlin32') {
                     val = this.noiseGen.perlin3(x / this.zoom, y / this.zoom, this.runtime) * 256;
+                }
+
+                if (val === undefined) {
+                    throw new Error('val is undefined - Noise32Bit can only be used with type simplex32 or perlin32');
                 }
 
                 /* eslint-disable no-bitwise */
@@ -117,6 +167,10 @@ export default class NoiseVisualizer extends Module {
                     val = this.noiseGen.perlin3(x / this.zoom, y / this.zoom, this.runtime) * 256;
                 }
 
+                if (val === undefined) {
+                    throw new Error('val is undefined - Noise can only be used with type simplex or perlin');
+                }
+
                 this.imageData.data[bufferIndex] = val + Math.max(0, (this.redThreshold - val) * this.red); // R
                 this.imageData.data[bufferIndex + 1] = val + Math.max(0, (this.greenThreshold - val) * this.green); // G
                 this.imageData.data[bufferIndex + 2] = val + Math.max(0, (this.blueThreshold - val) * this.blue); // B
@@ -125,11 +179,11 @@ export default class NoiseVisualizer extends Module {
         }
     }
 
-    update(delta) {
+    update(delta: number) {
         // only recalculate if a speed is set.
         if (this.speed <= 0) return;
 
-        this.runtime += delta * (this.speed / 1000);
+        this.runtime += delta * (this.speed);
         if (this.type === 'perlin' || this.type === 'simplex') {
             this.generateNoise();
         } else if (this.type === 'perlin32' || this.type === 'simplex32') {
@@ -138,21 +192,20 @@ export default class NoiseVisualizer extends Module {
     }
 
     clear() {
-        this.ctx.fillColor = 'black';
+        if (!this.ctx) return;
+
         this.ctx.fillRect(0, 0, this.width, this.height);
     }
 
     render() {
         this.clear();
+        if (!this.ctx) return;
+
         this.ctx.putImageData(this.imageData, 0, 0);
         this.texture.update();
     }
 
     destroy() {
-        if (store.gui) {
-            store.gui.removeFolder(this.folder);
-        }
-
         this.stage.removeChild(this.sprite);
         this.texture.destroy();
         this.sprite.destroy();

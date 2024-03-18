@@ -8,7 +8,7 @@ export default abstract class Module {
 
     description: string;
 
-    abstract stage?: Container;
+    abstract stage: Container;
 
     abstract backgroundColor?: number;
 

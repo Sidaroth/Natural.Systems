@@ -9,7 +9,6 @@ import QuadtreeMod from './modules/QuadTreeMod';
 import config from './config';
 import Roses from './modules/Roses';
 import FractalTreesMod from './modules/FractalTrees';
-import ShaderMod from './modules/ShaderMod';
 import Raycast from './modules/Raycast';
 import Module from './modules/Module';
 
@@ -99,7 +98,6 @@ export default class System {
         this.modules.push(new QuadtreeMod(this.stage));
         this.modules.push(new Roses(this.stage));
         this.modules.push(new FractalTreesMod(this.stage));
-        this.modules.push(new ShaderMod(this.stage));
         this.modules.push(new Raycast(this.stage));
     }
 
