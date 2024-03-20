@@ -25,7 +25,7 @@ export type EmitFunction<T extends EventKeys> = (event: T, data: EventData[T]) =
 export type OffFunction<T extends EventKeys> = (listener: Listener<T>) => void;
 export type OnFunction<T extends EventKeys> = (
     event: T,
-    callback: (event: EventData[T]) => void,
+    callback: EventCallback<T>,
     context: EmitComponent
 ) => Listener<T>;
 
@@ -59,8 +59,14 @@ export interface ListenComponent {
     destroy: () => void;
 }
 
-export interface MessageBus extends EmitComponent {
-
+export interface MessageBus {
+    emit: EmitFunction<any>;
+    on: OnFunction<any>;
+    once: OnFunction<any>;
+    off: OffFunction<any>;
+    eventNames: () => string[];
+    listenerCount: (event: EventKeys) => number;
+    removeAllListeners: () => void;
 }
 
 export type EventCallback<T extends EventKeys> = (event: EventData[T]) => void;

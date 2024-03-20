@@ -3,7 +3,7 @@ import Vector from 'math/Vector';
 import Rect from 'shapes/rect';
 import store from 'root/store';
 import Circle from 'shapes/circle';
-import { Boid, Entity, QuadTree } from 'root/interfaces/entities';
+import { Entity, QuadTree } from 'root/interfaces/entities';
 import { Graphics } from 'pixi.js';
 
 /**
