@@ -37,7 +37,7 @@ function createMessageBus(): MessageBus {
     }
 
     function removeAllListeners(event?: EventKeys) {
-        return globalEmitter.removeAllListeners(event);
+        globalEmitter.removeAllListeners(event);
     }
 
     const localState = {
