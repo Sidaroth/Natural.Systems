@@ -6,7 +6,6 @@ import UrlParam from 'interfaces/urlParam';
 import System from './system';
 import config from './config';
 import store from './store';
-import createMessageBus from './components/events/createMessageBus';
 
 const app = new Application();
 const options = {
@@ -29,7 +28,6 @@ if (!content) throw new Error('No div "app" found. Cannot append PIXI Canvas to 
 content.appendChild(app.canvas);
 
 store.renderer = app.renderer;
-store.messageBus = createMessageBus();
 store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
 
 // Replaces renderer.plugins.interaction.mouse.global in Pixi v7+
