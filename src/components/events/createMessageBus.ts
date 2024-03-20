@@ -2,7 +2,10 @@ import createState from 'utils/createState';
 import { EventEmitter } from 'pixi.js';
 import {
     EmitComponent,
-    EventCallback, EventData, EventKeys, MessageBus,
+    EventCallback,
+    EventData,
+    EventKeys,
+    MessageBus,
 } from './eventInterfaces';
 
 function createMessageBus(): MessageBus {
