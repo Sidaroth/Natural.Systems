@@ -2,7 +2,7 @@ import { Renderer } from 'pixi.js';
 import Point from 'math/point';
 import Rect from 'shapes/rect';
 import { MessageBus } from 'components/events/eventInterfaces';
-import createMessageBus from 'components/events/createMessageBus';
+import createMessageBus from './components/events/createMessageBus';
 
 interface Store {
     renderer?: Renderer;
