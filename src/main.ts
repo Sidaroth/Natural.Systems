@@ -1,99 +1,20 @@
-import {
-    Application, Text, Ticker, isWebGLSupported,
-} from 'pixi.js';
-import Rect from 'shapes/rect';
-import UrlParam from 'interfaces/urlParam';
-import System from './system';
-import config from './config';
-import store from './store';
+import 'primevue/resources/primevue.min.css';
+import 'primeicons/primeicons.css';
+import 'primeflex/primeflex.css';
 
-const app = new Application();
-const options = {
-    width: config.WORLD.width,
-    height: config.WORLD.height,
-    antialias: true, // default: false
-    transparent: false, // default: false
-    resolution: 1, // default: 1
-    backgroundColor: 0xbbbbbb,
-};
-await app.init(options);
+import { createApp } from 'vue';
+import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
+import PixiCanvas from 'components/vue/PixiCanvas.vue';
+import ProgressSpinner from 'primevue/progressspinner';
+import Ripple from 'primevue/ripple';
+import App from './App.vue';
 
-if (!isWebGLSupported()) {
-    throw new Error('WebGL is not supported');
-}
+const app = createApp(App);
+app.use(PrimeVue, { ripple: true }).use(ToastService);
+app.directive('ripple', Ripple);
 
-const content = document.getElementById('app');
-if (!content) throw new Error('No div "app" found. Cannot append PIXI Canvas to DOM');
+app.component('PixiCanvas', PixiCanvas);
+app.component('ProgressSpinner', ProgressSpinner);
 
-content.appendChild(app.canvas);
-
-store.renderer = app.renderer;
-store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
-
-// Replaces renderer.plugins.interaction.mouse.global in Pixi v7+
-app.stage.eventMode = 'static';
-app.stage.hitArea = app.screen;
-app.stage.addEventListener('pointermove', (e) => {
-    store.mousePosition.x = e.global.x;
-    store.mousePosition.y = e.global.y;
-});
-
-app.stage.isRenderGroup = true;
-
-const FPSCounter = new Text({ text: 'FPS: 0' });
-FPSCounter.scale = 0.75;
-FPSCounter.zIndex = 99999;
-FPSCounter.x = 5;
-FPSCounter.y = 5;
-
-app.stage.addChild(FPSCounter);
-
-// Source code link.
-const div = document.createElement('div');
-const sourceTag = document.createElement('a');
-sourceTag.setAttribute('href', 'https://github.com/Sidaroth/Natural.Systems');
-sourceTag.innerHTML = 'Source code';
-div.appendChild(sourceTag);
-content.appendChild(div);
-
-const descriptionDiv = document.createElement('div');
-const p = document.createElement('p');
-p.innerHTML = 'Placeholder Description';
-p.id = 'description';
-descriptionDiv.appendChild(p);
-content.appendChild(descriptionDiv);
-
-function getURLParams(): UrlParam {
-    const params: UrlParam = {};
-    const query = decodeURIComponent(window.location.href.slice(window.location.href.indexOf('?') + 1));
-    query.split('&').forEach((param) => {
-        const parts = param.split('=', 2);
-        const key = parts[0];
-        const value = parts[1];
-
-        if (key !== undefined && value !== undefined) {
-            params[key] = value;
-        }
-    });
-
-    return params;
-}
-
-const system = new System(app.stage, app.renderer);
-
-function mainLoop(ticker: Ticker) {
-    const delta = ticker.deltaTime;
-    FPSCounter.text = `FPS: ${Math.round(ticker.FPS)}`;
-
-    system.update(delta);
-    system.render();
-}
-
-function start() {
-    const params = getURLParams();
-    system.setup(params);
-
-    app.ticker.add(mainLoop);
-}
-
-start();
+app.mount('#app');

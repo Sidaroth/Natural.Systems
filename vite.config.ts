@@ -2,6 +2,7 @@ import { defineConfig, UserConfig, ConfigEnv } from 'vite';
 import stripCode from 'rollup-plugin-strip-code';
 import { resolve } from 'path';
 import { setDefaultResultOrder } from 'dns';
+import vue from '@vitejs/plugin-vue';
 
 setDefaultResultOrder('verbatim');
 
@@ -10,7 +11,7 @@ function getConfig(environment: ConfigEnv): UserConfig {
 
     const baseConfig: UserConfig = {
         base: './',
-        // plugins: [],
+        plugins: [vue()],
         resolve: {
             alias: {
                 root: resolve(__dirname, './src/'),
@@ -24,7 +25,6 @@ function getConfig(environment: ConfigEnv): UserConfig {
                 shaders: resolve(__dirname, './src/shaders'),
             },
         },
-
         server: {
             port: 3000,
         },

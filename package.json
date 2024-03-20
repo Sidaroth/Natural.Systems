@@ -22,22 +22,33 @@
     "devDependencies": {
         "@sidaroth/eslint-config-base": "1.0.4",
         "@sidaroth/eslint-config-typescript": "2.0.2",
-        "@typescript-eslint/eslint-plugin": "^7.2.0",
-        "@typescript-eslint/parser": "^7.2.0",
+        "@types/node": "^20.11.30",
+        "@typescript-eslint/eslint-plugin": "^7.3.1",
+        "@typescript-eslint/parser": "^7.3.1",
+        "@vitejs/plugin-vue": "^5.0.4",
         "eslint": "^8.57.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-airbnb-typescript": "^18.0.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-import": "^2.29.1",
         "rollup-plugin-strip-code": "^0.2.7",
-        "vite": "^5.1.6",
-        "vite-plugin-eslint": "^1.8.1"
+        "vite": "^5.2.2",
+        "vite-plugin-eslint": "^1.8.1",
+        "vue-tsc": "^2.0.7"
     },
     "dependencies": {
+        "@sidaroth/eslint-config-vue": "^2.0.0",
+        "@vue/eslint-config-typescript": "^13.0.0",
+        "eslint-plugin-vue": "^9.23.0",
         "lodash": "^4.17.21",
         "noisejs": "^2.1.0",
         "path": "^0.12.7",
         "pixi.js": "^8.0.2",
-        "typescript": "^5.4.2"
+        "primeflex": "^3.3.1",
+        "primeicons": "^6.0.1",
+        "primevue": "^3.50.0",
+        "typescript": "^5.4.2",
+        "vue": "^3.4.21",
+        "vue-router": "^4.3.0"
     }
 }
