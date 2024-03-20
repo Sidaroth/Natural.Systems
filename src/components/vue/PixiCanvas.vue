@@ -3,10 +3,10 @@
 </template>
 
 <script setup lang="ts">
+import config from 'root/config';
 import {
   onBeforeUnmount, onMounted, provide, ref,
 } from 'vue';
-import config from 'root/config';
 import {
   Application, Text, Renderer, FederatedPointerEvent, isWebGLSupported, Ticker,
 } from 'pixi.js';
@@ -90,7 +90,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  app.value?.stop();
+  application.stop();
 });
 
 </script>
