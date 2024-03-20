@@ -2,7 +2,7 @@ const config = {
     extends: [
         '@sidaroth/eslint-config-base',
         '@sidaroth/eslint-config-typescript',
-        // '@sidaroth/eslint-config-vue',
+        '@sidaroth/eslint-config-vue',
     ],
     settings: {
         'import/resolver': {
@@ -18,7 +18,7 @@ const config = {
                     ['styles', './src/styles'],
                     ['shaders', './src/shaders'],
                 ],
-                extensions: ['.js', '.ts', '.cjs', '.mjs'],
+                extensions: ['.js', '.ts', '.cjs', '.mjs', '.vue'],
             },
         },
     },
