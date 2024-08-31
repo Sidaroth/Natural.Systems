@@ -4,7 +4,7 @@
         "baseUrl": ".",
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "target": "esnext",
+        "target": "ESNext",
         "allowJs": false,
         "resolveJsonModule": true, /* allows us to import .json files */
         /* Strictness */
@@ -49,6 +49,11 @@
                 "./src/shaders/*"
             ],
         },
+        "types": [
+            "node",
+            "vite/client",
+            "vue"
+        ]
     },
     "include": [
         "./src/**/*"

@@ -5,25 +5,24 @@
 </template>
 
 <script setup lang="ts">
-import { usePrimeVue } from 'primevue/config';
+import { usePreset } from '@primevue/themes';
 import { ref, onMounted } from 'vue';
 import Button from 'primevue/button';
 
-const PrimeVue = usePrimeVue();
 const isDarkTheme = ref(true);
 
 const toggleTheme = () => {
   if (isDarkTheme.value) {
-    PrimeVue.changeTheme('lara-dark-teal', 'lara-light-teal', 'theme-link');
+    usePreset('lara-light-teal');
   } else {
-    PrimeVue.changeTheme('lara-light-teal', 'lara-dark-teal', 'theme-link');
+    usePreset('lara-dark-teal');
   }
 
   isDarkTheme.value = !isDarkTheme.value;
 };
 
 onMounted(() => {
-  PrimeVue.changeTheme('lara-light-teal', 'lara-dark-teal', 'theme-link');
+  usePreset('lara-dark-teal');
   isDarkTheme.value = true;
 });
 

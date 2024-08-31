@@ -26,15 +26,15 @@ export type OffFunction<T extends EventKeys> = (listener: Listener<T>) => void;
 export type OnFunction<T extends EventKeys> = (
     event: T,
     callback: EventCallback<T>,
-    context: EmitComponent
+    context: EmitComponent<T>
 ) => Listener<T>;
 
-export interface EmitComponent {
-    emitGlobal: EmitFunction<any>
-    emit: EmitFunction<any>
-    on: OnFunction<any>
-    once: OnFunction<any>
-    off: OffFunction<any>
+export interface EmitComponent<T extends EventKeys> {
+    emitGlobal: EmitFunction<T>
+    emit: EmitFunction<T>
+    on: OnFunction<T>
+    once: OnFunction<T>
+    off: OffFunction<T>
     removeAllListeners: () => void;
     destroy: () => void;
 }
@@ -43,19 +43,19 @@ export interface ListenComponent {
     dropListener: (listener: Listener<any>) => void;
 
     listenOn<T extends EventKeys>(
-        emitState: EmitComponent,
+        emitState: EmitComponent<T>,
         event: T,
         callback: EventCallback<T>,
-        context: EmitComponent): Listener<T>;
+        context: EmitComponent<T>): Listener<T>;
 
     listenOnce<T extends EventKeys>(
-        emitState: EmitComponent,
+        emitState: EmitComponent<T>,
         event: T,
         callback: EventCallback<T>,
-        context: EmitComponent): Listener<T>;
+        context: EmitComponent<T>): Listener<T>;
 
-    listenGlobal<T extends EventKeys>(event: T, fn: EventCallback<T>, context: EmitComponent): Listener<T>;
-    listenOnceGlobal<T extends EventKeys>(event: T, fn: EventCallback<T>, context: EmitComponent): Listener<T>;
+    listenGlobal<T extends EventKeys>(event: T, fn: EventCallback<T>, context: EmitComponent<T>): Listener<T>;
+    listenOnceGlobal<T extends EventKeys>(event: T, fn: EventCallback<T>, context: EmitComponent<T>): Listener<T>;
     destroy: () => void;
 }
 

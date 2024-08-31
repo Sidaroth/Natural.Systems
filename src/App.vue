@@ -30,11 +30,7 @@ import ThemeChanger from 'components/vue/ThemeChanger.vue';
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh; /* Adjust as needed */
-}
-
-.top-section {
-  margin-top: 1rem;
+  height: 98vh;
 }
 
 body {
