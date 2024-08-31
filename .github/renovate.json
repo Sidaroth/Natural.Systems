@@ -1,0 +1,41 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended"
+    ],
+    "platform": "github",
+    "repositories": [
+        "Sidaroth/Natural.Systems"
+    ],
+    "baseBranches": [
+        "main"
+    ],
+    "reviewers": [
+        "Sidaroth"
+    ],
+    "prConcurrentLimit": 10,
+    "npmrcMerge": true,
+    "packageRules": [
+        {
+            "groupName": "all non-major dependencies",
+            "groupSlug": "all-minor-patch",
+            "matchPackagePatterns": [
+                "*"
+            ],
+            "matchUpdateTypes": [
+                "minor",
+                "patch"
+            ],
+            "automerge": true
+        }
+    ],
+    "schedule": [
+        "before 6am on Monday"
+    ],
+    "vulnerabilityAlerts": {
+        "labels": [
+            "security"
+        ]
+    },
+    "osvVulnerabilityAlerts": true
+}
