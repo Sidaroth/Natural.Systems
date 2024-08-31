@@ -44,7 +44,7 @@ export default class System {
         this.warningText = new Text({ text: 'Requires WebGL and an up to date browser' });
     }
 
-    setup(params: { module?: string }) {
+    setup() {
         this.createModules();
 
         this.startText.anchor.set(0.5, 0.5);
@@ -56,13 +56,6 @@ export default class System {
         this.warningText.x = config.WORLD.width / 2;
         this.warningText.y = config.WORLD.height / 2;
         this.stage.addChild(this.warningText);
-
-        if (!params.module) return;
-
-        const startingModule = this.modules.find((m) => m.name === params.module);
-        if (startingModule) {
-            this.switchModule(startingModule.id);
-        }
     }
 
     switchModule(id: string) {
