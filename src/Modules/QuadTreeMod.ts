@@ -11,6 +11,7 @@ import Circle from 'shapes/circle';
 import store from 'root/store';
 import { Entity, QuadTree } from 'root/interfaces/entities';
 import Point from 'math/point';
+import { ModuleSettings } from './IModule';
 
 export default class QuadTreeMod extends Module {
     stage: Container;
@@ -39,6 +40,8 @@ export default class QuadTreeMod extends Module {
 
     highlights: Entity[] = [];
 
+    settings: ModuleSettings;
+
     constructor(stage: Container) {
         super();
         this.stage = stage;
@@ -47,6 +50,14 @@ export default class QuadTreeMod extends Module {
         this.pointTexture = new Texture();
         this.highlightTexture = new Texture();
         this.quadTree = createQuadTree(new Rect(0, 0, 0, 0), 0, 0);
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: 'A quad tree module.',
+            options: [],
+        }
     }
 
     addPoints() {
@@ -103,6 +114,10 @@ export default class QuadTreeMod extends Module {
         this.stage.on('mousedown', this.onMouseDown, this);
 
         this.reset();
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     update() {

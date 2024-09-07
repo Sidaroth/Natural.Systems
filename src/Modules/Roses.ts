@@ -47,6 +47,18 @@ export default class Roses extends Module {
         petals = 6; d = 71;<br/>
         petals = 7; d = 19;<br/><br/>
         Make use of the panel on the right to play around with some settings.`;
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: this.description,
+            options: [],
+        }
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     setup() {

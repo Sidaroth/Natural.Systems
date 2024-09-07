@@ -9,6 +9,7 @@ import Line from '../shapes/line';
 import createBoid from '../components/Boid';
 import createBoidTextures from '../components/createBoidTextures';
 import createQuadTree from '../components/QuadTree';
+import { ModuleSettings } from './IModule';
 
 // 2D Boids - Flock behaviour, obstacle avoidance.
 export default class Boids extends Module {
@@ -49,6 +50,8 @@ export default class Boids extends Module {
 
     debugGfx: Graphics;
 
+    settings: ModuleSettings;
+
     constructor(stage: Container) {
         super();
         this.stage = stage;
@@ -59,6 +62,18 @@ export default class Boids extends Module {
         this.boidTree = createQuadTree(store.worldBoundary, this.treeSize);
         this.gfx = new Graphics();
         this.debugGfx = new Graphics();
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: 'A boids module.',
+            options: [],
+        }
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     spawn50Boids() {

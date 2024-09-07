@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import config from 'root/config';
 import {
-  onBeforeUnmount, onMounted, provide, ref,
+  onBeforeUnmount, onMounted, provide, ref, defineEmits,
 } from 'vue';
 import {
   Application, Text, Renderer, FederatedPointerEvent, isWebGLSupported, Ticker,
@@ -13,27 +13,12 @@ import {
 import store from 'root/store';
 import Rect from 'shapes/rect';
 import System from 'root/system';
-import UrlParam from 'interfaces/urlParam';
 
 if (!isWebGLSupported()) {
   throw new Error('WebGL is not supported');
 }
 
-function getURLParams(): UrlParam {
-  const params: UrlParam = {};
-  const query = decodeURIComponent(window.location.href.slice(window.location.href.indexOf('?') + 1));
-  query.split('&').forEach((param) => {
-    const parts = param.split('=', 2);
-    const key = parts[0];
-    const value = parts[1];
-
-    if (key !== undefined && value !== undefined) {
-      params[key] = value;
-    }
-  });
-
-  return params;
-}
+const emit = defineEmits(['system-ready']);
 
 const app = ref<Application<Renderer> | null>(null);
 provide('app', app);
@@ -82,10 +67,10 @@ onMounted(() => {
   const canvasDiv = document.getElementById('pixi-canvas');
   if (!canvasDiv) throw new Error('No mounting div found. Cannot append PIXI Canvas to DOM');
   canvasDiv.appendChild(application.canvas);
-
-  const params = getURLParams();
-  system.setup(params);
-
+  system.setup();
+  
+  emit('system-ready', system);
+  
   application.ticker.add(mainLoop);
 });
 

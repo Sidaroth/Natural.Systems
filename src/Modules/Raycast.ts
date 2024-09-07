@@ -5,6 +5,7 @@ import Line from 'shapes/line';
 import store from 'root/store';
 import Module from 'modules/Module';
 import Point from 'math/point';
+import { ModuleSettings } from './IModule';
 
 interface CircleData {
     x: number;
@@ -38,6 +39,8 @@ export default class Raycast extends Module {
 
     ray: Line;
 
+    settings: ModuleSettings;
+
     constructor(stage: Container) {
         super();
         this.stage = stage;
@@ -58,6 +61,14 @@ export default class Raycast extends Module {
         this.movingRight = true;
         this.ray = new Line(new Point(0, 0), new Point(0, 0));
         this.gfx = new Graphics();
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: 'A raycast module.',
+            options: [],
+        }
     }
 
     setup() {
@@ -75,6 +86,10 @@ export default class Raycast extends Module {
 
         this.currentX = 0;
         this.currentY = store.worldBoundary.h;
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     update() {

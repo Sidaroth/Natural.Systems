@@ -5,26 +5,20 @@
 </template>
 
 <script setup lang="ts">
-import { usePreset } from '@primevue/themes';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import Button from 'primevue/button';
+import { usePreset } from '@primevue/themes';
+import Lara from '@primevue/themes/lara';
+import Nora from '@primevue/themes/nora';
 
-const isDarkTheme = ref(true);
+
+
+const isDarkTheme = ref(false);
 
 const toggleTheme = () => {
-  if (isDarkTheme.value) {
-    usePreset('lara-light-teal');
-  } else {
-    usePreset('lara-dark-teal');
-  }
-
+  usePreset(ref(isDarkTheme).value ? Lara : Nora);
   isDarkTheme.value = !isDarkTheme.value;
-};
-
-onMounted(() => {
-  usePreset('lara-dark-teal');
-  isDarkTheme.value = true;
-});
+}
 
 </script>
 
