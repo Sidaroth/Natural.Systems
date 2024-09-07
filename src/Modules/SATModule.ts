@@ -6,6 +6,7 @@ import Polygon from 'shapes/polygon';
 import Module from 'modules/Module';
 import config from 'root/config';
 import Point from 'root/math/point';
+import { ModuleSettings } from './IModule';
 
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
 export default class SATModule extends Module {
@@ -43,6 +44,8 @@ export default class SATModule extends Module {
 
     obstacleRotation: number;
 
+    settings: ModuleSettings;
+
     constructor(stage: Container) {
         super();
 
@@ -74,6 +77,18 @@ export default class SATModule extends Module {
 
         this.stage = stage;
         this.name = 'SAT';
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: 'A separating axis theorem module.',
+            options: [],
+        }
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     drawBoundary() {

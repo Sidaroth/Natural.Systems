@@ -4,6 +4,7 @@ import constrain from 'math/constrain';
 import Point from 'math/point';
 import config from 'root/config';
 import Module from 'modules/Module';
+import { ModuleSettings } from './IModule';
 
 enum DIRECTION {
     left = 0,
@@ -27,12 +28,22 @@ export default class RandomWalker extends Module {
 
     gfx: Graphics;
 
+    settings: ModuleSettings;
+
     constructor(stage: Container, x: number, y: number) {
         super();
         this.stage = stage;
         this.position = new Point(x, y);
         this.name = 'randomWalker';
         this.gfx = new Graphics();
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: 'A random walker module.',
+            options: [],
+        };
     }
 
     setup() {
@@ -66,6 +77,10 @@ export default class RandomWalker extends Module {
 
         this.position.x = constrain(this.position.x, 0, config.WORLD.width);
         this.position.y = constrain(this.position.y, 0, config.WORLD.height);
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     render() {

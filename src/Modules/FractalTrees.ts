@@ -4,6 +4,7 @@ import Point from 'math/point';
 import { Container, Graphics } from 'pixi.js';
 import config from 'root/config';
 import Module from 'modules/Module';
+import { ModuleSettings } from './IModule';
 
 export default class FractalTreesMod extends Module {
     backgroundColor?: number;
@@ -48,9 +49,9 @@ export default class FractalTreesMod extends Module {
 
     leafColor: number;
 
-    folder: any;
-
     gfx: Graphics;
+
+    settings: ModuleSettings;
 
     constructor(stage: Container) {
         super();
@@ -83,6 +84,14 @@ export default class FractalTreesMod extends Module {
         this.leafRadius = 2.5;
         this.leafColor = 0x4a204;
         this.gfx = new Graphics();
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: 'A fractal tree module.',
+            options: [],
+        }
     }
 
     setup() {
@@ -134,6 +143,10 @@ export default class FractalTreesMod extends Module {
         this.drawRandomBranches = true;
         this.drawBranches();
         this.drawRandomBranches = false;
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     // TODO draw leaf polygon instead of circles?

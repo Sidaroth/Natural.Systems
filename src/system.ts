@@ -81,6 +81,11 @@ export default class System {
         }
     }
 
+    getModuleSettings() {
+        console.log('requesting module options');
+        return this.modules.map((mod) => mod.getSettings());
+    }
+
     createModules() {
         this.modules.push(new RandomWalker(this.stage, 200, 200));
         this.modules.push(new GaussianDistribution(this.stage));

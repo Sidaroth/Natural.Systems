@@ -3,6 +3,7 @@ import gaussian from 'math/gaussian';
 import constrain from 'math/constrain';
 import config from '../config';
 import Module from './Module';
+import { ModuleSettings } from './IModule';
 
 interface Column {
     x: number;
@@ -27,6 +28,8 @@ export default class GaussianDistribution extends Module {
 
     gfx: Graphics;
 
+    settings: ModuleSettings;
+
     constructor(stage: Container) {
         super();
         this.stage = stage;
@@ -34,6 +37,14 @@ export default class GaussianDistribution extends Module {
         this.columns = [];
         this.randomGaussian = gaussian(this.numberOfColumns / 2, this.numberOfColumns / 10);
         this.gfx = new Graphics();
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: 'A gaussian distribution module.',
+            options: [],
+        };
     }
 
     setup() {
@@ -65,6 +76,10 @@ export default class GaussianDistribution extends Module {
 
         column.y = constrain(column.y, 0, config.WORLD.height);
         column.height = constrain(column.height, 0, config.WORLD.height);
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     render() {

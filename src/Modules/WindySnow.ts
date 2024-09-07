@@ -7,6 +7,7 @@ import PhysicsBody from 'components/PhysicsBody';
 import config from 'root/config';
 import store from 'root/store';
 import Region from 'components/Region';
+import { ModuleSettings } from './IModule';
 
 export default class WindySnow extends Module {
     stage: Container;
@@ -29,6 +30,8 @@ export default class WindySnow extends Module {
 
     time: number;
 
+    settings: ModuleSettings;
+
     constructor(stage: Container) {
         super();
 
@@ -38,6 +41,18 @@ export default class WindySnow extends Module {
         this.gravity = new Vector(0, 1);
         this.time = 0;
         this.bgfx = new Graphics();
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: 'A windy snow module.',
+            options: [],
+        }
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     // eslint-disable-next-line class-methods-use-this

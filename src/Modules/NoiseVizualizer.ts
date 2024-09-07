@@ -56,6 +56,8 @@ export default class NoiseVisualizer extends Module {
 
     pixels: Int32Array;
 
+    settings: ModuleSettings;
+
     constructor(stage: Container) {
         super();
         this.stage = stage;
@@ -89,6 +91,14 @@ export default class NoiseVisualizer extends Module {
 
         this.pixels = new Int32Array(imageData.data.buffer);
         this.imageData = imageData;
+
+        this.settings = {
+            id: this.id,
+            label: this.name,
+            title: this.name,
+            description: 'A noise visualizer module.',
+            options: [],
+        }
     }
 
     reset() {
@@ -189,6 +199,10 @@ export default class NoiseVisualizer extends Module {
         } else if (this.type === 'perlin32' || this.type === 'simplex32') {
             this.generateNoise32Bit();
         }
+    }
+
+    getSettings() {
+        return this.settings;
     }
 
     clear() {
