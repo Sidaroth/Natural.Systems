@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { Emitter } from 'mitt';
 import { ModuleSettings } from 'root/modules/IModule';
-import { ref, defineEmits, onMounted, inject } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import { Events } from '../events/IEvents';
 import System from 'root/system';
 
@@ -31,7 +31,7 @@ function toggleModule(module: ModuleSettings) {
     selectedModule.value = module;
   }
 
-  emits('toggle-module', selectedModule);
+  emits('toggle-module', selectedModule.value);
 }
 
 function onModulesReady(modules: ModuleSettings[]) {

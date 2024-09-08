@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import {
-  onBeforeUnmount, onMounted, provide, ref, defineEmits,
+  onBeforeUnmount, onMounted, provide, ref,
 } from 'vue';
 import {
   Application, Text, Renderer, FederatedPointerEvent, isWebGLSupported, Ticker,
@@ -67,9 +67,9 @@ onMounted(() => {
   if (!canvasDiv) throw new Error('No mounting div found. Cannot append PIXI Canvas to DOM');
   canvasDiv.appendChild(application.canvas);
   system.setup();
-  
+
   emit('system-ready', system);
-  
+
   application.ticker.add(mainLoop);
 });
 

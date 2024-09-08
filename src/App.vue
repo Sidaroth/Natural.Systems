@@ -33,8 +33,8 @@ import { Events } from './components/events/IEvents';
 const eventbus = mitt<Events>();
 provide('eventbus', eventbus);
 
-const selectedModule = ref<ModuleSettings | undefined>(undefined);
-const system = ref<System | undefined>(undefined);
+const selectedModule = ref<ModuleSettings>();
+const system = ref<System>();
 const moduleOptions = ref<ModuleSettings[]>([]);
 
 const title = computed(() => selectedModule.value?.title ?? 'Natural.Systems');
@@ -51,9 +51,9 @@ function onSystemReady(sys: System) {
 }
 
 function onModuleToggled(module: ModuleSettings) {
-  console.log('module toggled', module);
-
   selectedModule.value = module;
+
+  system.value?.switchModule(module.id);
 }
 
 </script>

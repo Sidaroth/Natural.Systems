@@ -72,13 +72,6 @@ export default class System {
         if (this.warningText) this.stage.removeChild(this.warningText);
         if (this.activeModule) this.activeModule.destroy();
 
-        // TODO Fix
-        // if (module.backgroundColor !== undefined) {
-        //     this.renderer.backgroundColor = module.backgroundColor;
-        // } else {
-        //     this.renderer.backgroundColor = 0xdddddd;
-        // }
-
         module.setup();
         this.activeModule = module;
         const description = document.getElementById('description');
