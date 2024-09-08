@@ -1,5 +1,4 @@
 import { defineConfig, UserConfig, ConfigEnv } from 'vite';
-import stripCode from 'rollup-plugin-strip-code';
 import { resolve } from 'path';
 import { setDefaultResultOrder } from 'dns';
 import vue from '@vitejs/plugin-vue';
@@ -7,8 +6,6 @@ import vue from '@vitejs/plugin-vue';
 setDefaultResultOrder('verbatim');
 
 function getConfig(environment: ConfigEnv): UserConfig {
-    const { mode } = environment;
-
     const baseConfig: UserConfig = {
         base: './',
         plugins: [vue()],
@@ -29,24 +26,6 @@ function getConfig(environment: ConfigEnv): UserConfig {
             port: 3000,
         },
     };
-
-    if (mode === 'production') {
-        return Object.assign(baseConfig, {
-            plugins: [...baseConfig.plugins,
-            stripCode({
-                start_comment: 'develblock:start',
-                end_comment: 'develblock:end',
-            }),
-            ],
-        });
-    } else if (mode === 'development') {
-        return Object.assign(baseConfig, {
-            build: {
-                ...baseConfig.build,
-                sourcemap: true,
-            }
-        });
-    }
 
     return baseConfig;
 };

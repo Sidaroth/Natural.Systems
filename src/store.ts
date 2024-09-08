@@ -10,6 +10,8 @@ interface Store {
     count: number;
     mousePosition: Point
     messageBus: MessageBus;
+    width: number;
+    height: number;
 }
 
 const store: Store = {
@@ -18,6 +20,8 @@ const store: Store = {
     count: 0,
     mousePosition: new Point(),
     messageBus: createMessageBus(),
+    width: 1280,
+    height: 720,
 };
 
 export default store;

@@ -1,7 +1,8 @@
 import { Texture, Sprite, Container } from 'pixi.js';
 import { Noise } from 'noisejs';
-import config from '../config';
+import store from 'root/store';
 import Module from './Module';
+import { ModuleSettings } from './IModule';
 
 export default class NoiseVisualizer extends Module {
     backgroundColor?: number;
@@ -85,20 +86,20 @@ export default class NoiseVisualizer extends Module {
         this.texture = Texture.from(this.canvas);
         this.sprite = new Sprite(this.texture);
 
-        this.imageData = new ImageData(this.width, this.height);
-        const imageData = this.ctx?.createImageData(this.width, this.height);
-        if (!imageData) return;
-
-        this.pixels = new Int32Array(imageData.data.buffer);
-        this.imageData = imageData;
-
         this.settings = {
             id: this.id,
             label: this.name,
             title: this.name,
             description: 'A noise visualizer module.',
             options: [],
-        }
+        };
+
+        this.imageData = new ImageData(this.width, this.height);
+        const imageData = this.ctx?.createImageData(this.width, this.height);
+        if (!imageData) return;
+
+        this.pixels = new Int32Array(imageData.data.buffer);
+        this.imageData = imageData;
     }
 
     reset() {
@@ -121,8 +122,8 @@ export default class NoiseVisualizer extends Module {
 
     setup() {
         this.reset();
-        this.height = config.WORLD.height;
-        this.width = config.WORLD.width;
+        this.height = store.height;
+        this.width = store.width;
         this.canvas = new OffscreenCanvas(this.width, this.height);
         this.ctx = this.canvas.getContext('2d');
         this.texture = Texture.from(this.canvas);

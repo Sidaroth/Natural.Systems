@@ -1,13 +1,15 @@
+import 'primeicons/primeicons.css';
+import 'primeflex/primeflex.css';
+
+
 import { createApp } from 'vue';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import PixiCanvas from 'components/vue/PixiCanvas.vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import Ripple from 'primevue/ripple';
-import App from './App.vue';
 import lara from '@primevue/themes/lara';
-import 'primeicons/primeicons.css';
-import 'primeflex/primeflex.css'
+import App from './App.vue';
 
 const app = createApp(App);
 app.use(PrimeVue, {

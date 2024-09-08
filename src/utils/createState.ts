@@ -1,5 +1,4 @@
 import { PipeFunction, State, StateCreationOptions } from 'interfaces/state';
-import getFunctionUsage from './getFunctionUsage';
 import pipe from './pipe';
 
 function verifyPipeChain(pipeChain: Array<PipeFunction<any>>) {
@@ -15,7 +14,7 @@ function verifyPipeChain(pipeChain: Array<PipeFunction<any>>) {
 
 function createState<T>(stateOptions: StateCreationOptions<T>): T {
     const {
-        states, mainState, stateName, overrides,
+        states, mainState, overrides,
     } = stateOptions;
 
     // List of named states (components) and their constructor functions.
@@ -60,8 +59,6 @@ function createState<T>(stateOptions: StateCreationOptions<T>): T {
             finishedPipes[pipeKey] = pipe(...pipeChain);
         }
     });
-
-    getFunctionUsage(stateList, stateName);
 
     // Creates a piped init/constructor that runs each internalConstructor() function in the different states.
     // This allows a created class/state to have a constructor that is ran at create time.

@@ -2,8 +2,8 @@ import degreesToRadians from 'math/degreesToRadians';
 import getRandomInt from 'math/getRandomInt';
 import Point from 'math/point';
 import { Container, Graphics } from 'pixi.js';
-import config from 'root/config';
 import Module from 'modules/Module';
+import store from 'root/store';
 import { ModuleSettings } from './IModule';
 
 export default class FractalTreesMod extends Module {
@@ -59,7 +59,7 @@ export default class FractalTreesMod extends Module {
         this.name = 'fractalTree';
         this.description = 'Fractal based tree "generator" with various options.';
 
-        this.origin = new Point(config.WORLD.width / 2, config.WORLD.height);
+        this.origin = new Point(store.width / 2, store.height);
 
         this.degrees = 120;
         this.maxDepth = 8;
@@ -91,7 +91,7 @@ export default class FractalTreesMod extends Module {
             title: this.name,
             description: 'A fractal tree module.',
             options: [],
-        }
+        };
     }
 
     setup() {
@@ -202,12 +202,12 @@ export default class FractalTreesMod extends Module {
 
     drawBranches() {
         this.gfx.clear();
-        this.gfx.moveTo(config.WORLD.width / 2, config.WORLD.height);
+        this.gfx.moveTo(store.width / 2, store.height);
 
         if (this.drawBase) {
             this.drawBranch(0, this.origin, this.startLength, 0, this.lineThickness);
         } else {
-            const center = new Point(config.WORLD.width / 2, config.WORLD.height / 2);
+            const center = new Point(store.width / 2, store.height / 2);
 
             this.drawBranch(0, center, this.startLength, this.degrees, this.lineThickness);
             this.drawBranch(0, center, this.startLength, -this.degrees, this.lineThickness);

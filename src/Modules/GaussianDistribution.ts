@@ -1,7 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
 import gaussian from 'math/gaussian';
 import constrain from 'math/constrain';
-import config from '../config';
+import store from 'root/store';
 import Module from './Module';
 import { ModuleSettings } from './IModule';
 
@@ -49,11 +49,11 @@ export default class GaussianDistribution extends Module {
 
     setup() {
         this.columns = [];
-        this.columnWidth = config.WORLD.width / this.numberOfColumns;
+        this.columnWidth = store.width / this.numberOfColumns;
         for (let i = 0; i < this.numberOfColumns; i += 1) {
             this.columns.push({
                 x: i * this.columnWidth,
-                y: config.WORLD.height,
+                y: store.height,
                 height: 0,
             });
         }
@@ -74,8 +74,8 @@ export default class GaussianDistribution extends Module {
         column.y -= this.growth;
         column.height += this.growth;
 
-        column.y = constrain(column.y, 0, config.WORLD.height);
-        column.height = constrain(column.height, 0, config.WORLD.height);
+        column.y = constrain(column.y, 0, store.height);
+        column.height = constrain(column.height, 0, store.height);
     }
 
     getSettings() {

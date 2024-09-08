@@ -1,7 +1,7 @@
 import { Color, Container, Graphics } from 'pixi.js';
 import degreesToRadians from 'math/degreesToRadians';
-import config from 'root/config';
 import Module from 'modules/Module';
+import store from 'root/store';
 
 // See https://www.wikiwand.com/en/Maurer_rose for formula.
 // Interesting petal & d combinations:
@@ -54,7 +54,7 @@ export default class Roses extends Module {
             title: this.name,
             description: this.description,
             options: [],
-        }
+        };
     }
 
     getSettings() {
@@ -83,8 +83,8 @@ export default class Roses extends Module {
 
     render() {
         this.gfx.clear();
-        const centerY = config.WORLD.height / 2;
-        let centerX = config.WORLD.width / 2;
+        const centerY = store.height / 2;
+        let centerX = store.width / 2;
 
         if (this.petals === 1) {
             centerX -= this.radius / 2;

@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import config from 'root/config';
 import {
   onBeforeUnmount, onMounted, provide, ref, defineEmits,
 } from 'vue';
@@ -24,8 +23,8 @@ const app = ref<Application<Renderer> | null>(null);
 provide('app', app);
 
 const appOptions = {
-  width: config.WORLD.width,
-  height: config.WORLD.height,
+  width: store.width,
+  height: store.height,
   antialias: true, // default: false
   transparent: false, // default: false
   resolution: 1, // default: 1
@@ -36,7 +35,7 @@ const application = new Application();
 await application.init(appOptions);
 
 store.renderer = application.renderer;
-store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
+store.worldBoundary = new Rect(0, 0, store.width, store.height);
 
 application.stage.eventMode = 'static';
 application.stage.hitArea = application.screen;
