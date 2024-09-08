@@ -3,7 +3,6 @@ import {
 } from 'pixi.js';
 import getRandomInt from 'math/getRandomInt';
 import getUUID from 'math/getUUID';
-import config from 'root/config';
 import Module from 'modules/Module';
 import createQuadTree from 'components/QuadTree';
 import Rect from 'shapes/rect';
@@ -57,7 +56,7 @@ export default class QuadTreeMod extends Module {
             title: this.name,
             description: 'A quad tree module.',
             options: [],
-        }
+        };
     }
 
     addPoints() {
@@ -67,7 +66,7 @@ export default class QuadTreeMod extends Module {
         for (let i = 0; i < this.numPoints; i += 1) {
             const point: Entity = {
                 id: getUUID(),
-                position: new Point(getRandomInt(0, config.WORLD.width), getRandomInt(0, config.WORLD.height)),
+                position: new Point(getRandomInt(0, store.width), getRandomInt(0, store.height)),
                 sprite: new Sprite(this.pointTexture),
             };
 
@@ -89,7 +88,7 @@ export default class QuadTreeMod extends Module {
     }
 
     recalculateTree() {
-        const boundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
+        const boundary = new Rect(0, 0, store.width, store.height);
         this.quadTree = createQuadTree(boundary, this.treeCapacity, this.treeDepth);
 
         this.entities.forEach((p) => this.quadTree.insert(p));

@@ -4,7 +4,6 @@ import getRandomInt from 'math/getRandomInt';
 import Vector from 'math/Vector';
 import Module from 'modules/Module';
 import PhysicsBody from 'components/PhysicsBody';
-import config from 'root/config';
 import store from 'root/store';
 import Region from 'components/Region';
 import { ModuleSettings } from './IModule';
@@ -48,7 +47,7 @@ export default class WindySnow extends Module {
             title: this.name,
             description: 'A windy snow module.',
             options: [],
-        }
+        };
     }
 
     getSettings() {
@@ -57,17 +56,17 @@ export default class WindySnow extends Module {
 
     // eslint-disable-next-line class-methods-use-this
     checkEdges(flake: PhysicsBody) {
-        if (flake.position.x > config.WORLD.width) {
+        if (flake.position.x > store.width) {
             flake.position.x = 0;
         }
 
         if (flake.position.x < 0) {
-            flake.position.x = config.WORLD.width;
+            flake.position.x = store.width;
         }
 
         // Randomize end position on the ground.
-        if (flake.position.y > getRandomInt(config.WORLD.height * 0.85, config.WORLD.height)) {
-            flake.position.y = getRandomInt(-config.WORLD.height / 2, 0);
+        if (flake.position.y > getRandomInt(store.height * 0.85, store.height)) {
+            flake.position.y = getRandomInt(-store.height / 2, 0);
             flake.velocity.zero();
         }
     }
@@ -75,25 +74,25 @@ export default class WindySnow extends Module {
     drawBackground() {
         // sky
         this.bgfx
-            .rect(0, 0, config.WORLD.width, config.WORLD.height * 0.85)
+            .rect(0, 0, store.width, store.height * 0.85)
             .fill(0x222222);
 
         // moon
         this.bgfx
-            .circle(config.WORLD.width * 0.8, config.WORLD.height * 0.18, 45)
+            .circle(store.width * 0.8, store.height * 0.18, 45)
             .fill(0xffffff);
 
         // moon dots
         this.bgfx
-            .circle(config.WORLD.width * 0.805, config.WORLD.height * 0.19, 4)
-            .circle(config.WORLD.width * 0.825, (config.WORLD.height * 0.18) + 2, 4)
-            .circle(config.WORLD.width * 0.81, (config.WORLD.height * 0.18) - 10, 7)
-            .circle(config.WORLD.width * 0.78, (config.WORLD.height * 0.18) + 7, 10)
+            .circle(store.width * 0.805, store.height * 0.19, 4)
+            .circle(store.width * 0.825, (store.height * 0.18) + 2, 4)
+            .circle(store.width * 0.81, (store.height * 0.18) - 10, 7)
+            .circle(store.width * 0.78, (store.height * 0.18) + 7, 10)
             .fill({ color: 0xcccccc, alpha: 0.75 });
 
         // ground
         this.bgfx
-            .rect(0, config.WORLD.height - (config.WORLD.height * 0.15), config.WORLD.width, config.WORLD.height * 0.33)
+            .rect(0, store.height - (store.height * 0.15), store.width, store.height * 0.33)
             .fill(0xdddddd);
     }
 
@@ -108,15 +107,15 @@ export default class WindySnow extends Module {
         snowFlake.setMass(size / 100000); // The weight of a snowflake is about 0.02 grams, generate flakes in weightrange 0.01 - 0.03 grams.
         snowFlake.setTexture(texture);
 
-        snowFlake.position.set(getRandomInt(0, config.WORLD.width), getRandomInt(0, config.WORLD.height));
+        snowFlake.position.set(getRandomInt(0, store.width), getRandomInt(0, store.height));
         this.stage.addChild(snowFlake.sprite);
         this.snowFlakes.push(snowFlake);
     }
 
     // TODO https://youtu.be/c1yuYXg4IeE make smarter wind regions.
     addWindRegions() {
-        const topRegion = new Region(0, 100, config.WORLD.width, 200);
-        const bottomRegion = new Region(0, 300, config.WORLD.width, 200);
+        const topRegion = new Region(0, 100, store.width, 200);
+        const bottomRegion = new Region(0, 300, store.width, 200);
 
         topRegion.setForce(new Vector(-0.00001, -0.000001));
         bottomRegion.setForce(new Vector(0.00001, 0));

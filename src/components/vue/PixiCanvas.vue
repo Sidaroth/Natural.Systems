@@ -3,9 +3,8 @@
 </template>
 
 <script setup lang="ts">
-import config from 'root/config';
 import {
-  onBeforeUnmount, onMounted, provide, ref, defineEmits,
+  onBeforeUnmount, onMounted, provide, ref,
 } from 'vue';
 import {
   Application, Text, Renderer, FederatedPointerEvent, isWebGLSupported, Ticker,
@@ -24,8 +23,8 @@ const app = ref<Application<Renderer> | null>(null);
 provide('app', app);
 
 const appOptions = {
-  width: config.WORLD.width,
-  height: config.WORLD.height,
+  width: store.width,
+  height: store.height,
   antialias: true, // default: false
   transparent: false, // default: false
   resolution: 1, // default: 1
@@ -36,7 +35,7 @@ const application = new Application();
 await application.init(appOptions);
 
 store.renderer = application.renderer;
-store.worldBoundary = new Rect(0, 0, config.WORLD.width, config.WORLD.height);
+store.worldBoundary = new Rect(0, 0, store.width, store.height);
 
 application.stage.eventMode = 'static';
 application.stage.hitArea = application.screen;
@@ -68,9 +67,9 @@ onMounted(() => {
   if (!canvasDiv) throw new Error('No mounting div found. Cannot append PIXI Canvas to DOM');
   canvasDiv.appendChild(application.canvas);
   system.setup();
-  
+
   emit('system-ready', system);
-  
+
   application.ticker.add(mainLoop);
 });
 

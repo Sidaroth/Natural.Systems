@@ -1,25 +1,16 @@
 <template>
   <div class="container">
-    <div class="sidebar">
-      <div v-for="module in moduleOptions" 
-      :key="module.label" 
-      class="sidebar-item"
-      @click="toggleModule(module)"
-      :class="{ 'selected': module === selectedModule }">
-        <span>{{ module.label }}</span>
-        <ul v-if="module === selectedModule">
-          <li v-for="option in module.options" :key="option">{{ option }}</li>
-        </ul>
-      </div>
-    </div>
+    <Sidebar @toggle-module="onModuleToggled" />
     <div class="main-content">
       <div class="top-section">
-        <h1 class="title"> {{ title }} </h1>
+        <h1 class="title">
+          {{ title }}
+        </h1>
         <p class="description">{{ description }}</p>
       </div>
       <Suspense>
         <template #default>
-          <PixiCanvas @system-ready="onSystemReady"/>
+          <PixiCanvas @system-ready="onSystemReady" />
         </template>
         <template #fallback>
           <ProgressSpinner />
@@ -31,39 +22,38 @@
 
 <script setup lang="ts">
 import PixiCanvas from 'components/vue/PixiCanvas.vue';
+import Sidebar from 'components/vue/Sidebar.vue';
 import ProgressSpinner from 'primevue/progressspinner';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, provide } from 'vue';
+import mitt from 'mitt';
 import System from './system';
 import { ModuleSettings } from './modules/IModule';
+import { Events } from './components/events/IEvents';
 
-onMounted(() => {
-});
+const eventbus = mitt<Events>();
+provide('eventbus', eventbus);
 
-const selectedModule = ref<ModuleSettings | undefined>(undefined);
-const system = ref<System | undefined>(undefined);
+const selectedModule = ref<ModuleSettings>();
+const system = ref<System>();
 const moduleOptions = ref<ModuleSettings[]>([]);
 
-const title = computed(() => {
-  return selectedModule.value?.title || 'Natural.Systems';
-});
+const title = computed(() => selectedModule.value?.title ?? 'Natural.Systems');
 
-const description = computed(() => {
-  return selectedModule.value?.description ?? 'This is a test lorem ipsum sit dolor et amet';
-});
-
-function toggleModule(module: ModuleSettings) {
-  if (selectedModule.value === module) {
-    selectedModule.value = undefined;
-  } else {
-    selectedModule.value = module;
-  }
-
-  system.value?.switchModule(module.id);
-}
+const description = computed(() => selectedModule.value?.description ?? 'This is a test lorem ipsum sit dolor et amet');
 
 function onSystemReady(sys: System) {
   system.value = sys;
   moduleOptions.value = sys.getModuleSettings();
+
+  provide('system', system);
+  provide('moduleOptions', moduleOptions);
+  eventbus.emit('modules-ready', moduleOptions.value);
+}
+
+function onModuleToggled(module: ModuleSettings) {
+  selectedModule.value = module;
+
+  system.value?.switchModule(module.id);
 }
 
 </script>
@@ -94,48 +84,5 @@ function onSystemReady(sys: System) {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.sidebar {
-  width: 200px;
-  padding: 1rem;
-  overflow-y: auto;
-  border-right: 1px solid var(--p-primary-500);
-}
-
-.sidebar-item {
-  cursor: pointer;
-  padding: 10px;
-  position: relative;
-  display: block;
-}
-
-.sidebar-item span {
-  display: inline-block;
-  font-family: var(--p-font-family);
-  color: var(--p-text-color);
-}
-
-.sidebar-item::before {
-  content: "";
-  position: absolute;
-  display: block;
-  width: 100%;
-  height: 2px;
-  bottom: 5px;
-  left: 0;
-  background-color: var(--p-primary-500);
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.sidebar-item:hover::before {
-  transform: scaleX(1);
-}
-
-
-.sidebar-item ul {
-  list-style-type: none;
-  padding-left: 20px;
 }
 </style>

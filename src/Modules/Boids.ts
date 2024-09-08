@@ -1,7 +1,6 @@
 import { Container, Graphics, Texture } from 'pixi.js';
 import { QuadTree, Boid } from 'root/interfaces/entities';
 import Module from './Module';
-import config from '../config';
 import store from '../store';
 import Vector from '../math/Vector';
 import getRandomInt from '../math/getRandomInt';
@@ -69,7 +68,7 @@ export default class Boids extends Module {
             title: this.name,
             description: 'A boids module.',
             options: [],
-        }
+        };
     }
 
     getSettings() {
@@ -91,7 +90,7 @@ export default class Boids extends Module {
         }
 
         const boid = createBoid(texture, this.debugGfx);
-        boid.setPosition(getRandomInt(25, config.WORLD.width - 25), getRandomInt(25, config.WORLD.height - 25));
+        boid.setPosition(getRandomInt(25, store.width - 25), getRandomInt(25, store.height - 25));
 
         let xDir = 0;
         let yDir = 0;
@@ -133,10 +132,10 @@ export default class Boids extends Module {
 
     createEdges() {
         this.edges = [];
-        const bottomRight = new Vector(config.WORLD.width, config.WORLD.height);
-        const topRight = new Vector(config.WORLD.width, 0);
+        const bottomRight = new Vector(store.width, store.height);
+        const topRight = new Vector(store.width, 0);
         const topLeft = new Vector(0, 0);
-        const bottomLeft = new Vector(0, config.WORLD.height);
+        const bottomLeft = new Vector(0, store.height);
 
         const left = new Line(topLeft, bottomLeft);
         const right = new Line(topRight, bottomRight);

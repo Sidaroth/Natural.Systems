@@ -25,6 +25,7 @@ const config = {
     rules: {
         'no-console': 'off',
         'max-len': ['error', { code: 120, ignoreComments: true }],
+        'import/no-cycle': 'off', // For some reason primevue imports die with this on.
     },
 };
 

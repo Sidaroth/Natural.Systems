@@ -6,7 +6,6 @@ import WindySnow from './modules/WindySnow';
 import SAT from './modules/SATModule';
 import Boids from './modules/Boids';
 import QuadtreeMod from './modules/QuadTreeMod';
-import config from './config';
 import Roses from './modules/Roses';
 import FractalTreesMod from './modules/FractalTrees';
 import Raycast from './modules/Raycast';
@@ -31,6 +30,10 @@ export default class System {
 
     warningText: Text;
 
+    width: number;
+
+    height: number;
+
     constructor(stage: Container, renderer: Renderer) {
         this.modules = [];
         this.activeModule = null;
@@ -42,19 +45,22 @@ export default class System {
         this.lastFPSUpdate = -Infinity;
         this.startText = new Text({ text: 'Use the selector to select a module' });
         this.warningText = new Text({ text: 'Requires WebGL and an up to date browser' });
+
+        this.width = 1280;
+        this.height = 720;
     }
 
     setup() {
         this.createModules();
 
         this.startText.anchor.set(0.5, 0.5);
-        this.startText.x = config.WORLD.width / 2;
-        this.startText.y = (config.WORLD.height / 2) - (this.startText.height * 2);
+        this.startText.x = this.width / 2;
+        this.startText.y = (this.height / 2) - (this.startText.height * 2);
         this.stage.addChild(this.startText);
 
         this.warningText.anchor.set(0.5, 0.5);
-        this.warningText.x = config.WORLD.width / 2;
-        this.warningText.y = config.WORLD.height / 2;
+        this.warningText.x = this.width / 2;
+        this.warningText.y = this.height / 2;
         this.stage.addChild(this.warningText);
     }
 
@@ -66,13 +72,6 @@ export default class System {
         if (this.warningText) this.stage.removeChild(this.warningText);
         if (this.activeModule) this.activeModule.destroy();
 
-        // TODO Fix
-        // if (module.backgroundColor !== undefined) {
-        //     this.renderer.backgroundColor = module.backgroundColor;
-        // } else {
-        //     this.renderer.backgroundColor = 0xdddddd;
-        // }
-
         module.setup();
         this.activeModule = module;
         const description = document.getElementById('description');
@@ -82,7 +81,6 @@ export default class System {
     }
 
     getModuleSettings() {
-        console.log('requesting module options');
         return this.modules.map((mod) => mod.getSettings());
     }
 

@@ -68,7 +68,7 @@ export default class Raycast extends Module {
             title: this.name,
             description: 'A raycast module.',
             options: [],
-        }
+        };
     }
 
     setup() {

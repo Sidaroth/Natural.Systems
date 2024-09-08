@@ -4,8 +4,8 @@ import SAT from 'math/sat';
 import Region from 'components/Region';
 import Polygon from 'shapes/polygon';
 import Module from 'modules/Module';
-import config from 'root/config';
 import Point from 'root/math/point';
+import store from 'root/store';
 import { ModuleSettings } from './IModule';
 
 // Showcasing an implementation of the separating axis theorem (SAT) in 2D.
@@ -54,8 +54,8 @@ export default class SATModule extends Module {
         this.gfx = new Graphics();
 
         this.innerRegionOffset = 40;
-        this.innerRegionWidth = config.WORLD.width - (2 * this.innerRegionOffset);
-        this.innerRegionHeight = config.WORLD.height - (2 * this.innerRegionOffset);
+        this.innerRegionWidth = store.width - (2 * this.innerRegionOffset);
+        this.innerRegionHeight = store.height - (2 * this.innerRegionOffset);
         this.innerRegion = new Region(
             this.innerRegionOffset,
             this.innerRegionOffset,
@@ -84,7 +84,7 @@ export default class SATModule extends Module {
             title: this.name,
             description: 'A separating axis theorem module.',
             options: [],
-        }
+        };
     }
 
     getSettings() {

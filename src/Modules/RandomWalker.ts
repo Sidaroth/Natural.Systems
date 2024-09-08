@@ -2,8 +2,8 @@ import { Color, Container, Graphics } from 'pixi.js';
 import getRandomInt from 'math/getRandomInt';
 import constrain from 'math/constrain';
 import Point from 'math/point';
-import config from 'root/config';
 import Module from 'modules/Module';
+import store from 'root/store';
 import { ModuleSettings } from './IModule';
 
 enum DIRECTION {
@@ -75,8 +75,8 @@ export default class RandomWalker extends Module {
                 console.error('The random number generator somehow managed to produce something out of range.');
         }
 
-        this.position.x = constrain(this.position.x, 0, config.WORLD.width);
-        this.position.y = constrain(this.position.y, 0, config.WORLD.height);
+        this.position.x = constrain(this.position.x, 0, store.width);
+        this.position.y = constrain(this.position.y, 0, store.height);
     }
 
     getSettings() {
