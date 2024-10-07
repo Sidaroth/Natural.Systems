@@ -44,7 +44,7 @@
     "dependencies": {
         "@primevue/themes": "^4.0.5",
         "@tsconfig/node20": "^20.1.4",
-        "@vue/eslint-config-typescript": "^13.0.0",
+        "@vue/eslint-config-typescript": "^14.0.0",
         "eslint-plugin-vue": "^9.28.0",
         "lodash": "^4.17.21",
         "mitt": "^3.0.1",
