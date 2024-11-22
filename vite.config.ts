@@ -1,11 +1,11 @@
-import { defineConfig, UserConfig, ConfigEnv } from 'vite';
+import { defineConfig, UserConfig } from 'vite';
 import { resolve } from 'path';
 import { setDefaultResultOrder } from 'dns';
 import vue from '@vitejs/plugin-vue';
 
 setDefaultResultOrder('verbatim');
 
-function getConfig(environment: ConfigEnv): UserConfig {
+function getConfig(): UserConfig {
     const baseConfig: UserConfig = {
         base: './',
         plugins: [vue()],
