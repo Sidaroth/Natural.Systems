@@ -43,7 +43,7 @@
     "dependencies": {
         "@primevue/themes": "4.2.2",
         "@tsconfig/node20": "20.1.4",
-        "eslint-plugin-vue": "9.31.0",
+        "eslint-plugin-vue": "10.4.0",
         "lodash": "4.17.21",
         "mitt": "3.0.1",
         "noisejs": "2.1.0",
